@@ -48,4 +48,39 @@ describe('sortPosition / movePosition', () => {
     );
     expect(result).toBe(true);
   });
+
+  it('P29: getIdType returns bigint for test entities', () => {
+    expect(service.getIdType()).toBe('bigint');
+  });
+
+  it('P30: sortPosition auto-order when no order specified', async () => {
+    const result = await service.sortPosition(
+      'position',
+      {},
+      { allow: true },
+    );
+    expect(result).toBe(true);
+  });
+
+  it('P31: sortPosition rejects non-numeric field', async () => {
+    await expect(
+      service.sortPosition('title', {}, { allow: true }),
+    ).rejects.toThrow('non-numeric');
+  });
+
+  it('P32: movePosition clamps out-of-bounds to last+1', async () => {
+    const result = await service.movePosition(1, 'position', 999, {
+      allow: true,
+    });
+    expect(result).toBe(true);
+
+    const article = await service.findOne({ id: 1 });
+    expect(article.position).toBeGreaterThanOrEqual(1);
+  });
+
+  it('P33: movePosition rejects non-numeric field', async () => {
+    await expect(
+      service.movePosition(1, 'title', 1, { allow: true }),
+    ).rejects.toThrow('non-numeric');
+  });
 });

@@ -189,4 +189,114 @@ describe('Unit — utility services', () => {
       expect(result.allow).toBeUndefined();
     });
   });
+
+  describe('scalar.helper — isFilled', () => {
+    it('U21: returns false for empty string', () => {
+      const { isFilled } = require('@src/common/helper/scalar.helper');
+      expect(isFilled('')).toBe(false);
+    });
+
+    it('U22: returns false for null and undefined', () => {
+      const { isFilled } = require('@src/common/helper/scalar.helper');
+      expect(isFilled(null)).toBe(false);
+      expect(isFilled(undefined)).toBe(false);
+    });
+
+    it('U23: returns true for non-empty values', () => {
+      const { isFilled } = require('@src/common/helper/scalar.helper');
+      expect(isFilled('text')).toBe(true);
+      expect(isFilled(0)).toBe(true);
+      expect(isFilled(false)).toBe(true);
+    });
+  });
+
+  describe('array.helper — arrayWrap / arrayUnwrap', () => {
+    it('U24: arrayWrap wraps single value', () => {
+      const { arrayWrap } = require('@src/common/helper/array.helper');
+      expect(arrayWrap(42)).toEqual([42]);
+    });
+
+    it('U25: arrayWrap returns array as-is', () => {
+      const { arrayWrap } = require('@src/common/helper/array.helper');
+      expect(arrayWrap([1, 2])).toEqual([1, 2]);
+    });
+
+    it('U26: arrayUnwrap extracts first element', () => {
+      const { arrayUnwrap } = require('@src/common/helper/array.helper');
+      expect(arrayUnwrap([1, 2])).toBe(1);
+    });
+
+    it('U27: arrayUnwrap returns non-array as-is', () => {
+      const { arrayUnwrap } = require('@src/common/helper/array.helper');
+      expect(arrayUnwrap(42)).toBe(42);
+    });
+  });
+
+  describe('object.helper — except / only', () => {
+    it('U28: except removes specified keys', () => {
+      const { except } = require('@src/common/helper/object.helper');
+      expect(except({ a: 1, b: 2, c: 3 }, 'b')).toEqual({ a: 1, c: 3 });
+    });
+
+    it('U29: except accepts array of keys', () => {
+      const { except } = require('@src/common/helper/object.helper');
+      expect(except({ a: 1, b: 2, c: 3 }, ['a', 'c'])).toEqual({ b: 2 });
+    });
+
+    it('U30: only keeps specified keys', () => {
+      const { only } = require('@src/common/helper/object.helper');
+      expect(only({ a: 1, b: 2, c: 3 }, ['a', 'c'])).toEqual({ a: 1, c: 3 });
+    });
+  });
+
+  describe('string.helper — stripHtmlTags', () => {
+    it('U31: strips simple HTML tags', () => {
+      const { stripHtmlTags } = require('@src/common/helper/string.helper');
+      const result = stripHtmlTags('<p>Hello</p>');
+      expect(result.trim()).toBe('Hello');
+    });
+
+    it('U32: converts <br> to newline', () => {
+      const { stripHtmlTags } = require('@src/common/helper/string.helper');
+      expect(stripHtmlTags('Line 1<br>Line 2')).toBe('Line 1\nLine 2');
+    });
+
+    it('U33: returns empty string for falsy input', () => {
+      const { stripHtmlTags } = require('@src/common/helper/string.helper');
+      expect(stripHtmlTags('')).toBe('');
+      expect(stripHtmlTags(null)).toBe('');
+    });
+  });
+
+  describe('json.service — prepareJsonOrm', () => {
+    afterEach(() => {
+      jest.resetModules();
+    });
+
+    it('U34: returns JsonContains for postgres', () => {
+      jest.doMock('dotenv', () => ({ config: jest.fn() }));
+      process.env.DB_TYPE = 'postgres';
+      const { prepareJsonOrm } = require('@src/common/service/json.service');
+      const result = prepareJsonOrm({ key: 'value' });
+      expect(result).toBeDefined();
+      expect((result as any)._type).toBe('jsonContains');
+      delete process.env.DB_TYPE;
+    });
+
+    it('U35: returns Raw for mysql', () => {
+      jest.doMock('dotenv', () => ({ config: jest.fn() }));
+      process.env.DB_TYPE = 'mysql';
+      const { prepareJsonOrm } = require('@src/common/service/json.service');
+      const result = prepareJsonOrm({ key: 'value' });
+      expect(result).toBeDefined();
+      expect((result as any)._type).toBe('raw');
+      delete process.env.DB_TYPE;
+    });
+
+    it('U36: returns undefined for non-object value', () => {
+      const { prepareJsonOrm } = require('@src/common/service/json.service');
+      expect(prepareJsonOrm('string')).toBeUndefined();
+      expect(prepareJsonOrm(42)).toBeUndefined();
+    });
+  });
 });
