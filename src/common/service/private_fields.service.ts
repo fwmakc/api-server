@@ -1,82 +1,48 @@
-export const removePrivateFields = async ({ result, repository }, bind) => {
+export const removePrivateFields = (result: any | any[], bind: any): any | any[] => {
   const seen = new WeakSet();
-  await Promise.all(
-    result.map(
-      (entrie) =>
-        entrie &&
-        processEntity(
-          {
-            entrie,
-            metadata: repository.metadata,
-          },
-          bind,
-          seen,
-        ),
-    ),
-  );
+  if (Array.isArray(result)) {
+    result.forEach((entry) => entry && processDto(entry, bind, seen));
+  } else if (result && typeof result === 'object') {
+    processDto(result, bind, seen);
+  }
   return result;
 };
 
-const processEntity = async ({ entrie, metadata }, bind, seen) => {
-  if (!entrie || typeof entrie !== 'object' || seen.has(entrie)) {
-    return;
-  }
-  seen.add(entrie);
+const processDto = (dto: any, bind: any, seen: WeakSet<object>): void => {
+  if (!dto || typeof dto !== 'object' || seen.has(dto)) return;
+  seen.add(dto);
 
-  if (!metadata.columns || !Array.isArray(metadata.columns)) {
-    return;
-  }
+  const proto = dto.constructor?.prototype;
 
-  for (const column of metadata.columns) {
-    const { propertyName } = column;
-    const entityClass = metadata.target;
-    const metadataValue = Reflect.getMetadata(
-      'customMetadata',
-      entityClass.prototype,
-      propertyName,
-    );
+  for (const key of Object.keys(dto)) {
+    const metadataValue = proto
+      ? Reflect.getMetadata('customMetadata', proto, key)
+      : undefined;
+
     if (metadataValue === 'private') {
-      const { allow, id, key = 'id', name = 'auth' } = bind;
-      const ownerId = entrie?.[name]?.[key];
+      const { allow, id, key: bindKey = 'id', name = 'auth' } = bind;
+      const ownerId = dto?.[name]?.[bindKey];
+      const ownerIdFallback = dto?.[name + 'Id'];
       const equal =
         String(ownerId) === String(id) ||
-        String(entrie?.[name + 'Id']) === String(id);
+        String(ownerIdFallback) === String(id);
       if (!allow && !equal) {
-        delete entrie[propertyName];
+        delete dto[key];
+        continue;
       }
     }
-  }
 
-  if (!metadata.relations || !Array.isArray(metadata.relations)) {
-    return;
-  }
-
-  for (const relation of metadata.relations) {
-    const relatedEntities = entrie[relation.propertyName];
-    if (Array.isArray(relatedEntities)) {
-      await Promise.all(
-        relatedEntities.map(
-          (relatedEntity) =>
-            relatedEntity &&
-            processEntity(
-              {
-                entrie: relatedEntity,
-                metadata: relation.inverseEntityMetadata,
-              },
-              bind,
-              seen,
-            ),
-        ),
-      );
-    } else if (relatedEntities) {
-      await processEntity(
-        {
-          entrie: relatedEntities,
-          metadata: relation.inverseEntityMetadata,
-        },
-        bind,
-        seen,
-      );
+    const value = dto[key];
+    if (value && typeof value === 'object') {
+      if (Array.isArray(value)) {
+        value.forEach((item) => item && processDto(item, bind, seen));
+      } else if (
+        value.constructor &&
+        value.constructor !== Object &&
+        value.constructor !== Date
+      ) {
+        processDto(value, bind, seen);
+      }
     }
   }
 };

@@ -35,9 +35,8 @@ describe('@PrivateColumn — field-level access control', () => {
       { relations: [{ name: 'auth' }] },
       { allow: true },
     );
-    const repo = (service as any).repository;
-    await removePrivateFields(
-      { result: articles, repository: repo },
+    removePrivateFields(
+      articles,
       { id: 2, name: 'auth', key: 'id', allow: false },
     );
     const aliceArticle = articles.find((a) => +a.id === 1);
@@ -49,12 +48,13 @@ describe('@PrivateColumn — field-level access control', () => {
 
   it('P20: non-owner secretNotes stripped with relations', async () => {
     const articles = await service.find(
-      { relations: [{ name: 'auth' }] },
+      {
+        relations: [{ name: 'auth' }],
+      },
       { allow: true },
     );
-    const repo = (service as any).repository;
-    await removePrivateFields(
-      { result: articles, repository: repo },
+    removePrivateFields(
+      articles,
       { id: 2, name: 'auth', key: 'id', allow: false },
     );
     const aliceArticle = articles.find((a) => +a.id === 1);
@@ -73,9 +73,8 @@ describe('@PrivateColumn — field-level access control', () => {
     const article = articles[0];
     expect(article.comments.length).toBe(2);
 
-    const repo = (service as any).repository;
-    await removePrivateFields(
-      { result: articles, repository: repo },
+    removePrivateFields(
+      articles,
       { id: 1, name: 'auth', key: 'id', allow: false },
     );
 

@@ -15,26 +15,24 @@ describe('Cycle protection in removePrivateFields', () => {
     await moduleRef.close();
   });
 
-  it('C1: self-referencing cycle does not crash (currently no-op due to broken code)', async () => {
-    const repo = (cycleAService as any).repository;
+  it('C1: self-referencing cycle does not crash', () => {
     const obj: any = { id: 1, name: 'root', secretA: 'hidden' };
     obj.self = obj;
 
-    await expect(
-      removePrivateFields({ result: [obj], repository: repo }, { allow: false }),
-    ).resolves.toBeDefined();
+    expect(
+      removePrivateFields([obj], { allow: false }),
+    ).toBeDefined();
   });
 
-  it('C2: mutual cycle (A→B→A) does not crash (currently no-op due to broken code)', async () => {
-    const repo = (cycleAService as any).repository;
+  it('C2: mutual cycle (A→B→A) does not crash', () => {
     const a: any = { id: 1, name: 'A', secretA: 'hidden_a' };
     const b: any = { id: 2, name: 'B', secretB: 'hidden_b' };
     a.b = b;
     b.a = a;
 
-    await expect(
-      removePrivateFields({ result: [a], repository: repo }, { allow: false }),
-    ).resolves.toBeDefined();
+    expect(
+      removePrivateFields([a], { allow: false }),
+    ).toBeDefined();
   });
 
   it('C3: entity with circular TypeORM relation loads without crash', async () => {

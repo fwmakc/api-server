@@ -78,13 +78,7 @@ export class CommonService<Dto extends CommonDto, Entity extends CommonEntity> {
           .filter(Boolean);
       }
 
-      result = await removePrivateFields(
-        {
-          result,
-          repository: this.repository,
-        },
-        bind,
-      );
+      result = removePrivateFields(result, bind);
       return result;
     } catch (e) {
       this.error(e);
@@ -241,8 +235,16 @@ export class CommonService<Dto extends CommonDto, Entity extends CommonEntity> {
   }
 
   async updateEntity(entity: DeepPartial<any>): Promise<any> {
-    const { id, ...data } = entity;
-    await this.repository.update(id, data);
+    const idType = this.getIdType();
+    entity.id = idType === 'bigint' ? `${entity.id}` : +entity.id;
+    return await this.repository.save(entity);
+  }
+
+  getIdType(): string {
+    const column: DeepPartial<any> = this.repository.metadata.columns.find(
+      (column) => column.propertyName === 'id',
+    );
+    return column?.type || 'int';
   }
 
   async remove(id: number, bind: BindDto = { allow: true }): Promise<boolean> {
@@ -265,10 +267,18 @@ export class CommonService<Dto extends CommonDto, Entity extends CommonEntity> {
   ): Promise<boolean> {
     this.validatePositionField(field);
 
+    if (!find.order) {
+      find.order = { [field]: 'asc', id: 'asc' } as FindOptionsOrder<any>;
+    }
+
     const entries = await this.find(find, bind);
 
     if (!entries) {
       return;
+    }
+
+    if (typeof entries?.[0]?.[field] !== 'number') {
+      this.error({ message: 'cannot position by non-numeric field' });
     }
 
     try {
@@ -331,6 +341,32 @@ export class CommonService<Dto extends CommonDto, Entity extends CommonEntity> {
 
     if (!entrie) {
       return false;
+    }
+
+    if (typeof entrie[field] !== 'number') {
+      this.error({ message: 'cannot position by non-numeric field' });
+    }
+
+    const lastEntrie: DeepPartial<any> = await this.findFirst(
+      {
+        select: {
+          id: true,
+          [field]: true,
+        },
+        order: {
+          [field]: 'DESC',
+        },
+      },
+      bind,
+    );
+
+    const lastPosition = +lastEntrie?.[field] || 0;
+
+    if (position < 0 || position > lastPosition + 1) {
+      if (+id === +lastEntrie?.id) {
+        return false;
+      }
+      position = lastPosition + 1;
     }
 
     try {

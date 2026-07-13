@@ -30,9 +30,8 @@ describe('@PrivateColumn — closed entity (profile)', () => {
       { relations: [{ name: 'auth' }] },
       { allow: true },
     );
-    const repo = (service as any).repository;
-    await removePrivateFields(
-      { result: profiles, repository: repo },
+    removePrivateFields(
+      profiles,
       { id: 2, name: 'auth', key: 'id', allow: false },
     );
     const aliceProfile = profiles.find((p) => +p.id === 1);
