@@ -26,10 +26,10 @@ export class RefreshTokenGrant {
     if (grantsTokenDto.client_id || grantsTokenDto.client_secret) {
       return await this.client(grantsTokenDto);
     }
-    return await this.auth(grantsTokenDto);
+    return await this.account(grantsTokenDto);
   }
 
-  async auth(grantsTokenDto: GrantsTokenDto): Promise<any> {
+  async account(grantsTokenDto: GrantsTokenDto): Promise<any> {
     const { refresh_token } = grantsTokenDto;
     const token = await this.tokenService.refresh(
       refresh_token,

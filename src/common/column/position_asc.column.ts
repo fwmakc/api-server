@@ -1,4 +1,3 @@
-import { Field } from '@nestjs/graphql';
 import { Column } from 'typeorm';
 import { IndexedColumn } from './indexed.column';
 
@@ -12,8 +11,6 @@ export function PositionAscColumn(
     if (index) {
       IndexedColumn(index)(object, propertyName);
     }
-
-    Field({ nullable: true })(object, propertyName);
 
     Column({
       comment,

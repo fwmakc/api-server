@@ -1,8 +1,8 @@
 import { PassportModule } from '@nestjs/passport';
-import { AuthModule } from './auth/auth.module';
-import { AuthConfirmModule } from './auth/auth_confirm/auth_confirm.module';
-import { AuthSessionsModule } from './auth/auth_sessions/auth_sessions.module';
-import { AuthStrategiesModule } from './auth/auth_strategies/auth_strategies.module';
+import { AccountModule } from './account/account.module';
+import { AccountConfirmModule } from './account/account_confirm/account_confirm.module';
+import { AccountSessionsModule } from './account/account_sessions/account_sessions.module';
+import { AccountStrategiesModule } from './account/account_strategies/account_strategies.module';
 import { ClientsModule } from './clients/clients.module';
 import { ClientsRedirectsModule } from './clients/clients_redirects/clients_redirects.module';
 import { FilesModule } from './files/files.module';
@@ -21,10 +21,10 @@ import { UsersModule } from './db/users/users.module';
 
 export default [
   PassportModule.register({ session: true }),
-  AuthModule,
-  AuthConfirmModule,
-  AuthSessionsModule,
-  AuthStrategiesModule,
+  AccountModule,
+  AccountConfirmModule,
+  AccountSessionsModule,
+  AccountStrategiesModule,
   ClientsModule,
   ClientsRedirectsModule,
   FilesModule,

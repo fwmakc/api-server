@@ -18,7 +18,7 @@ export class RemovePrivateFieldsInterceptor implements NestInterceptor {
       allow: user?.isSuperuser ?? false,
       id: user?.id,
       key: 'id',
-      name: 'auth',
+      name: 'account',
     };
 
     return next

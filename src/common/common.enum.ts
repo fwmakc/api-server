@@ -1,23 +1,13 @@
-import { registerEnumType } from '@nestjs/graphql';
-
 export enum TypeClients {
   DEFAULT = 'public',
   CONFIDENTIAL = 'confidential',
 }
-
-registerEnumType(TypeClients, {
-  name: 'TypeClients',
-});
 
 export enum TypeGenders {
   DEFAULT = '',
   MAN = 'm',
   WOMAN = 'w',
 }
-
-registerEnumType(TypeGenders, {
-  name: 'TypeGenders',
-});
 
 export enum TypeGrants {
   PASSWORD = 'password',
@@ -39,7 +29,3 @@ export enum TypeValues {
   NUMBER = 'number',
   STRING = 'string',
 }
-
-registerEnumType(TypeValues, {
-  name: 'TypeValues',
-});

@@ -4,7 +4,6 @@ import { SettingsModule } from '../settings.module';
 import { SettingsGroupsController } from './settings_groups.controller';
 import { SettingsGroupsEntity } from './settings_groups.entity';
 import { SettingsGroupsService } from './settings_groups.service';
-import { SettingsGroupsResolver } from './settings_groups.resolver';
 
 @Module({
   controllers: [SettingsGroupsController],
@@ -12,7 +11,7 @@ import { SettingsGroupsResolver } from './settings_groups.resolver';
     TypeOrmModule.forFeature([SettingsGroupsEntity]),
     forwardRef(() => SettingsModule),
   ],
-  providers: [SettingsGroupsService, SettingsGroupsResolver],
+  providers: [SettingsGroupsService],
   exports: [SettingsGroupsService],
 })
 export class SettingsGroupsModule {}

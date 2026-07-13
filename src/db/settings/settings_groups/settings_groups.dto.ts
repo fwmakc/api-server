@@ -1,10 +1,8 @@
-import { Field, InputType } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
 import { DtoColumn } from '@src/common/common.column';
 import { CommonDto } from '@src/common/common.dto';
 import { SettingsDto } from '../settings.dto';
 
-@InputType()
 export class SettingsGroupsDto extends CommonDto {
   @DtoColumn('Имя группы')
   name?: string;
@@ -23,6 +21,5 @@ export class SettingsGroupsDto extends CommonDto {
     description: 'Данные настроек, входящих в группу',
     type: () => [SettingsDto],
   })
-  @Field(() => [SettingsDto], { nullable: true })
   settings?: SettingsDto[];
 }

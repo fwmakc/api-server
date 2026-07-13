@@ -1,1 +1,1 @@
-export type ApiType = 'gql' | 'gqlNoBlock' | 'noBlock' | undefined;
+export type ApiType = 'noBlock' | undefined;

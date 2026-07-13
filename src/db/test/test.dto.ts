@@ -1,4 +1,3 @@
-import { InputType } from '@nestjs/graphql';
 import {
   DtoColumn,
   DtoCreatedColumn,
@@ -9,7 +8,6 @@ import {
 import { TypeValues } from '@src/common/common.enum';
 import { CommonDto } from '@src/common/common.dto';
 
-@InputType()
 export class TestDto extends CommonDto {
   @DtoCreatedColumn()
   createdAt?: Date;

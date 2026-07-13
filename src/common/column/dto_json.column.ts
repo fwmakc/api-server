@@ -1,7 +1,5 @@
-import { Field } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsJSON, IsOptional } from 'class-validator';
-import GraphQLJSON from 'graphql-type-json';
 import { DeepPartial } from 'typeorm';
 
 export function DtoJsonColumn(
@@ -21,7 +19,6 @@ export function DtoJsonColumn(
     };
 
     ApiProperty(properties)(object, propertyName);
-    Field(() => GraphQLJSON, params)(object, propertyName);
     IsJSON();
     IsOptional();
   };

@@ -4,25 +4,14 @@ import {
   createParamDecorator,
   ExecutionContext,
 } from '@nestjs/common';
-import { GqlExecutionContext } from '@nestjs/graphql';
-import { ApiType } from '@src/common/type/api.type';
-import { GqlPersonsGuard } from './guard/gql.persons.guard';
 import { JwtPersonsGuard } from './guard/jwt.persons.guard';
 
-export const Person = (apiType: ApiType = undefined) => {
-  if (apiType === 'gql') {
-    return applyDecorators(UseGuards(GqlPersonsGuard));
-  }
+export const Person = () => {
   return applyDecorators(UseGuards(JwtPersonsGuard));
 };
 
 export const SelfPerson = createParamDecorator(
-  async (apiType: ApiType = undefined, context: ExecutionContext) => {
-    if (apiType === 'gql') {
-      const ctx = GqlExecutionContext.create(context);
-      const req = ctx.getContext().req;
-      return req.user;
-    }
+  async (_data: unknown, context: ExecutionContext) => {
     const request = context.switchToHttp().getRequest();
     return request.user;
   },

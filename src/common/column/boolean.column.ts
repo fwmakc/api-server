@@ -1,4 +1,3 @@
-import { Field } from '@nestjs/graphql';
 import { Column } from 'typeorm';
 import { IndexedColumn } from './indexed.column';
 
@@ -24,8 +23,6 @@ export function BooleanColumn(
     }
 
     const defaultValue = +value || 0;
-
-    Field({ defaultValue, nullable: true })(object, propertyName);
 
     Column({
       comment,

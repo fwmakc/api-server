@@ -1,15 +1,15 @@
 import { createTestModule } from '../app.testingModule';
-import { TestArticleService, TestAuthService } from '../services';
+import { TestArticleService, TestAccountService } from '../services';
 
 describe('Where modifiers — parseWhereObject', () => {
   let moduleRef: Awaited<ReturnType<typeof createTestModule>>;
   let articles: TestArticleService;
-  let auths: TestAuthService;
+  let auths: TestAccountService;
 
   beforeAll(async () => {
     moduleRef = await createTestModule();
     articles = moduleRef.get(TestArticleService);
-    auths = moduleRef.get(TestAuthService);
+    auths = moduleRef.get(TestAccountService);
 
     await articles.create({ title: 'No Content Article' } as any); // 4th article (id=4) with null content for empty/null modifier tests
   });
@@ -188,12 +188,12 @@ describe('Where modifiers — parseWhereObject', () => {
 
   it('W21: nested object where — relation property', async () => {
     const result = await articles.find({
-      where: { auth: { id: 1 } },
-      relations: [{ name: 'auth' }],
+      where: { account: { id: 1 } },
+      relations: [{ name: 'account' }],
       order: { id: 'ASC' },
     });
     expect(result.length).toBe(2);
-    expect(result.every((r) => +r.auth.id === 1)).toBe(true);
+    expect(result.every((r) => +r.account.id === 1)).toBe(true);
   });
 
   it('W22: chained modifiers — "not.like" (not ILIKE)', async () => {

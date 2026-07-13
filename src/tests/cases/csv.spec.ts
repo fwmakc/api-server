@@ -26,8 +26,8 @@ describe('csv + countDistinct', () => {
   });
 
   describe('countDistinct', () => {
-    it('CD1: countDistinct on auth across articles', async () => {
-      const result = await articleService.countDistinct('auth_id', {});
+    it('CD1: countDistinct on account across articles', async () => {
+      const result = await articleService.countDistinct('account_id', {});
       expect(result).toBe(2);
     });
 
@@ -40,7 +40,7 @@ describe('csv + countDistinct', () => {
   describe('csv export', () => {
     it('CSV1: exports articles to csv file', async () => {
       const result = await articleService.csv(
-        { relations: [{ name: 'auth' }] },
+        { relations: [{ name: 'account' }] },
         'articles_export',
       );
 

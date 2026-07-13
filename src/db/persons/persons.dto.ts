@@ -1,4 +1,3 @@
-import { InputType } from '@nestjs/graphql';
 import { IsEmail, IsString, MinLength } from 'class-validator';
 import {
   DtoColumn,
@@ -9,7 +8,6 @@ import {
 import { CommonDto } from '@src/common/common.dto';
 import { TypeGenders } from '@src/common/common.enum';
 
-@InputType()
 export class PersonsDto extends CommonDto {
   @DtoCreatedColumn()
   createdAt?: Date;

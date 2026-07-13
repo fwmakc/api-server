@@ -1,4 +1,3 @@
-import { Field, ObjectType } from '@nestjs/graphql';
 import { BaseEntity, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { TypeValues } from '@src/common/common.enum';
 import { SettingsGroupsEntity } from './settings_groups/settings_groups.entity';
@@ -11,7 +10,6 @@ import {
   VarcharColumn,
 } from '@src/common/common.column';
 
-@ObjectType()
 @Entity({ name: 'settings' })
 export class SettingsEntity extends BaseEntity {
   @IdColumn()
@@ -38,7 +36,6 @@ export class SettingsEntity extends BaseEntity {
   @BooleanColumn('is_disabled')
   isDisabled?: boolean;
 
-  @Field(() => SettingsGroupsEntity, { nullable: true })
   @ManyToOne(() => SettingsGroupsEntity, (group) => group.settings, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',

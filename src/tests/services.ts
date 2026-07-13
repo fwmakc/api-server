@@ -6,7 +6,7 @@ import { CommonService } from '@src/common/common.service';
 import { RelationsDto } from '@src/common/dto/relations.dto';
 import { BindDto } from '@src/common/dto/bind.dto';
 import {
-  TestAuthEntity,
+  TestAccountEntity,
   TestArticleEntity,
   TestCommentEntity,
   TestTagEntity,
@@ -15,9 +15,10 @@ import {
   TestCycleBEntity,
   TestUserEntity,
   TestNoteEntity,
+  TestSecretEntity,
 } from './entities';
 import {
-  TestAuthDto,
+  TestAccountDto,
   TestArticleDto,
   TestCommentDto,
   TestTagDto,
@@ -26,56 +27,57 @@ import {
   TestCycleBDto,
   TestUserDto,
   TestNoteDto,
+  TestSecretDto,
 } from './dtos';
 
 @Injectable()
-export class TestAuthService extends CommonService<
-  TestAuthDto,
-  TestAuthEntity
+export class TestAccountService extends CommonService<
+  TestAccountDto,
+  TestAccountEntity
 > {
   constructor(
-    @InjectRepository(TestAuthEntity)
-    protected readonly repository: Repository<TestAuthEntity>,
+    @InjectRepository(TestAccountEntity)
+    protected readonly repository: Repository<TestAccountEntity>,
   ) {
     super();
   }
 
   async create(
-    dto: TestAuthDto,
+    dto: TestAccountDto,
     relations: Array<RelationsDto> = undefined,
     bind: BindDto = { allow: true },
-  ): Promise<TestAuthEntity> {
+  ): Promise<TestAccountEntity> {
     delete dto.isSuperuser;
     return await super.create(dto, relations, bind);
   }
 
   async update(
     id: number,
-    dto: TestAuthDto,
+    dto: TestAccountDto,
     relations: Array<RelationsDto> = undefined,
     bind: BindDto = { allow: true },
-  ): Promise<TestAuthEntity> {
+  ): Promise<TestAccountEntity> {
     delete dto.isSuperuser;
     return await super.update(id, dto, relations, bind);
   }
 
-  async findByUsername(username: string): Promise<TestAuthEntity> {
+  async findByUsername(username: string): Promise<TestAccountEntity> {
     return await this.repository.findOneBy({ username });
   }
 
-  async login(username: string, password: string): Promise<TestAuthEntity> {
-    const auth = await this.findByUsername(username);
-    if (!auth) {
+  async login(username: string, password: string): Promise<TestAccountEntity> {
+    const account = await this.findByUsername(username);
+    if (!account) {
       throw new UnauthorizedException('User not found');
     }
-    const isValidPassword = await compare(password, auth.password);
+    const isValidPassword = await compare(password, account.password);
     if (!isValidPassword) {
       throw new UnauthorizedException('Invalid password');
     }
-    if (!auth.isActivated) {
+    if (!account.isActivated) {
       throw new UnauthorizedException('Not activated');
     }
-    return auth;
+    return account;
   }
 }
 
@@ -175,6 +177,19 @@ export class TestNoteService extends CommonService<
   constructor(
     @InjectRepository(TestNoteEntity)
     protected readonly repository: Repository<TestNoteEntity>,
+  ) {
+    super();
+  }
+}
+
+@Injectable()
+export class TestSecretService extends CommonService<
+  TestSecretDto,
+  TestSecretEntity
+> {
+  constructor(
+    @InjectRepository(TestSecretEntity)
+    protected readonly repository: Repository<TestSecretEntity>,
   ) {
     super();
   }

@@ -1,15 +1,21 @@
 import { Controller } from '@nestjs/common';
-import { ClosedController } from '@src/common/controller/closed.controller';
+import { EntityController } from '@src/common/entity.controller';
 import { SettingsGroupsDto } from './settings_groups.dto';
 import { SettingsGroupsEntity } from './settings_groups.entity';
 import { SettingsGroupsService } from './settings_groups.service';
 
 @Controller('settings/groups')
-export class SettingsGroupsController extends ClosedController(
-  'Группы настроек',
-  SettingsGroupsDto,
-  SettingsGroupsEntity,
-)<SettingsGroupsDto, SettingsGroupsEntity, SettingsGroupsService> {
+export class SettingsGroupsController extends EntityController({
+  name: 'Группы настроек',
+  dto: SettingsGroupsDto,
+  entity: SettingsGroupsEntity,
+  operations: {
+    read: 'public',
+    create: 'admin',
+    update: 'admin',
+    delete: 'admin',
+  },
+})<SettingsGroupsDto, SettingsGroupsEntity, SettingsGroupsService> {
   constructor(readonly service: SettingsGroupsService) {
     super();
   }

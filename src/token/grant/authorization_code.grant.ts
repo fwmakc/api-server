@@ -1,5 +1,5 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { OpenAuthService } from '@src/auth/service/open.auth.service';
+import { OpenAccountService } from '@src/account/service/open.account.service';
 import { ClientsService } from '@src/clients/clients.service';
 import { GrantsTokenDto } from '@src/token/dto/grants.token.dto';
 import { TokenService } from '@src/token/token.service';
@@ -7,7 +7,7 @@ import { TokenService } from '@src/token/token.service';
 @Injectable()
 export class AuthorizationCodeGrant {
   constructor(
-    private readonly openAuthService: OpenAuthService,
+    private readonly openAccountService: OpenAccountService,
     private readonly clientsService: ClientsService,
     private readonly tokenService: TokenService,
   ) {}
@@ -30,7 +30,7 @@ export class AuthorizationCodeGrant {
       );
     }
     const { code, client_id, redirect_uri } = grantsTokenDto;
-    const id = await this.openAuthService.codeVerify(code, {
+    const id = await this.openAccountService.codeVerify(code, {
       client_id,
       redirect_uri,
     });
@@ -48,9 +48,9 @@ export class AuthorizationCodeGrant {
           uri: redirect_uri,
         },
       },
-      [{ name: 'auth' }, { name: 'redirects' }],
+      [{ name: 'account' }, { name: 'redirects' }],
     );
-    if (!client?.auth) {
+    if (!client?.account) {
       throw new BadRequestException(
         'Client authentication failed. Unknown client [client.authorization.code.grant]',
         'invalid_client',
@@ -60,7 +60,7 @@ export class AuthorizationCodeGrant {
     await this.clientsService.update(client.id, { ...client });
 
     // здесь токен для учетки
-    // const token = await this.pairTokenService.pair({ id: client.auth.id });
+    // const token = await this.pairTokenService.pair({ id: client.account.id });
     // либо должен быть токен для клиента, либо редирект на авторизацию пользователя
     const token = await this.tokenService.pair({ id });
     if (!token) {

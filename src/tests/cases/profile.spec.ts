@@ -2,7 +2,7 @@ import { createTestModule } from '../app.testingModule';
 import { TestProfileService } from '../services';
 import { removePrivateFields } from '@src/common/service/private_fields.service';
 
-describe('@PrivateColumn — closed entity (profile)', () => {
+describe('@FieldAccess — closed entity (profile)', () => {
   let moduleRef: Awaited<ReturnType<typeof createTestModule>>;
   let service: TestProfileService;
 
@@ -17,7 +17,7 @@ describe('@PrivateColumn — closed entity (profile)', () => {
 
   it('N7a: admin sees internalNotes', async () => {
     const profiles = await service.find(
-      { relations: [{ name: 'auth' }] },
+      { relations: [{ name: 'account' }] },
       { allow: true },
     );
     const aliceProfile = profiles.find((p) => +p.id === 1);
@@ -27,12 +27,12 @@ describe('@PrivateColumn — closed entity (profile)', () => {
 
   it('N7b: non-owner internalNotes stripped', async () => {
     const profiles = await service.find(
-      { relations: [{ name: 'auth' }] },
+      { relations: [{ name: 'account' }] },
       { allow: true },
     );
     removePrivateFields(profiles, {
       id: 2,
-      name: 'auth',
+      name: 'account',
       key: 'id',
       allow: false,
     });

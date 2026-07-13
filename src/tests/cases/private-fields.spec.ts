@@ -2,7 +2,7 @@ import { createTestModule } from '../app.testingModule';
 import { TestArticleService } from '../services';
 import { removePrivateFields } from '@src/common/service/private_fields.service';
 
-describe('@PrivateColumn — field-level access control', () => {
+describe('@FieldAccess({ read: "owner" }) — field-level access control', () => {
   let moduleRef: Awaited<ReturnType<typeof createTestModule>>;
   let service: TestArticleService;
 
@@ -18,7 +18,7 @@ describe('@PrivateColumn — field-level access control', () => {
   it('P17: owner sees own secretNotes', async () => {
     const result = await service.find(
       {},
-      { id: 1, name: 'auth', key: 'id', allow: false },
+      { id: 1, name: 'account', key: 'id', allow: false },
     );
     expect(result.length).toBeGreaterThan(0);
     expect(result[0].secretNotes).toBeDefined();
@@ -32,12 +32,12 @@ describe('@PrivateColumn — field-level access control', () => {
 
   it('P19: non-owner secretNotes stripped', async () => {
     const articles = await service.find(
-      { relations: [{ name: 'auth' }] },
+      { relations: [{ name: 'account' }] },
       { allow: true },
     );
     removePrivateFields(articles, {
       id: 2,
-      name: 'auth',
+      name: 'account',
       key: 'id',
       allow: false,
     });
@@ -51,13 +51,13 @@ describe('@PrivateColumn — field-level access control', () => {
   it('P20: non-owner secretNotes stripped with relations', async () => {
     const articles = await service.find(
       {
-        relations: [{ name: 'auth' }],
+        relations: [{ name: 'account' }],
       },
       { allow: true },
     );
     removePrivateFields(articles, {
       id: 2,
-      name: 'auth',
+      name: 'account',
       key: 'id',
       allow: false,
     });
@@ -69,7 +69,7 @@ describe('@PrivateColumn — field-level access control', () => {
     const articles = await service.find(
       {
         where: { id: 1 },
-        relations: [{ name: 'comments' }, { name: 'comments.auth' }],
+        relations: [{ name: 'comments' }, { name: 'comments.account' }],
       },
       { allow: true },
     );
@@ -79,7 +79,7 @@ describe('@PrivateColumn — field-level access control', () => {
 
     removePrivateFields(articles, {
       id: 1,
-      name: 'auth',
+      name: 'account',
       key: 'id',
       allow: false,
     });

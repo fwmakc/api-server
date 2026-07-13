@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { SettingsGroupsModule } from './settings_groups/settings_groups.module';
 import { SettingsController } from './settings.controller';
 import { SettingsEntity } from './settings.entity';
-import { SettingsResolver } from './settings.resolver';
 import { SettingsService } from './settings.service';
 
 @Module({
@@ -12,7 +11,7 @@ import { SettingsService } from './settings.service';
     TypeOrmModule.forFeature([SettingsEntity]),
     forwardRef(() => SettingsGroupsModule),
   ],
-  providers: [SettingsService, SettingsResolver],
+  providers: [SettingsService],
   exports: [SettingsService],
 })
 export class SettingsModule {}

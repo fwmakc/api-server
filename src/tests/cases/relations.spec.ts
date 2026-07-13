@@ -14,14 +14,14 @@ describe('Relations — eager/lazy loading', () => {
     await moduleRef.close();
   });
 
-  it('P22: findOne with auth relation', async () => {
+  it('P22: findOne with account relation', async () => {
     const result = await service.findOne({
       id: 1,
-      relations: [{ name: 'auth' }],
+      relations: [{ name: 'account' }],
     });
     expect(result).toBeDefined();
-    expect(result.auth).toBeDefined();
-    expect(result.auth.username).toBe('alice@test');
+    expect(result.account).toBeDefined();
+    expect(result.account.username).toBe('alice@test');
   });
 
   it('P23: findOne with comments relation (OneToMany)', async () => {
@@ -48,10 +48,10 @@ describe('Relations — eager/lazy loading', () => {
   it('P25: findOne with multiple relations', async () => {
     const result = await service.findOne({
       id: 1,
-      relations: [{ name: 'auth' }, { name: 'comments' }, { name: 'tags' }],
+      relations: [{ name: 'account' }, { name: 'comments' }, { name: 'tags' }],
     });
     expect(result).toBeDefined();
-    expect(result.auth).toBeDefined();
+    expect(result.account).toBeDefined();
     expect(result.comments.length).toBe(2);
     expect(result.tags.length).toBe(1);
   });

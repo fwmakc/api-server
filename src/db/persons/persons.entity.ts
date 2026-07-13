@@ -1,7 +1,6 @@
-import { Field, ObjectType } from '@nestjs/graphql';
 import { BaseEntity, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { TypeGenders } from '@src/common/common.enum';
-import { AuthEntity } from '@src/auth/auth.entity';
+import { AccountEntity } from '@src/account/account.entity';
 import {
   CreatedColumn,
   DateColumn,
@@ -11,16 +10,14 @@ import {
   VarcharColumn,
 } from '@src/common/common.column';
 
-@ObjectType()
 @Entity({ name: 'persons' })
 export class PersonsEntity extends BaseEntity {
   @IdColumn()
   id: number;
 
-  @Field(() => AuthEntity, { nullable: true })
-  @ManyToOne(() => AuthEntity)
-  @JoinColumn({ name: 'auth_id', referencedColumnName: 'id' })
-  auth: AuthEntity;
+  @ManyToOne(() => AccountEntity)
+  @JoinColumn({ name: 'account_id', referencedColumnName: 'id' })
+  account: AccountEntity;
 
   @CreatedColumn()
   createdAt?: Date;
@@ -64,10 +61,6 @@ export class PersonsEntity extends BaseEntity {
   @VarcharColumn('timezone', 'tiny')
   timezone?: string;
 
-  @Field(() => TypeGenders, {
-    nullable: true,
-    defaultValue: TypeGenders.DEFAULT,
-  })
   @EnumColumn('gender', TypeGenders, TypeGenders.MAN)
   gender?: TypeGenders;
 }

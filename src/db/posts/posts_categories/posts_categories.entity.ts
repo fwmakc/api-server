@@ -1,4 +1,3 @@
-import { Field, ObjectType } from '@nestjs/graphql';
 import { BaseEntity, Entity, OneToMany } from 'typeorm';
 import {
   CreatedColumn,
@@ -8,7 +7,6 @@ import {
 } from '@src/common/common.column';
 import { PostsEntity } from '../posts.entity';
 
-@ObjectType()
 @Entity({ name: 'posts_categories' })
 export class PostsCategoriesEntity extends BaseEntity {
   @IdColumn()
@@ -23,7 +21,6 @@ export class PostsCategoriesEntity extends BaseEntity {
   @VarcharColumn('title')
   title?: string;
 
-  @Field(() => [PostsEntity], { nullable: true })
   @OneToMany(() => PostsEntity, (post) => post.category, {
     cascade: true,
   })

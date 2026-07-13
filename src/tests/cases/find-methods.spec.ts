@@ -29,8 +29,8 @@ describe('Find methods — findFirst, findMany, search', () => {
 
     it('F3: returns first entity matching where filter', async () => {
       const result = await service.findFirst({
-        where: { auth: { id: 2 } },
-        relations: [{ name: 'auth' }],
+        where: { account: { id: 2 } },
+        relations: [{ name: 'account' }],
       });
       expect(result).toBeDefined();
       expect(result.title).toBe('Bob Post');
@@ -131,14 +131,16 @@ describe('Find methods — findFirst, findMany, search', () => {
 
     it('F15: search with dot-path nested field', async () => {
       const result = await service.find({
-        relations: [{ name: 'auth' }],
+        relations: [{ name: 'account' }],
         search: {
-          fields: ['auth.username'],
+          fields: ['account.username'],
           terms: ['alice'],
         },
       });
       expect(result.length).toBe(2);
-      expect(result.every((r) => r.auth.username.includes('alice'))).toBe(true);
+      expect(result.every((r) => r.account.username.includes('alice'))).toBe(
+        true,
+      );
     });
   });
 });

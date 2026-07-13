@@ -1,4 +1,3 @@
-import { Field } from '@nestjs/graphql';
 import { UpdateDateColumn } from 'typeorm';
 import { IndexedColumn } from './indexed.column';
 
@@ -12,11 +11,6 @@ export function UpdatedColumn(
     if (index) {
       IndexedColumn(index)(object, propertyName);
     }
-
-    Field({ defaultValue: () => 'CURRENT_TIMESTAMP', nullable: true })(
-      object,
-      propertyName,
-    );
 
     UpdateDateColumn({
       comment,

@@ -18,13 +18,13 @@ describe('sortPosition / movePosition', () => {
     const result = await service.sortPosition(
       'position',
       {},
-      { id: 1, name: 'auth', key: 'id', allow: false },
+      { id: 1, name: 'account', key: 'id', allow: false },
     );
     expect(result).toBe(true);
 
     const articles = await service.find(
       {},
-      { id: 1, name: 'auth', key: 'id', allow: false },
+      { id: 1, name: 'account', key: 'id', allow: false },
     );
     expect(articles[0].position).toBe(1);
     expect(articles[1].position).toBe(2);
@@ -43,7 +43,7 @@ describe('sortPosition / movePosition', () => {
   it('P28: sortPosition with where filter [EXPECT FAIL — empty criteria bug]', async () => {
     const result = await service.sortPosition(
       'position',
-      { where: { auth: { id: 1 } }, order: { id: 'ASC' } },
+      { where: { account: { id: 1 } }, order: { id: 'ASC' } },
       { allow: true },
     );
     expect(result).toBe(true);

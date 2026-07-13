@@ -3,11 +3,9 @@ import { createTestModule } from '../app.testingModule';
 import { TestArticleService } from '../services';
 import { TestArticleDto } from '../dtos';
 import { TestArticleEntity } from '../entities';
-import { PrivateController } from '@src/common/controller/private.controller';
-import { ClosedController } from '@src/common/controller/closed.controller';
-import { CommonController } from '@src/common/common.controller';
+import { EntityController } from '@src/common/entity.controller';
 
-describe('Controllers — PrivateController, ClosedController, CommonController', () => {
+describe('Controllers — EntityController access levels', () => {
   let moduleRef: Awaited<ReturnType<typeof createTestModule>>;
   let articleService: TestArticleService;
 
@@ -20,16 +18,22 @@ describe('Controllers — PrivateController, ClosedController, CommonController'
     await moduleRef.close();
   });
 
-  describe('PrivateController — bind on reads + self endpoint', () => {
+  describe('owner-level (PrivateController equivalent) — bind on reads + self endpoint', () => {
     let controller: any;
 
     beforeAll(() => {
-      const CtrlClass = PrivateController(
-        'test_articles',
-        TestArticleDto,
-        TestArticleEntity,
-        'auth',
-      );
+      const CtrlClass = EntityController({
+        name: 'test_articles',
+        dto: TestArticleDto,
+        entity: TestArticleEntity,
+        accountTable: 'account',
+        operations: {
+          read: 'owner',
+          create: 'owner',
+          update: 'owner',
+          delete: 'owner',
+        },
+      });
       controller = new CtrlClass();
       controller.service = articleService;
     });
@@ -43,7 +47,7 @@ describe('Controllers — PrivateController, ClosedController, CommonController'
         { id: 1, isSuperuser: false } as any,
       );
       expect(result.length).toBe(2);
-      expect(result.every((r: any) => +r.auth.id === 1)).toBe(true);
+      expect(result.every((r: any) => +r.account.id === 1)).toBe(true);
     });
 
     it('CC2: self for bob returns only bob articles', async () => {
@@ -70,7 +74,7 @@ describe('Controllers — PrivateController, ClosedController, CommonController'
         { id: 2, isSuperuser: false } as any,
       );
       expect(result.length).toBe(1);
-      expect(+result[0].auth.id).toBe(2);
+      expect(+result[0].account.id).toBe(2);
     });
 
     it('CC4: find with bind — superuser sees all', async () => {
@@ -91,7 +95,7 @@ describe('Controllers — PrivateController, ClosedController, CommonController'
       const result = await controller.findOne(
         1,
         undefined,
-        [{ name: 'auth' }],
+        [{ name: 'account' }],
         { id: 1, isSuperuser: false } as any,
       );
       expect(result).toBeDefined();
@@ -100,7 +104,7 @@ describe('Controllers — PrivateController, ClosedController, CommonController'
 
     it('CC6: findOne with bind — non-owner gets NotFoundException', async () => {
       await expect(
-        controller.findOne(1, undefined, [{ name: 'auth' }], {
+        controller.findOne(1, undefined, [{ name: 'account' }], {
           id: 2,
           isSuperuser: false,
         } as any),
@@ -123,7 +127,7 @@ describe('Controllers — PrivateController, ClosedController, CommonController'
         undefined,
         {},
         undefined,
-        [{ name: 'auth' }],
+        [{ name: 'account' }],
         { id: 2, isSuperuser: false } as any,
       );
       for (const article of result) {
@@ -136,7 +140,7 @@ describe('Controllers — PrivateController, ClosedController, CommonController'
         undefined,
         {},
         undefined,
-        [{ name: 'auth' }],
+        [{ name: 'account' }],
         { id: 1, isSuperuser: false } as any,
       );
       for (const article of result) {
@@ -145,15 +149,21 @@ describe('Controllers — PrivateController, ClosedController, CommonController'
     });
   });
 
-  describe('ClosedController — superuser-only access', () => {
+  describe('admin-level (ClosedController equivalent) — superuser-only access', () => {
     let controller: any;
 
     beforeAll(() => {
-      const CtrlClass = ClosedController(
-        'test_articles',
-        TestArticleDto,
-        TestArticleEntity,
-      );
+      const CtrlClass = EntityController({
+        name: 'test_articles',
+        dto: TestArticleDto,
+        entity: TestArticleEntity,
+        operations: {
+          read: 'public',
+          create: 'admin',
+          update: 'admin',
+          delete: 'admin',
+        },
+      });
       controller = new CtrlClass();
       controller.service = articleService;
     });
@@ -228,20 +238,20 @@ describe('Controllers — PrivateController, ClosedController, CommonController'
     });
   });
 
-  describe('CommonController — open access (no auth required)', () => {
+  describe('public-level (CommonController equivalent) — open access (no account required)', () => {
     let controller: any;
 
     beforeAll(() => {
-      const CtrlClass = CommonController(
-        'test_articles',
-        TestArticleDto,
-        TestArticleEntity,
-      );
+      const CtrlClass = EntityController({
+        name: 'test_articles',
+        dto: TestArticleDto,
+        entity: TestArticleEntity,
+      });
       controller = new CtrlClass();
       controller.service = articleService;
     });
 
-    it('CC17: find returns all without auth', async () => {
+    it('CC17: find returns all without account', async () => {
       const result = await controller.find(
         undefined,
         undefined,
@@ -255,7 +265,7 @@ describe('Controllers — PrivateController, ClosedController, CommonController'
       expect(result.length).toBeGreaterThanOrEqual(3);
     });
 
-    it('CC18: findOne returns entity without auth', async () => {
+    it('CC18: findOne returns entity without account', async () => {
       const result = await controller.findOne(
         1,
         undefined,
@@ -266,7 +276,7 @@ describe('Controllers — PrivateController, ClosedController, CommonController'
       expect(+result.id).toBe(1);
     });
 
-    it('CC19: count returns total without auth', async () => {
+    it('CC19: count returns total without account', async () => {
       const result = await controller.count(
         undefined,
         undefined,
@@ -277,7 +287,7 @@ describe('Controllers — PrivateController, ClosedController, CommonController'
       expect(result).toBeGreaterThanOrEqual(3);
     });
 
-    it('CC20: create works without auth (open)', async () => {
+    it('CC20: create works without account (open)', async () => {
       const result = await controller.create(
         { title: 'Open Create' } as any,
         undefined,
@@ -287,7 +297,7 @@ describe('Controllers — PrivateController, ClosedController, CommonController'
       expect(result.title).toBe('Open Create');
     });
 
-    it('CC21: update works without auth (open)', async () => {
+    it('CC21: update works without account (open)', async () => {
       const result = await controller.update(
         1,
         { title: 'Open Update' } as any,

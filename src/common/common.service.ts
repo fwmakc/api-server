@@ -20,7 +20,11 @@ import { FindDto } from './dto/find.dto';
 import { FindManyDto } from './dto/find_many.dto';
 import { FindOneDto } from './dto/find_one.dto';
 import { parseWhereObject } from './service/where.service';
-import { removePrivateFields } from './service/private_fields.service';
+import {
+  removePrivateFields,
+  stripWriteFields,
+} from './service/private_fields.service';
+import { sanitizeForSave } from './service/sanitize.service';
 import { searchService } from './service/search.service';
 import { bind } from './service/bind.service';
 import { CsvService } from './service/csv.service';
@@ -184,7 +188,7 @@ export class CommonService<Dto extends CommonDto, Entity extends BaseEntity> {
     // delete dto.updatedAt;
 
     if (bind.id !== undefined) {
-      const relationName = bind.name || 'auth';
+      const relationName = bind.name || 'account';
       const resolvedId = await this.resolveBindRelationId(bind);
       if (resolvedId !== null) {
         dto[relationName] = { id: resolvedId };
@@ -192,6 +196,9 @@ export class CommonService<Dto extends CommonDto, Entity extends BaseEntity> {
     }
 
     const entity: DeepPartial<any> = { ...dto };
+
+    stripWriteFields(entity, this.repository.metadata.target, bind);
+    sanitizeForSave(entity, this.repository.metadata, bind);
 
     try {
       const { id } = await this.createEntity(entity);
@@ -254,7 +261,7 @@ export class CommonService<Dto extends CommonDto, Entity extends BaseEntity> {
     const entity: DeepPartial<any> = { ...dto };
 
     if (bind.id !== undefined) {
-      const relationName = bind.name || 'auth';
+      const relationName = bind.name || 'account';
       const resolvedId = await this.resolveBindRelationId(bind);
       if (resolvedId !== null) {
         entity[relationName] = { id: resolvedId };
@@ -292,6 +299,9 @@ export class CommonService<Dto extends CommonDto, Entity extends BaseEntity> {
 
     const entity: DeepPartial<any> = { ...dto, id };
 
+    stripWriteFields(entity, this.repository.metadata.target, bind);
+    sanitizeForSave(entity, this.repository.metadata, bind);
+
     try {
       await this.updateEntity(entity);
       return await this.findOne(
@@ -326,7 +336,7 @@ export class CommonService<Dto extends CommonDto, Entity extends BaseEntity> {
     if (key === 'id') {
       return bind.id;
     }
-    const name = bind.name || 'auth';
+    const name = bind.name || 'account';
     const relation = this.repository.metadata.relations.find(
       (r) => r.propertyName === name,
     );
@@ -349,7 +359,7 @@ export class CommonService<Dto extends CommonDto, Entity extends BaseEntity> {
       if (resolvedId === null) {
         return false;
       }
-      where[bind.name || 'auth'] = { id: resolvedId };
+      where[bind.name || 'account'] = { id: resolvedId };
     }
     try {
       const result = await this.repository.delete(where);
@@ -391,7 +401,7 @@ export class CommonService<Dto extends CommonDto, Entity extends BaseEntity> {
               const resolvedId = await this.resolveBindRelationId(bind);
               resetWhere = {
                 ...resetWhere,
-                [bind.name || 'auth']:
+                [bind.name || 'account']:
                   resolvedId !== null
                     ? { id: resolvedId }
                     : { [bind.key || 'id']: bind.id },

@@ -1,4 +1,3 @@
-import { Field } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum } from 'class-validator';
 import { DeepPartial } from 'typeorm';
@@ -28,7 +27,6 @@ export function DtoEnumColumn(
     }
 
     ApiProperty(properties)(object, propertyName);
-    Field(() => value, params)(object, propertyName);
     IsEnum(value);
   };
 }

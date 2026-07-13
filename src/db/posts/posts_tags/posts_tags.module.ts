@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostsModule } from '../posts.module';
 import { PostsTagsController } from './posts_tags.controller';
 import { PostsTagsEntity } from './posts_tags.entity';
-import { PostsTagsResolver } from './posts_tags.resolver';
 import { PostsTagsService } from './posts_tags.service';
 
 @Module({
@@ -12,7 +11,7 @@ import { PostsTagsService } from './posts_tags.service';
     TypeOrmModule.forFeature([PostsTagsEntity]),
     forwardRef(() => PostsModule),
   ],
-  providers: [PostsTagsService, PostsTagsResolver],
+  providers: [PostsTagsService],
   exports: [PostsTagsService],
 })
 export class PostsTagsModule {}

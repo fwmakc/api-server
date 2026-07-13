@@ -1,4 +1,3 @@
-import { Field } from '@nestjs/graphql';
 import { Column } from 'typeorm';
 import { IndexedColumn } from './indexed.column';
 
@@ -14,8 +13,6 @@ export function EnumColumn(
     if (index) {
       IndexedColumn(index)(object, propertyName);
     }
-
-    Field(() => value, { defaultValue, nullable: true })(object, propertyName);
 
     Column({
       comment,

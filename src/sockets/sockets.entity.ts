@@ -1,8 +1,7 @@
-import { Field, ObjectType } from '@nestjs/graphql';
 import { BaseEntity, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { RoomsEntity } from '@src/rooms/rooms.entity';
 import { UsersEntity } from '@src/db/users/users.entity';
-import { AuthEntity } from '@src/auth/auth.entity';
+import { AccountEntity } from '@src/account/account.entity';
 import {
   IdColumn,
   JsonColumn,
@@ -10,16 +9,14 @@ import {
   VarcharColumn,
 } from '@src/common/common.column';
 
-@ObjectType()
 @Entity({ name: 'sockets' })
 export class SocketsEntity extends BaseEntity {
   @IdColumn()
   id: number;
 
-  @Field(() => AuthEntity, { nullable: true })
-  @ManyToOne(() => AuthEntity)
-  @JoinColumn({ name: 'auth_id', referencedColumnName: 'id' })
-  auth: AuthEntity;
+  @ManyToOne(() => AccountEntity)
+  @JoinColumn({ name: 'account_id', referencedColumnName: 'id' })
+  account: AccountEntity;
 
   @VarcharColumn('name')
   name?: string;
@@ -30,7 +27,6 @@ export class SocketsEntity extends BaseEntity {
   @TextColumn('message')
   message?: string;
 
-  @Field(() => RoomsEntity, { nullable: true })
   @ManyToOne(() => RoomsEntity, (room) => room.sockets, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',

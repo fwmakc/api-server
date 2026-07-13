@@ -1,4 +1,3 @@
-import { Field, ObjectType } from '@nestjs/graphql';
 import {
   Entity,
   BaseEntity,
@@ -18,11 +17,10 @@ import {
   UpdatedColumn,
   VarcharColumn,
 } from '@src/common/common.column';
-import { PrivateColumn } from '@src/common/decorator/private_column.decorator';
+import { FieldAccess } from '@src/common/decorator/field_access.decorator';
 
-@ObjectType()
-@Entity({ name: 'test_auth' })
-export class TestAuthEntity extends BaseEntity {
+@Entity({ name: 'test_accounts' })
+export class TestAccountEntity extends BaseEntity {
   @IdColumn()
   id: number;
 
@@ -42,7 +40,6 @@ export class TestAuthEntity extends BaseEntity {
   isSuperuser: boolean;
 }
 
-@ObjectType()
 @Entity({ name: 'test_articles' })
 export class TestArticleEntity extends BaseEntity {
   @IdColumn()
@@ -60,29 +57,25 @@ export class TestArticleEntity extends BaseEntity {
   @TextColumn('content')
   content: string;
 
-  @PrivateColumn()
+  @FieldAccess({ read: 'owner', write: 'owner' })
   @TextColumn('secret_notes')
   secretNotes: string;
 
   @IntColumn('position')
   position: number;
 
-  @Field(() => TestAuthEntity, { nullable: true })
-  @ManyToOne(() => TestAuthEntity, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'auth_id', referencedColumnName: 'id' })
-  auth: TestAuthEntity;
+  @ManyToOne(() => TestAccountEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'account_id', referencedColumnName: 'id' })
+  account: TestAccountEntity;
 
-  @Field(() => [TestCommentEntity], { nullable: true })
   @OneToMany(() => TestCommentEntity, (comment) => comment.article)
   comments: TestCommentEntity[];
 
-  @Field(() => [TestTagEntity], { nullable: true })
   @ManyToMany(() => TestTagEntity, (tag) => tag.articles)
   @JoinTable({ name: 'test_articles_tags' })
   tags: TestTagEntity[];
 }
 
-@ObjectType()
 @Entity({ name: 'test_comments' })
 export class TestCommentEntity extends BaseEntity {
   @IdColumn()
@@ -91,16 +84,14 @@ export class TestCommentEntity extends BaseEntity {
   @VarcharColumn('text')
   text: string;
 
-  @PrivateColumn()
+  @FieldAccess({ read: 'owner', write: 'owner' })
   @VarcharColumn('author_ip')
   authorIp: string;
 
-  @Field(() => TestAuthEntity, { nullable: true })
-  @ManyToOne(() => TestAuthEntity, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'auth_id', referencedColumnName: 'id' })
-  auth: TestAuthEntity;
+  @ManyToOne(() => TestAccountEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'account_id', referencedColumnName: 'id' })
+  account: TestAccountEntity;
 
-  @Field(() => TestArticleEntity, { nullable: true })
   @ManyToOne(() => TestArticleEntity, (article) => article.comments, {
     onDelete: 'CASCADE',
   })
@@ -108,7 +99,6 @@ export class TestCommentEntity extends BaseEntity {
   article: TestArticleEntity;
 }
 
-@ObjectType()
 @Entity({ name: 'test_tags' })
 export class TestTagEntity extends BaseEntity {
   @IdColumn()
@@ -117,12 +107,10 @@ export class TestTagEntity extends BaseEntity {
   @VarcharColumn('name')
   name: string;
 
-  @Field(() => [TestArticleEntity], { nullable: true })
   @ManyToMany(() => TestArticleEntity, (article) => article.tags)
   articles: TestArticleEntity[];
 }
 
-@ObjectType()
 @Entity({ name: 'test_profiles' })
 export class TestProfileEntity extends BaseEntity {
   @IdColumn()
@@ -131,17 +119,15 @@ export class TestProfileEntity extends BaseEntity {
   @TextColumn('bio')
   bio: string;
 
-  @PrivateColumn()
+  @FieldAccess({ read: 'owner', write: 'owner' })
   @TextColumn('internal_notes')
   internalNotes: string;
 
-  @Field(() => TestAuthEntity, { nullable: true })
-  @OneToOne(() => TestAuthEntity, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'auth_id', referencedColumnName: 'id' })
-  auth: TestAuthEntity;
+  @OneToOne(() => TestAccountEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'account_id', referencedColumnName: 'id' })
+  account: TestAccountEntity;
 }
 
-@ObjectType()
 @Entity({ name: 'test_cycle_a' })
 export class TestCycleAEntity extends BaseEntity {
   @IdColumn()
@@ -150,7 +136,7 @@ export class TestCycleAEntity extends BaseEntity {
   @VarcharColumn('name')
   name: string;
 
-  @PrivateColumn()
+  @FieldAccess({ read: 'owner', write: 'owner' })
   @VarcharColumn('secret_a')
   secretA: string;
 
@@ -159,7 +145,6 @@ export class TestCycleAEntity extends BaseEntity {
   b: any;
 }
 
-@ObjectType()
 @Entity({ name: 'test_cycle_b' })
 export class TestCycleBEntity extends BaseEntity {
   @IdColumn()
@@ -168,7 +153,7 @@ export class TestCycleBEntity extends BaseEntity {
   @VarcharColumn('name')
   name: string;
 
-  @PrivateColumn()
+  @FieldAccess({ read: 'owner', write: 'owner' })
   @VarcharColumn('secret_b')
   secretB: string;
 
@@ -177,7 +162,6 @@ export class TestCycleBEntity extends BaseEntity {
   a: any;
 }
 
-@ObjectType()
 @Entity({ name: 'test_users' })
 export class TestUserEntity extends BaseEntity {
   @IdColumn()
@@ -190,7 +174,6 @@ export class TestUserEntity extends BaseEntity {
   name: string;
 }
 
-@ObjectType()
 @Entity({ name: 'test_notes' })
 export class TestNoteEntity extends BaseEntity {
   @IdColumn()
@@ -199,18 +182,46 @@ export class TestNoteEntity extends BaseEntity {
   @VarcharColumn('title')
   title: string;
 
-  @PrivateColumn()
+  @FieldAccess({ read: 'owner', write: 'owner' })
   @TextColumn('secret')
   secret: string;
 
-  @Field(() => TestUserEntity, { nullable: true })
   @ManyToOne(() => TestUserEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user: TestUserEntity;
 }
 
+@Entity({ name: 'test_secrets' })
+export class TestSecretEntity extends BaseEntity {
+  @IdColumn()
+  id: number;
+
+  @VarcharColumn('name')
+  name: string;
+
+  @FieldAccess({ read: 'admin' })
+  @VarcharColumn('admin_code')
+  adminCode: string;
+
+  @FieldAccess({ read: 'closed' })
+  @VarcharColumn('hidden_field')
+  hiddenField: string;
+
+  @FieldAccess({ write: 'admin' })
+  @IntColumn('admin_price')
+  adminPrice: number;
+
+  @FieldAccess({ write: 'closed' })
+  @VarcharColumn('locked_field')
+  lockedField: string;
+
+  @ManyToOne(() => TestAccountEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'account_id', referencedColumnName: 'id' })
+  account: TestAccountEntity;
+}
+
 export const TestEntities = [
-  TestAuthEntity,
+  TestAccountEntity,
   TestArticleEntity,
   TestCommentEntity,
   TestTagEntity,
@@ -219,4 +230,5 @@ export const TestEntities = [
   TestCycleBEntity,
   TestUserEntity,
   TestNoteEntity,
+  TestSecretEntity,
 ];

@@ -1,15 +1,21 @@
 import { Controller } from '@nestjs/common';
-import { ClosedController } from '@src/common/controller/closed.controller';
+import { EntityController } from '@src/common/entity.controller';
 import { PostsTagsDto } from './posts_tags.dto';
 import { PostsTagsEntity } from './posts_tags.entity';
 import { PostsTagsService } from './posts_tags.service';
 
 @Controller('posts/tags')
-export class PostsTagsController extends ClosedController(
-  'Теги постов',
-  PostsTagsDto,
-  PostsTagsEntity,
-)<PostsTagsDto, PostsTagsEntity, PostsTagsService> {
+export class PostsTagsController extends EntityController({
+  name: 'Теги постов',
+  dto: PostsTagsDto,
+  entity: PostsTagsEntity,
+  operations: {
+    read: 'public',
+    create: 'admin',
+    update: 'admin',
+    delete: 'admin',
+  },
+})<PostsTagsDto, PostsTagsEntity, PostsTagsService> {
   constructor(readonly service: PostsTagsService) {
     super();
   }

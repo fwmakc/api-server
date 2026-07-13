@@ -1,4 +1,3 @@
-import { Field, ObjectType } from '@nestjs/graphql';
 import {
   BaseEntity,
   Entity,
@@ -9,7 +8,7 @@ import {
 } from 'typeorm';
 import { PostsCategoriesEntity } from './posts_categories/posts_categories.entity';
 import { PostsTagsEntity } from './posts_tags/posts_tags.entity';
-import { AuthEntity } from '@src/auth/auth.entity';
+import { AccountEntity } from '@src/account/account.entity';
 import {
   BooleanColumn,
   CreatedColumn,
@@ -20,16 +19,14 @@ import {
   VarcharColumn,
 } from '@src/common/common.column';
 
-@ObjectType()
 @Entity({ name: 'posts' })
 export class PostsEntity extends BaseEntity {
   @IdColumn()
   id: number;
 
-  @Field(() => AuthEntity, { nullable: true })
-  @ManyToOne(() => AuthEntity)
-  @JoinColumn({ name: 'auth_id', referencedColumnName: 'id' })
-  auth: AuthEntity;
+  @ManyToOne(() => AccountEntity)
+  @JoinColumn({ name: 'account_id', referencedColumnName: 'id' })
+  account: AccountEntity;
 
   @CreatedColumn()
   createdAt?: Date;
@@ -49,7 +46,6 @@ export class PostsEntity extends BaseEntity {
   @BooleanColumn('is_published')
   isPublished: boolean;
 
-  @Field(() => PostsCategoriesEntity, { nullable: true })
   @ManyToOne(() => PostsCategoriesEntity, (category) => category.posts, {
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
@@ -57,7 +53,6 @@ export class PostsEntity extends BaseEntity {
   @JoinColumn({ name: 'posts_category_id', referencedColumnName: 'id' })
   category: PostsCategoriesEntity;
 
-  @Field(() => [PostsTagsEntity], { nullable: true })
   @ManyToMany(() => PostsTagsEntity, (tag) => tag.posts, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',

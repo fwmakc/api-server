@@ -1,6 +1,6 @@
 import { Body, Controller, Get } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
-import { Auth } from '@src/auth/auth.decorator';
+import { Account } from '@src/account/account.decorator';
 import { RandomService } from './random.service';
 
 @ApiExcludeController()
@@ -9,7 +9,7 @@ export class RandomController {
   constructor(private readonly randomService: RandomService) {}
 
   @Get('random')
-  @Auth()
+  @Account()
   random(
     @Body('min') min: number,
     @Body('max') max: number,
@@ -19,73 +19,73 @@ export class RandomController {
   }
 
   @Get('string')
-  @Auth()
+  @Account()
   randomString(min, max = undefined, string = '') {
     return this.randomService.randomString(min, max, string);
   }
 
   @Get('set')
-  @Auth()
+  @Account()
   randomSet(min, max = undefined, name = '') {
     return this.randomService.randomSet(min, max, name);
   }
 
   @Get('num')
-  @Auth()
+  @Account()
   randomNum(min, max = undefined) {
     return this.randomService.randomNum(min, max);
   }
 
   @Get('bin')
-  @Auth()
+  @Account()
   randomBin(min, max = undefined) {
     return this.randomService.randomBin(min, max);
   }
 
   @Get('hex')
-  @Auth()
+  @Account()
   randomHex(min, max = undefined) {
     return this.randomService.randomHex(min, max);
   }
 
   @Get('array')
-  @Auth()
+  @Account()
   randomArray(n, callback = (i) => i) {
     return this.randomService.randomArray(n, callback);
   }
 
   @Get('shuffle_array')
-  @Auth()
+  @Account()
   shuffleArray([...array]) {
     return this.randomService.shuffleArray(array);
   }
 
   @Get('option')
-  @Auth()
+  @Account()
   randomOption(...args) {
     return this.randomService.randomOption(...args);
   }
 
   @Get('email')
-  @Auth()
+  @Account()
   randomEmail(min = 9, max = 30) {
     return this.randomService.randomEmail(min, max);
   }
 
   @Get('names')
-  @Auth()
+  @Account()
   randomNames(words = 1) {
     return this.randomService.randomNames(words);
   }
 
   @Get('en_names')
-  @Auth()
+  @Account()
   randomEnNames(words = 1) {
     return this.randomService.randomEnNames(words);
   }
 
   @Get('ru_names')
-  @Auth()
+  @Account()
   randomRuNames(words = 1) {
     return this.randomService.randomRuNames(words);
   }

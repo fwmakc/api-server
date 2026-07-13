@@ -1,4 +1,3 @@
-import { Field } from '@nestjs/graphql';
 import { Column } from 'typeorm';
 import { IndexedColumn } from './indexed.column';
 
@@ -48,8 +47,6 @@ export function VarcharColumn(
     if (clear) {
       transformer = new VarcharColumnTransformer(clear);
     }
-
-    Field({ nullable: true })(object, propertyName);
 
     Column({
       comment,

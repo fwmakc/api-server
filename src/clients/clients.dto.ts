@@ -1,4 +1,3 @@
-import { Field, InputType } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   DtoColumn,
@@ -10,7 +9,6 @@ import { TypeClients } from '@src/common/common.enum';
 import { CommonDto } from '@src/common/common.dto';
 import { ClientsRedirectsDto } from './clients_redirects/clients_redirects.dto';
 
-@InputType()
 export class ClientsDto extends CommonDto {
   @DtoCreatedColumn()
   createdAt?: Date;
@@ -67,6 +65,5 @@ export class ClientsDto extends CommonDto {
     description: 'Данные редиректов, связанных с этим клиентским приложением',
     type: () => [ClientsRedirectsDto],
   })
-  @Field(() => [ClientsRedirectsDto], { nullable: true })
   redirects?: ClientsRedirectsDto[];
 }

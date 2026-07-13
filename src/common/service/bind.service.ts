@@ -5,7 +5,7 @@ export function bind(entrie, { allow, key, name }: BindDto): BindDto {
     allow,
     id: entrie?.[key || 'id'],
     key: key || 'id',
-    name: name || 'auth',
+    name: name || 'account',
   };
   return bind;
 }

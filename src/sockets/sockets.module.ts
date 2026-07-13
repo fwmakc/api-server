@@ -1,6 +1,6 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from '@src/auth/auth.module';
+import { AccountModule } from '@src/account/account.module';
 import { RoomsModule } from '@src/rooms/rooms.module';
 import { SocketsController } from './sockets.controller';
 import { SocketsEntity } from './sockets.entity';
@@ -11,7 +11,7 @@ import { SocketsService } from './sockets.service';
   controllers: [SocketsController],
   imports: [
     TypeOrmModule.forFeature([SocketsEntity]),
-    forwardRef(() => AuthModule),
+    forwardRef(() => AccountModule),
     forwardRef(() => RoomsModule),
   ],
   providers: [SocketsService, SocketsGateway],

@@ -1,4 +1,3 @@
-import { Field, InputType } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   DtoColumn,
@@ -8,7 +7,6 @@ import {
 import { CommonDto } from '@src/common/common.dto';
 import { PostsDto } from '../posts.dto';
 
-@InputType()
 export class PostsTagsDto extends CommonDto {
   @DtoCreatedColumn()
   createdAt?: Date;
@@ -24,6 +22,5 @@ export class PostsTagsDto extends CommonDto {
     description: 'Массив данных постов, связанных с этим тегом',
     type: () => [PostsDto],
   })
-  @Field(() => [PostsDto], { nullable: true })
   posts?: PostsDto[];
 }

@@ -15,9 +15,6 @@ import { UpdateDoc } from '@src/common/doc/update.doc';
 import { RemoveDoc } from '@src/common/doc/remove.doc';
 import { SortPositionDoc } from '@src/common/doc/position_sort.doc';
 import { MovePositionDoc } from '@src/common/doc/position_move.doc';
-import { ApiType } from './type/api.type';
-import { GqlSecureGuard } from './guard/gql.secure.guard';
-import { GqlSimpleSecureGuard } from './guard/gql.simple.secure.guard';
 import { SecureGuard } from './guard/secure.guard';
 import { SimpleSecureGuard } from './guard/simple.secure.guard';
 
@@ -72,18 +69,10 @@ export const Doc = (type, classDto) => {
   }
 };
 
-export const Secure = (apiType: ApiType = undefined) => {
-  if (apiType === 'gql' || apiType === 'gqlNoBlock') {
-    return applyDecorators(UseGuards(GqlSecureGuard));
-  }
-
+export const Secure = () => {
   return applyDecorators(UseGuards(SecureGuard));
 };
 
-export const SimpleSecure = (apiType: ApiType = undefined) => {
-  if (apiType === 'gql' || apiType === 'gqlNoBlock') {
-    return applyDecorators(UseGuards(GqlSimpleSecureGuard));
-  }
-
+export const SimpleSecure = () => {
   return applyDecorators(UseGuards(SimpleSecureGuard));
 };

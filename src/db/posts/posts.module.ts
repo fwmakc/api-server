@@ -4,7 +4,6 @@ import { PostsCategoriesModule } from './posts_categories/posts_categories.modul
 import { PostsTagsModule } from './posts_tags/posts_tags.module';
 import { PostsController } from './posts.controller';
 import { PostsEntity } from './posts.entity';
-import { PostsResolver } from './posts.resolver';
 import { PostsService } from './posts.service';
 
 @Module({
@@ -14,7 +13,7 @@ import { PostsService } from './posts.service';
     forwardRef(() => PostsCategoriesModule),
     forwardRef(() => PostsTagsModule),
   ],
-  providers: [PostsService, PostsResolver],
+  providers: [PostsService],
   exports: [PostsService],
 })
 export class PostsModule {}

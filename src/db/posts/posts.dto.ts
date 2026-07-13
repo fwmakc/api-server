@@ -1,11 +1,9 @@
-import { Field, InputType } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
 import { DtoColumn } from '@src/common/common.column';
 import { CommonDto } from '@src/common/common.dto';
 import { PostsCategoriesDto } from './posts_categories/posts_categories.dto';
 import { PostsTagsDto } from './posts_tags/posts_tags.dto';
 
-@InputType()
 export class PostsDto extends CommonDto {
   @DtoColumn('Дата и время создания записи, назначается автоматически')
   createdAt?: Date;
@@ -32,7 +30,6 @@ export class PostsDto extends CommonDto {
     description: 'Данные категории, связанной с данной записью',
     type: () => PostsCategoriesDto,
   })
-  @Field(() => PostsCategoriesDto, { nullable: true })
   category?: PostsCategoriesDto;
 
   @ApiProperty({
@@ -40,6 +37,5 @@ export class PostsDto extends CommonDto {
     description: 'Данные тегов, связанных с данной записью',
     type: () => [PostsTagsDto],
   })
-  @Field(() => [PostsTagsDto], { nullable: true })
   tags?: PostsTagsDto[];
 }

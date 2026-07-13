@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostsModule } from '../posts.module';
 import { PostsCategoriesController } from './posts_categories.controller';
 import { PostsCategoriesEntity } from './posts_categories.entity';
-import { PostsCategoriesResolver } from './posts_categories.resolver';
 import { PostsCategoriesService } from './posts_categories.service';
 
 @Module({
@@ -12,7 +11,7 @@ import { PostsCategoriesService } from './posts_categories.service';
     TypeOrmModule.forFeature([PostsCategoriesEntity]),
     forwardRef(() => PostsModule),
   ],
-  providers: [PostsCategoriesService, PostsCategoriesResolver],
+  providers: [PostsCategoriesService],
   exports: [PostsCategoriesService],
 })
 export class PostsCategoriesModule {}

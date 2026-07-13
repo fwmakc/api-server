@@ -1,4 +1,3 @@
-import { ObjectType } from '@nestjs/graphql';
 import { BaseEntity, Entity } from 'typeorm';
 import {
   BigIntColumn,
@@ -17,7 +16,6 @@ import {
 } from '@src/common/common.column';
 import { TypeValues } from '@src/common/common.enum';
 
-@ObjectType()
 @Entity({ name: 'test' })
 export class TestEntity extends BaseEntity {
   @IdColumn()

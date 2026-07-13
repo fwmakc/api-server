@@ -4,7 +4,7 @@ import { DataSource } from 'typeorm';
 import { genSalt, hash } from 'bcryptjs';
 import { TestEntities } from './entities';
 import {
-  TestAuthService,
+  TestAccountService,
   TestArticleService,
   TestCommentService,
   TestTagService,
@@ -13,6 +13,7 @@ import {
   TestCycleBService,
   TestUserService,
   TestNoteService,
+  TestSecretService,
 } from './services';
 
 export const createTestModule = async (): Promise<TestingModule> => {
@@ -26,7 +27,7 @@ export const createTestModule = async (): Promise<TestingModule> => {
         port: 5432,
         username: 'root',
         password: '1234',
-        database: 'nestapi_test',
+        database: 'api_server_test',
         entities: TestEntities,
         synchronize: true,
         dropSchema: true,
@@ -35,7 +36,7 @@ export const createTestModule = async (): Promise<TestingModule> => {
       TypeOrmModule.forFeature(TestEntities),
     ],
     providers: [
-      TestAuthService,
+      TestAccountService,
       TestArticleService,
       TestCommentService,
       TestTagService,
@@ -44,6 +45,7 @@ export const createTestModule = async (): Promise<TestingModule> => {
       TestCycleBService,
       TestUserService,
       TestNoteService,
+      TestSecretService,
     ],
   }).compile();
 
@@ -55,7 +57,7 @@ export const createTestModule = async (): Promise<TestingModule> => {
 const seedDatabase = async (moduleRef: TestingModule) => {
   const dataSource = moduleRef.get(DataSource);
 
-  const authRepo = dataSource.getRepository('TestAuthEntity');
+  const accountRepo = dataSource.getRepository('TestAccountEntity');
   const articleRepo = dataSource.getRepository('TestArticleEntity');
   const commentRepo = dataSource.getRepository('TestCommentEntity');
   const tagRepo = dataSource.getRepository('TestTagEntity');
@@ -64,9 +66,10 @@ const seedDatabase = async (moduleRef: TestingModule) => {
   const cycleBRepo = dataSource.getRepository('TestCycleBEntity');
   const userRepo = dataSource.getRepository('TestUserEntity');
   const noteRepo = dataSource.getRepository('TestNoteEntity');
+  const secretRepo = dataSource.getRepository('TestSecretEntity');
 
-  const [alice, bob, admin] = await authRepo.save([
-    authRepo.create({
+  const [alice, bob, admin] = await accountRepo.save([
+    accountRepo.create({
       id: 1,
       username: 'alice@test',
       email: 'alice@test',
@@ -74,7 +77,7 @@ const seedDatabase = async (moduleRef: TestingModule) => {
       isActivated: true,
       isSuperuser: false,
     }),
-    authRepo.create({
+    accountRepo.create({
       id: 2,
       username: 'bob@test',
       email: 'bob@test',
@@ -82,7 +85,7 @@ const seedDatabase = async (moduleRef: TestingModule) => {
       isActivated: true,
       isSuperuser: false,
     }),
-    authRepo.create({
+    accountRepo.create({
       id: 3,
       username: 'admin@test',
       email: 'admin@test',
@@ -95,7 +98,7 @@ const seedDatabase = async (moduleRef: TestingModule) => {
   const [art1, art2, art3] = await articleRepo.save([
     articleRepo.create({
       id: 1,
-      auth: alice,
+      account: alice,
       title: 'Alice Post 1',
       content: 'Content 1',
       secretNotes: 'alice secret 1',
@@ -103,7 +106,7 @@ const seedDatabase = async (moduleRef: TestingModule) => {
     }),
     articleRepo.create({
       id: 2,
-      auth: alice,
+      account: alice,
       title: 'Alice Post 2',
       content: 'Content 2',
       secretNotes: 'alice secret 2',
@@ -111,7 +114,7 @@ const seedDatabase = async (moduleRef: TestingModule) => {
     }),
     articleRepo.create({
       id: 3,
-      auth: bob,
+      account: bob,
       title: 'Bob Post',
       content: 'Content 3',
       secretNotes: 'bob secret',
@@ -122,14 +125,14 @@ const seedDatabase = async (moduleRef: TestingModule) => {
   await commentRepo.save([
     commentRepo.create({
       id: 1,
-      auth: alice,
+      account: alice,
       article: art1,
       text: 'Alice comment on own post',
       authorIp: '127.0.0.1',
     }),
     commentRepo.create({
       id: 2,
-      auth: bob,
+      account: bob,
       article: art1,
       text: 'Bob comment on Alice post',
       authorIp: '192.168.1.1',
@@ -149,13 +152,13 @@ const seedDatabase = async (moduleRef: TestingModule) => {
   await profileRepo.save([
     profileRepo.create({
       id: 1,
-      auth: alice,
+      account: alice,
       bio: 'Alice bio',
       internalNotes: 'admin note: alice is VIP',
     }),
     profileRepo.create({
       id: 2,
-      auth: bob,
+      account: bob,
       bio: 'Bob bio',
       internalNotes: 'admin note: bob is banned',
     }),
@@ -202,6 +205,27 @@ const seedDatabase = async (moduleRef: TestingModule) => {
       user: userBob,
       title: 'Bob Note',
       secret: 'bob secret',
+    }),
+  ]);
+
+  await secretRepo.save([
+    secretRepo.create({
+      id: 1,
+      account: alice,
+      name: 'Alice Secret',
+      adminCode: 'AC-001',
+      hiddenField: 'should-never-appear',
+      adminPrice: 100,
+      lockedField: 'cannot-be-changed',
+    }),
+    secretRepo.create({
+      id: 2,
+      account: bob,
+      name: 'Bob Secret',
+      adminCode: 'BC-002',
+      hiddenField: 'also-hidden',
+      adminPrice: 200,
+      lockedField: 'also-locked',
     }),
   ]);
 };

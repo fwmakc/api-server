@@ -1,5 +1,5 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { AuthService } from '@src/auth/auth.service';
+import { AccountService } from '@src/account/account.service';
 import { GrantsTokenDto } from '@src/token/dto/grants.token.dto';
 import { TokenService } from '@src/token/token.service';
 import { Cookie } from '@src/common/service/cookie.service';
@@ -11,7 +11,7 @@ import { UsersService } from '@src/db/users/users.service';
 @Injectable()
 export class KeyGrant {
   constructor(
-    private readonly authService: AuthService,
+    private readonly accountService: AccountService,
     private readonly tokenService: TokenService,
     private readonly usersService: UsersService,
   ) {}
@@ -38,10 +38,10 @@ export class KeyGrant {
       );
     }
 
-    let auth = await this.authService.findByUsername(user.email);
-    if (!auth) {
-      auth = await this.authService.create({ username: user.email });
-      if (!auth) {
+    let account = await this.accountService.findByUsername(user.email);
+    if (!account) {
+      account = await this.accountService.create({ username: user.email });
+      if (!account) {
         throw new BadRequestException(
           'User authentication failed. Unknown account',
           'invalid_user',
@@ -49,11 +49,11 @@ export class KeyGrant {
       }
     }
 
-    if (!user?.['auth_id']) {
-      await this.usersService.linkToAuth(user.id, auth.id);
+    if (!user?.['account_id']) {
+      await this.usersService.linkToAuth(user.id, account.id);
     }
 
-    const token = await this.tokenService.pair({ id: auth.id, key: true });
+    const token = await this.tokenService.pair({ id: account.id, key: true });
     if (!token) {
       throw new BadRequestException(
         'User authentication failed. Unknown user',
@@ -61,11 +61,11 @@ export class KeyGrant {
       );
     }
     // if (request) {
-    //   await this.authSessionsService.start(auth, request);
+    //   await this.accountSessionsService.start(account, request);
     // }
     if (response) {
       const cookie = new Cookie(request, response);
-      cookie.set('id', auth.id);
+      cookie.set('id', account.id);
     }
     return await this.tokenService.prepare(token, grantsTokenDto.state);
   }

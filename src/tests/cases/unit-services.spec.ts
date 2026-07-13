@@ -168,7 +168,7 @@ describe('Unit — utility services', () => {
       const result = bind(entity, { allow: true });
       expect(result.id).toBe(42);
       expect(result.key).toBe('id');
-      expect(result.name).toBe('auth');
+      expect(result.name).toBe('account');
       expect(result.allow).toBe(true);
     });
 
@@ -191,7 +191,7 @@ describe('Unit — utility services', () => {
       const result = bind(null, { allow: true });
       expect(result.id).toBeUndefined();
       expect(result.key).toBe('id');
-      expect(result.name).toBe('auth');
+      expect(result.name).toBe('account');
     });
 
     it('U20: passes through undefined allow as undefined', async () => {

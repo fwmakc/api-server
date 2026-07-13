@@ -1,4 +1,3 @@
-import { Field, ObjectType } from '@nestjs/graphql';
 import { BaseEntity, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import {
   CreatedColumn,
@@ -8,7 +7,6 @@ import {
 } from '@src/common/common.column';
 import { ClientsEntity } from '../clients.entity';
 
-@ObjectType()
 @Entity({ name: 'clients_redirects' })
 export class ClientsRedirectsEntity extends BaseEntity {
   @IdColumn()
@@ -23,7 +21,6 @@ export class ClientsRedirectsEntity extends BaseEntity {
   @VarcharColumn('uri', 'long')
   uri: string;
 
-  @Field(() => ClientsEntity, { nullable: true })
   @ManyToOne(() => ClientsEntity, (client) => client.redirects, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',

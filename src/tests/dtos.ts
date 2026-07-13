@@ -1,8 +1,6 @@
-import { InputType } from '@nestjs/graphql';
 import { CommonDto } from '@src/common/common.dto';
 
-@InputType()
-export class TestAuthDto extends CommonDto {
+export class TestAccountDto extends CommonDto {
   username?: string;
   email?: string;
   password?: string;
@@ -10,56 +8,57 @@ export class TestAuthDto extends CommonDto {
   isSuperuser?: boolean;
 }
 
-@InputType()
 export class TestArticleDto extends CommonDto {
   title?: string;
   content?: string;
   secretNotes?: string;
   position?: number;
-  auth?: any;
+  account?: any;
 }
 
-@InputType()
 export class TestCommentDto extends CommonDto {
   text?: string;
   authorIp?: string;
-  auth?: any;
+  account?: any;
   article?: any;
 }
 
-@InputType()
 export class TestTagDto extends CommonDto {
   name?: string;
 }
 
-@InputType()
 export class TestProfileDto extends CommonDto {
   bio?: string;
   internalNotes?: string;
-  auth?: any;
+  account?: any;
 }
 
-@InputType()
 export class TestCycleADto extends CommonDto {
   name?: string;
   secretA?: string;
 }
 
-@InputType()
 export class TestCycleBDto extends CommonDto {
   name?: string;
   secretB?: string;
 }
 
-@InputType()
 export class TestUserDto extends CommonDto {
   email?: string;
   name?: string;
 }
 
-@InputType()
 export class TestNoteDto extends CommonDto {
   title?: string;
   secret?: string;
   user?: any;
+}
+
+export class TestSecretDto extends CommonDto {
+  name?: string;
+  adminCode?: string;
+  hiddenField?: string;
+  adminPrice?: number;
+  lockedField?: string;
+  account?: any;
 }

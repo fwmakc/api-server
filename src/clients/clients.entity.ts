@@ -1,4 +1,3 @@
-import { Field, ObjectType } from '@nestjs/graphql';
 import {
   BaseEntity,
   Column,
@@ -18,19 +17,17 @@ import {
   VarcharColumn,
 } from '@src/common/common.column';
 import { TypeClients } from '@src/common/common.enum';
-import { AuthEntity } from '@src/auth/auth.entity';
+import { AccountEntity } from '@src/account/account.entity';
 import { ClientsRedirectsEntity } from './clients_redirects/clients_redirects.entity';
 
-@ObjectType()
 @Entity({ name: 'clients' })
 export class ClientsEntity extends BaseEntity {
   @IdColumn()
   id: number;
 
-  @Field(() => AuthEntity, { nullable: true })
-  @ManyToOne(() => AuthEntity)
-  @JoinColumn({ name: 'auth_id', referencedColumnName: 'id' })
-  auth: AuthEntity;
+  @ManyToOne(() => AccountEntity)
+  @JoinColumn({ name: 'account_id', referencedColumnName: 'id' })
+  account: AccountEntity;
 
   @CreatedColumn()
   createdAt?: Date;
@@ -38,7 +35,6 @@ export class ClientsEntity extends BaseEntity {
   @UpdatedColumn()
   updatedAt?: Date;
 
-  @Field({ nullable: true })
   @VarcharColumn('client_id', 'normal', { index: 'unique' })
   client_id: string;
 
@@ -69,7 +65,6 @@ export class ClientsEntity extends BaseEntity {
   @BooleanColumn('is_published', true)
   isPublished: boolean;
 
-  @Field(() => [ClientsRedirectsEntity], { nullable: true })
   @OneToMany(() => ClientsRedirectsEntity, (redirect) => redirect.client, {
     cascade: true,
   })

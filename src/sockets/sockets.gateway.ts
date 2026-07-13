@@ -55,7 +55,7 @@ export class SocketsGateway
     /*
       handshake.headers
       handshake.query
-      handshake.auth
+      handshake.account
       id
       adapter.rooms => client.nsp.adapter.rooms
       adapter.sids

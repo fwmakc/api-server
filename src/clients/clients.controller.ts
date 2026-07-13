@@ -1,33 +1,23 @@
-import {
-  Controller,
-  Get,
-  Post,
-  NotFoundException,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, NotFoundException, Query } from '@nestjs/common';
 import { ClientsService } from '@src/clients/clients.service';
 import { ClientsDto } from '@src/clients/clients.dto';
 import { Client, SelfClient } from '@src/clients/clients.decorator';
-import { PrivateController } from '@src/common/controller/private.controller';
+import { EntityController } from '@src/common/entity.controller';
 import { ClientsEntity } from '@src/clients/clients.entity';
-import {
-  ApiOperation,
-  ApiExtraModels,
-  ApiBody,
-  ApiParam,
-  ApiQuery,
-  ApiResponse,
-  getSchemaPath,
-  ApiTags,
-  ApiExcludeEndpoint,
-} from '@nestjs/swagger';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
 
 @Controller('clients')
-export class ClientsController extends PrivateController(
-  'Клиентские приложения',
-  ClientsDto,
-  ClientsEntity,
-)<ClientsDto, ClientsEntity, ClientsService> {
+export class ClientsController extends EntityController({
+  name: 'Клиентские приложения',
+  dto: ClientsDto,
+  entity: ClientsEntity,
+  operations: {
+    read: 'owner',
+    create: 'owner',
+    update: 'owner',
+    delete: 'owner',
+  },
+})<ClientsDto, ClientsEntity, ClientsService> {
   constructor(readonly service: ClientsService) {
     super();
   }

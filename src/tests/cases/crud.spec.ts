@@ -50,7 +50,7 @@ describe('CRUD — CommonService basics', () => {
   });
 
   it('P9: count articles by owner', async () => {
-    const result = await service.count({ where: { auth: { id: 1 } } });
+    const result = await service.count({ where: { account: { id: 1 } } });
     expect(result).toBe(2);
   });
 

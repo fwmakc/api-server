@@ -1,4 +1,3 @@
-import { Field } from '@nestjs/graphql';
 import { Column, DeepPartial } from 'typeorm';
 import { IndexedColumn } from './indexed.column';
 
@@ -28,8 +27,6 @@ export function BigIntColumn(
     if (index) {
       IndexedColumn(index)(object, propertyName);
     }
-
-    Field({ nullable: true })(object, propertyName);
 
     const props: DeepPartial<any> = {
       comment,

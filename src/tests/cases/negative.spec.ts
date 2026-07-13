@@ -32,7 +32,7 @@ describe('Negative / security tests', () => {
   it('N4: non-owner cannot update via bind', async () => {
     const result = await service.update(1, { title: 'Hacked' } as any, [], {
       id: 2,
-      name: 'auth',
+      name: 'account',
       key: 'id',
       allow: false,
     });
@@ -45,7 +45,7 @@ describe('Negative / security tests', () => {
   it('N5: non-owner cannot remove via bind', async () => {
     const result = await service.remove(1, {
       id: 2,
-      name: 'auth',
+      name: 'account',
       key: 'id',
       allow: false,
     });

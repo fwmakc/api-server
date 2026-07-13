@@ -1,3 +1,55 @@
+import { AccessLevel } from '@src/common/access.type';
+import {
+  FIELD_ACCESS_METADATA,
+  FieldAccessOptions,
+} from '@src/common/decorator/field_access.decorator';
+
+function canRead(level: AccessLevel, bind: any, dto: any): boolean {
+  if (!bind) return level === 'public';
+  switch (level) {
+    case 'public':
+      return true;
+    case 'account':
+      return bind.id !== undefined || bind.allow === true;
+    case 'owner':
+      if (bind.allow) return true;
+      if (bind.id === undefined) return false;
+      {
+        const { id, key = 'id', name = 'account' } = bind;
+        const ownerId = dto?.[name]?.[key];
+        const ownerIdFallback = dto?.[name + 'Id'];
+        return (
+          String(ownerId) === String(id) ||
+          String(ownerIdFallback) === String(id)
+        );
+      }
+    case 'admin':
+      return !!bind.allow;
+    case 'closed':
+      return false;
+    default:
+      return true;
+  }
+}
+
+function canWrite(level: AccessLevel, bind: any): boolean {
+  if (!bind) return level === 'public';
+  switch (level) {
+    case 'public':
+      return true;
+    case 'account':
+      return bind?.id !== undefined || bind?.allow === true;
+    case 'owner':
+      return true;
+    case 'admin':
+      return !!bind?.allow;
+    case 'closed':
+      return false;
+    default:
+      return true;
+  }
+}
+
 export const removePrivateFields = (
   result: any | any[],
   bind: any,
@@ -18,18 +70,12 @@ const processDto = (dto: any, bind: any, seen: WeakSet<object>): void => {
   const proto = dto.constructor?.prototype;
 
   for (const key of Object.keys(dto)) {
-    const metadataValue = proto
-      ? Reflect.getMetadata('customMetadata', proto, key)
+    const fieldAccess: FieldAccessOptions | undefined = proto
+      ? Reflect.getMetadata(FIELD_ACCESS_METADATA, proto, key)
       : undefined;
 
-    if (metadataValue === 'private') {
-      const { allow, id, key: bindKey = 'id', name = 'auth' } = bind;
-      const ownerId = dto?.[name]?.[bindKey];
-      const ownerIdFallback = dto?.[name + 'Id'];
-      const equal =
-        String(ownerId) === String(id) ||
-        String(ownerIdFallback) === String(id);
-      if (!allow && !equal) {
+    if (fieldAccess?.read && fieldAccess.read !== 'public') {
+      if (!canRead(fieldAccess.read, bind, dto)) {
         delete dto[key];
         continue;
       }
@@ -46,6 +92,28 @@ const processDto = (dto: any, bind: any, seen: WeakSet<object>): void => {
       ) {
         processDto(value, bind, seen);
       }
+    }
+  }
+};
+
+export const stripWriteFields = (
+  dto: any,
+  entityTarget: any,
+  bind: any,
+): void => {
+  const proto = entityTarget?.prototype;
+  if (!proto) return;
+
+  for (const key of Object.keys(dto)) {
+    const fieldAccess: FieldAccessOptions | undefined = Reflect.getMetadata(
+      FIELD_ACCESS_METADATA,
+      proto,
+      key,
+    );
+    if (!fieldAccess?.write || fieldAccess.write === 'public') continue;
+
+    if (!canWrite(fieldAccess.write, bind)) {
+      delete dto[key];
     }
   }
 };

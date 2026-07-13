@@ -1,7 +1,6 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { TokenController } from '@src/token/token.controller';
 import { TokenService } from '@src/token/token.service';
-import { TokenResolver } from '@src/token/token.resolver';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { getJwtConfig } from '@src/config/jwt.config';
@@ -19,7 +18,7 @@ import { ClientCredentialsGrant } from '@src/token/grant/client_credentials.gran
 import { KeyGrant } from '@src/token/grant/key.grant';
 import { PasswordGrant } from '@src/token/grant/password.grant';
 import { RefreshTokenGrant } from '@src/token/grant/refresh_token.grant';
-import { AuthModule } from '@src/auth/auth.module';
+import { AccountModule } from '@src/account/account.module';
 import { UsersModule } from '@src/db/users/users.module';
 
 @Module({
@@ -32,12 +31,11 @@ import { UsersModule } from '@src/db/users/users.module';
       useFactory: getJwtConfig,
     }),
     forwardRef(() => ClientsModule),
-    forwardRef(() => AuthModule),
+    forwardRef(() => AccountModule),
     forwardRef(() => UsersModule),
   ],
   providers: [
     TokenService,
-    TokenResolver,
 
     GrantsTokenService,
     AuthorizationCodeGrant,
