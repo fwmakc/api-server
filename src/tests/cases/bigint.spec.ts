@@ -22,13 +22,13 @@ describe('BigInt precision', () => {
   });
 
   it('N19b: seed data ids survive +id conversion (small values)', () => {
-    expect(+('1')).toBe(1);
-    expect(+('2')).toBe(2);
-    expect(+('3')).toBe(3);
+    expect(+'1').toBe(1);
+    expect(+'2').toBe(2);
+    expect(+'3').toBe(3);
   });
 
   it('N19c: find with large id does not match', async () => {
-    const result = await service.findOne({ id: 9007199254740993 });
+    const result = await service.findOne({ id: '9007199254740993' as any });
     expect(result).toBeUndefined();
   });
 });

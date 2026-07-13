@@ -109,10 +109,10 @@ describe('Auth — AuthService and HashAuthHandler', () => {
 
   describe('AuthService.update — strips isSuperuser', () => {
     it('A12: update ignores isSuperuser', async () => {
-      const updated = await authService.update(
-        1,
-        { username: 'alice@test', isSuperuser: true } as any,
-      );
+      const updated = await authService.update(1, {
+        username: 'alice@test',
+        isSuperuser: true,
+      } as any);
       expect(updated.isSuperuser).toBe(false);
     });
   });

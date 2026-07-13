@@ -21,11 +21,13 @@ export const PrivateResolver = <T extends Type<unknown>>(
     Dto extends CommonDto,
     Entity extends BaseEntity,
     Service extends CommonService<Dto, Entity>,
-  > extends ProtectedResolver(name, classDto, classEntity, authTable, authField)<
-    Dto,
-    Entity,
-    Service
-  > {
+  > extends ProtectedResolver(
+    name,
+    classDto,
+    classEntity,
+    authTable,
+    authField,
+  )<Dto, Entity, Service> {
     readonly service: Service;
 
     @Auth('gql')

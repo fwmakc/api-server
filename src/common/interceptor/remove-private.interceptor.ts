@@ -21,8 +21,8 @@ export class RemovePrivateFieldsInterceptor implements NestInterceptor {
       name: 'auth',
     };
 
-    return next.handle().pipe(
-      map((result) => removePrivateFields(result, bind)),
-    );
+    return next
+      .handle()
+      .pipe(map((result) => removePrivateFields(result, bind)));
   }
 }

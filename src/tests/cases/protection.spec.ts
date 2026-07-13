@@ -6,8 +6,17 @@ import { TestArticleEntity, TestProfileEntity } from '../entities';
 import { ProtectedController } from '@src/common/controller/protected.controller';
 import { ClosedController } from '@src/common/controller/closed.controller';
 
-const ArticleBase = ProtectedController('Articles', TestArticleDto, TestArticleEntity, 'auth');
-const ProfileBase = ClosedController('Profiles', TestProfileDto, TestProfileEntity);
+const ArticleBase = ProtectedController(
+  'Articles',
+  TestArticleDto,
+  TestArticleEntity,
+  'auth',
+);
+const ProfileBase = ClosedController(
+  'Profiles',
+  TestProfileDto,
+  TestProfileEntity,
+);
 
 const aliceAuth = { id: 1, isSuperuser: false } as any;
 const bobAuth = { id: 2, isSuperuser: false } as any;
@@ -47,10 +56,19 @@ describe('Protection — controller-level access control', () => {
   });
 
   it('N14: admin update via ProtectedController → success (own article)', async () => {
-    const created: any = await articleController.create({ title: 'Admin Article' } as any, [], adminAuth);
+    const created: any = await articleController.create(
+      { title: 'Admin Article' } as any,
+      [],
+      adminAuth,
+    );
     expect(created).toBeDefined();
 
-    const result: any = await articleController.update(created.id, { title: 'Admin Edit' } as any, [], adminAuth);
+    const result: any = await articleController.update(
+      created.id,
+      { title: 'Admin Edit' } as any,
+      [],
+      adminAuth,
+    );
     expect(result).toBeDefined();
     expect(result.title).toBe('Admin Edit');
   });
@@ -62,14 +80,18 @@ describe('Protection — controller-level access control', () => {
   });
 
   it('N16: admin create via ClosedController → success', async () => {
-    const result: any = await profileController.create({ bio: 'admin created' } as any, [], adminAuth);
+    const result: any = await profileController.create(
+      { bio: 'admin created' } as any,
+      [],
+      adminAuth,
+    );
     expect(result).toBeDefined();
     expect(result.bio).toBe('admin created');
   });
 
   it('N17: non-admin remove via ClosedController → ForbiddenException', async () => {
-    await expect(
-      profileController.remove(1, aliceAuth),
-    ).rejects.toThrow(ForbiddenException);
+    await expect(profileController.remove(1, aliceAuth)).rejects.toThrow(
+      ForbiddenException,
+    );
   });
 });

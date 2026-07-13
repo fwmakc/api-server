@@ -30,12 +30,12 @@ describe('Negative / security tests', () => {
   });
 
   it('N4: non-owner cannot update via bind', async () => {
-    const result = await service.update(
-      1,
-      { title: 'Hacked' } as any,
-      [],
-      { id: 2, name: 'auth', key: 'id', allow: false },
-    );
+    const result = await service.update(1, { title: 'Hacked' } as any, [], {
+      id: 2,
+      name: 'auth',
+      key: 'id',
+      allow: false,
+    });
     expect(result).toBeUndefined();
 
     const article = await service.findOne({ id: 1 });
@@ -66,9 +66,9 @@ describe('Negative / security tests', () => {
   });
 
   it('N7: PostgreSQL rejects string injection in bigint column', async () => {
-    await expect(
-      service.find({ where: { id: '1 OR 1=1' } }),
-    ).rejects.toThrow('invalid input syntax');
+    await expect(service.find({ where: { id: '1 OR 1=1' } })).rejects.toThrow(
+      'invalid input syntax',
+    );
   });
 
   it('N8: XSS payload stored as literal string (sanitization is view-layer)', async () => {
@@ -114,7 +114,10 @@ describe('Negative / security tests', () => {
   });
 
   it('N15: movePosition to same position returns false', async () => {
-    const article = await service.findOne({ id: 1, select: { position: true } });
+    const article = await service.findOne({
+      id: 1,
+      select: { position: true },
+    });
     const result = await service.movePosition(1, 'position', +article.position);
     expect(result).toBe(false);
   });

@@ -60,9 +60,7 @@ export class CsvService {
     try {
       mkdirSync(path, { recursive: true });
     } catch (err) {
-      throw new ForbiddenException(
-        `Error creating directory: ${err.message}`,
-      );
+      throw new ForbiddenException(`Error creating directory: ${err.message}`);
     }
   }
 

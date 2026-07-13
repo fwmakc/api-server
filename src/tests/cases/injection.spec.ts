@@ -24,14 +24,12 @@ describe('SQL injection in sortPosition / movePosition field names', () => {
   });
 
   it('N2: sortPosition by primary key → rejected', async () => {
-    await expect(
-      service.sortPosition('id', {}),
-    ).rejects.toThrow('primary key');
+    await expect(service.sortPosition('id', {})).rejects.toThrow('primary key');
   });
 
   it('N3: movePosition with raw SQL in field name → rejected', async () => {
     await expect(
-      service.movePosition(1, "position; DROP TABLE test_articles;--", 2),
+      service.movePosition(1, 'position; DROP TABLE test_articles;--', 2),
     ).rejects.toThrow('Invalid field name');
 
     const all = await service.find({});
@@ -39,18 +37,18 @@ describe('SQL injection in sortPosition / movePosition field names', () => {
   });
 
   it('N4: sortPosition with malformed field name → rejected', async () => {
-    await expect(
-      service.sortPosition("position} HACK {", {}),
-    ).rejects.toThrow('Invalid field name');
+    await expect(service.sortPosition('position} HACK {', {})).rejects.toThrow(
+      'Invalid field name',
+    );
 
     const all = await service.find({});
     expect(all.length).toBe(3);
   });
 
   it('N5: sortPosition with unknown field → rejected', async () => {
-    await expect(
-      service.sortPosition('nonexistent', {}),
-    ).rejects.toThrow('Unknown field');
+    await expect(service.sortPosition('nonexistent', {})).rejects.toThrow(
+      'Unknown field',
+    );
   });
 
   it('N6: sortPosition with valid field → success', async () => {

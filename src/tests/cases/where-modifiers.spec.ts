@@ -78,7 +78,9 @@ describe('Where modifiers — parseWhereObject', () => {
       where: { 'content.null': true },
     });
     expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result.every((r) => r.content === '' || r.content === null)).toBe(true);
+    expect(result.every((r) => r.content === '' || r.content === null)).toBe(
+      true,
+    );
   });
 
   it('W9: "empty" modifier — field is NULL or empty string', async () => {
@@ -200,7 +202,9 @@ describe('Where modifiers — parseWhereObject', () => {
       order: { id: 'ASC' },
     });
     expect(result.length).toBe(2);
-    expect(result.every((r) => !r.title.toLowerCase().includes('alice'))).toBe(true);
+    expect(result.every((r) => !r.title.toLowerCase().includes('alice'))).toBe(
+      true,
+    );
   });
 
   it('W23: chained modifiers — "and.not.like" array', async () => {

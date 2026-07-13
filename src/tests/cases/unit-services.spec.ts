@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { ILike, Like } from 'typeorm';
 
 describe('Unit — utility services', () => {
@@ -112,7 +113,9 @@ describe('Unit — utility services', () => {
     });
 
     it('U11: decrypt reverses encrypt', async () => {
-      const { encrypt, decrypt } = await import('@src/common/service/crypt.service');
+      const { encrypt, decrypt } = await import(
+        '@src/common/service/crypt.service'
+      );
       const original = 'secret data 123';
       const { encrypted, iv } = await encrypt(original);
       const decrypted = await decrypt(encrypted, iv);
@@ -120,7 +123,9 @@ describe('Unit — utility services', () => {
     });
 
     it('U12: decrypt with wrong iv throws', async () => {
-      const { encrypt, decrypt } = await import('@src/common/service/crypt.service');
+      const { encrypt, decrypt } = await import(
+        '@src/common/service/crypt.service'
+      );
       const { encrypted } = await encrypt('test data');
       const badIv = '000000000000000000000000';
       await expect(decrypt(encrypted, badIv)).rejects.toThrow();
@@ -146,7 +151,9 @@ describe('Unit — utility services', () => {
     });
 
     it('U16: encrypt handles unicode', async () => {
-      const { encrypt, decrypt } = await import('@src/common/service/crypt.service');
+      const { encrypt, decrypt } = await import(
+        '@src/common/service/crypt.service'
+      );
       const original = 'Привет мир 🌍';
       const { encrypted, iv } = await encrypt(original);
       const decrypted = await decrypt(encrypted, iv);
@@ -168,7 +175,11 @@ describe('Unit — utility services', () => {
     it('U18: extracts field by custom key', async () => {
       const { bind } = await import('@src/common/service/bind.service');
       const entity = { id: 1, email: 'user@test' };
-      const result = bind(entity, { allow: false, key: 'email', name: 'owner' });
+      const result = bind(entity, {
+        allow: false,
+        key: 'email',
+        name: 'owner',
+      });
       expect(result.id).toBe('user@test');
       expect(result.key).toBe('email');
       expect(result.name).toBe('owner');

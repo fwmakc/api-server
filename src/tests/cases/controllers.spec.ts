@@ -100,12 +100,10 @@ describe('Controllers — PrivateController, ClosedController, CommonController'
 
     it('CC6: findOne with bind — non-owner gets NotFoundException', async () => {
       await expect(
-        controller.findOne(
-          1,
-          undefined,
-          [{ name: 'auth' }],
-          { id: 2, isSuperuser: false } as any,
-        ),
+        controller.findOne(1, undefined, [{ name: 'auth' }], {
+          id: 2,
+          isSuperuser: false,
+        } as any),
       ).rejects.toThrow('Entrie not found');
     });
 
@@ -162,22 +160,19 @@ describe('Controllers — PrivateController, ClosedController, CommonController'
 
     it('CC10: create by non-superuser throws ForbiddenException', async () => {
       await expect(
-        controller.create(
-          { title: 'Forbidden' } as any,
-          undefined,
-          { id: 1, isSuperuser: false } as any,
-        ),
+        controller.create({ title: 'Forbidden' } as any, undefined, {
+          id: 1,
+          isSuperuser: false,
+        } as any),
       ).rejects.toThrow(ForbiddenException);
     });
 
     it('CC11: update by non-superuser throws ForbiddenException', async () => {
       await expect(
-        controller.update(
-          1,
-          { title: 'Hack' } as any,
-          undefined,
-          { id: 1, isSuperuser: false } as any,
-        ),
+        controller.update(1, { title: 'Hack' } as any, undefined, {
+          id: 1,
+          isSuperuser: false,
+        } as any),
       ).rejects.toThrow(ForbiddenException);
     });
 
@@ -225,12 +220,10 @@ describe('Controllers — PrivateController, ClosedController, CommonController'
 
     it('CC16: movePosition by non-superuser throws', async () => {
       await expect(
-        controller.movePosition(
-          1,
-          'position',
-          2,
-          { id: 1, isSuperuser: false } as any,
-        ),
+        controller.movePosition(1, 'position', 2, {
+          id: 1,
+          isSuperuser: false,
+        } as any),
       ).rejects.toThrow(ForbiddenException);
     });
   });

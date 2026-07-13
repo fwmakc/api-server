@@ -30,10 +30,12 @@ describe('@PrivateColumn — closed entity (profile)', () => {
       { relations: [{ name: 'auth' }] },
       { allow: true },
     );
-    removePrivateFields(
-      profiles,
-      { id: 2, name: 'auth', key: 'id', allow: false },
-    );
+    removePrivateFields(profiles, {
+      id: 2,
+      name: 'auth',
+      key: 'id',
+      allow: false,
+    });
     const aliceProfile = profiles.find((p) => +p.id === 1);
     expect(aliceProfile.internalNotes).toBeUndefined();
 

@@ -48,11 +48,7 @@ describe('Relations — eager/lazy loading', () => {
   it('P25: findOne with multiple relations', async () => {
     const result = await service.findOne({
       id: 1,
-      relations: [
-        { name: 'auth' },
-        { name: 'comments' },
-        { name: 'tags' },
-      ],
+      relations: [{ name: 'auth' }, { name: 'comments' }, { name: 'tags' }],
     });
     expect(result).toBeDefined();
     expect(result.auth).toBeDefined();

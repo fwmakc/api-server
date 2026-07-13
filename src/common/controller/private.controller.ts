@@ -27,11 +27,13 @@ export const PrivateController = <T extends Type<unknown>>(
     Dto extends CommonDto,
     Entity extends BaseEntity,
     Service extends CommonService<Dto, Entity>,
-  > extends ProtectedController(name, classDto, classEntity, authTable, authField)<
-    Dto,
-    Entity,
-    Service
-  > {
+  > extends ProtectedController(
+    name,
+    classDto,
+    classEntity,
+    authTable,
+    authField,
+  )<Dto, Entity, Service> {
     readonly service: Service;
 
     @Auth()

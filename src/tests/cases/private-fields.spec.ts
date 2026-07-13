@@ -35,10 +35,12 @@ describe('@PrivateColumn — field-level access control', () => {
       { relations: [{ name: 'auth' }] },
       { allow: true },
     );
-    removePrivateFields(
-      articles,
-      { id: 2, name: 'auth', key: 'id', allow: false },
-    );
+    removePrivateFields(articles, {
+      id: 2,
+      name: 'auth',
+      key: 'id',
+      allow: false,
+    });
     const aliceArticle = articles.find((a) => +a.id === 1);
     expect(aliceArticle.secretNotes).toBeUndefined();
 
@@ -53,10 +55,12 @@ describe('@PrivateColumn — field-level access control', () => {
       },
       { allow: true },
     );
-    removePrivateFields(
-      articles,
-      { id: 2, name: 'auth', key: 'id', allow: false },
-    );
+    removePrivateFields(articles, {
+      id: 2,
+      name: 'auth',
+      key: 'id',
+      allow: false,
+    });
     const aliceArticle = articles.find((a) => +a.id === 1);
     expect(aliceArticle.secretNotes).toBeUndefined();
   });
@@ -73,10 +77,12 @@ describe('@PrivateColumn — field-level access control', () => {
     const article = articles[0];
     expect(article.comments.length).toBe(2);
 
-    removePrivateFields(
-      articles,
-      { id: 1, name: 'auth', key: 'id', allow: false },
-    );
+    removePrivateFields(articles, {
+      id: 1,
+      name: 'auth',
+      key: 'id',
+      allow: false,
+    });
 
     const aliceComment = article.comments.find((c) => +c.id === 1);
     const bobComment = article.comments.find((c) => +c.id === 2);

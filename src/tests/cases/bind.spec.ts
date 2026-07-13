@@ -48,20 +48,22 @@ describe('bind — ownership mechanism', () => {
   });
 
   it('P14: remove by non-owner returns false', async () => {
-    const result = await service.remove(
-      3,
-      { id: 1, name: 'auth', key: 'id', allow: false },
-    );
+    const result = await service.remove(3, {
+      id: 1,
+      name: 'auth',
+      key: 'id',
+      allow: false,
+    });
     expect(result).toBe(false);
   });
 
   it('P15: update by non-owner returns undefined', async () => {
-    const result = await service.update(
-      3,
-      { title: 'Hacked' } as any,
-      [],
-      { id: 1, name: 'auth', key: 'id', allow: false },
-    );
+    const result = await service.update(3, { title: 'Hacked' } as any, [], {
+      id: 1,
+      name: 'auth',
+      key: 'id',
+      allow: false,
+    });
     expect(result).toBeUndefined();
   });
 

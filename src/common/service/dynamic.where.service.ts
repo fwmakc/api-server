@@ -85,7 +85,8 @@ const prepareDynamicWhereValue = (property, value, modifiers) => {
       break;
     case 'boolean': {
       const sv = `${value}`.trim().toLowerCase();
-      const bv = sv === 'true' ? true : sv === 'false' ? false : Boolean(+value);
+      const bv =
+        sv === 'true' ? true : sv === 'false' ? false : Boolean(+value);
       result = `${property} ${sign} ${bv ? 'TRUE' : 'FALSE'}`;
       break;
     }

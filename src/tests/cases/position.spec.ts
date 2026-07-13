@@ -54,11 +54,7 @@ describe('sortPosition / movePosition', () => {
   });
 
   it('P30: sortPosition auto-order when no order specified', async () => {
-    const result = await service.sortPosition(
-      'position',
-      {},
-      { allow: true },
-    );
+    const result = await service.sortPosition('position', {}, { allow: true });
     expect(result).toBe(true);
   });
 

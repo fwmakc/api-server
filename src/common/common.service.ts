@@ -145,10 +145,7 @@ export class CommonService<Dto extends CommonDto, Entity extends BaseEntity> {
     return result && Array.isArray(result) ? result.length : 0;
   }
 
-  async countDistinct(
-    field: string,
-    find: FindDto,
-  ): Promise<number> {
+  async countDistinct(field: string, find: FindDto): Promise<number> {
     const qb = this.repository.createQueryBuilder('t');
 
     const where = parseWhereObject(find.where);
@@ -234,9 +231,7 @@ export class CommonService<Dto extends CommonDto, Entity extends BaseEntity> {
     }
 
     const where = uniques
-      .filter(
-        (field) => entity[field] !== undefined && entity[field] !== null,
-      )
+      .filter((field) => entity[field] !== undefined && entity[field] !== null)
       .map((field) => ({ [field]: entity[field] }));
 
     if (where.length === 0) {
@@ -403,11 +398,9 @@ export class CommonService<Dto extends CommonDto, Entity extends BaseEntity> {
               };
             }
             if (Object.keys(resetWhere).length > 0) {
-              await transactionalManager.update(
-                entityTarget,
-                resetWhere,
-                { [field]: 0 } as DeepPartial<any>,
-              );
+              await transactionalManager.update(entityTarget, resetWhere, {
+                [field]: 0,
+              } as DeepPartial<any>);
             }
           }
 

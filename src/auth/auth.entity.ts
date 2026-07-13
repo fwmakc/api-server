@@ -1,10 +1,4 @@
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  OneToMany,
-  OneToOne,
-} from 'typeorm';
+import { BaseEntity, Column, Entity, OneToMany, OneToOne } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 import {
   BooleanColumn,

@@ -115,8 +115,12 @@ describe('Unit — dynamic SQL services', () => {
     });
 
     it('D22: "search" modifier — tokenized ILIKE', () => {
-      const [clause] = parseDynamicWhereObject({ 'name.search': 'hello world' });
-      expect(clause).toBe(`("name" ILIKE '%hello%') AND ("name" ILIKE '%world%')`);
+      const [clause] = parseDynamicWhereObject({
+        'name.search': 'hello world',
+      });
+      expect(clause).toBe(
+        `("name" ILIKE '%hello%') AND ("name" ILIKE '%world%')`,
+      );
     });
 
     it('D23: "empty" modifier', () => {
@@ -128,7 +132,9 @@ describe('Unit — dynamic SQL services', () => {
       const [clause] = parseDynamicWhereObject({
         'name.and.like': ['%foo%', '%bar%'],
       });
-      expect(clause).toBe(`(("name" ILIKE '%foo%') and ("name" ILIKE '%bar%'))`);
+      expect(clause).toBe(
+        `(("name" ILIKE '%foo%') and ("name" ILIKE '%bar%'))`,
+      );
     });
 
     it('D25: "or" combinator with "like"', () => {
@@ -305,7 +311,9 @@ describe('Unit — dynamic SQL services', () => {
     it('C4: setJson stores JSON cookie', () => {
       const cookie = new Cookie(mockRequest, mockResponse);
       cookie.setJson('data', { key: 'value' });
-      expect(mockResponse.cookies.data.value).toBe(JSON.stringify({ key: 'value' }));
+      expect(mockResponse.cookies.data.value).toBe(
+        JSON.stringify({ key: 'value' }),
+      );
     });
 
     it('C5: getJson parses JSON cookie', () => {

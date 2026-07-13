@@ -61,18 +61,22 @@ describe('bind — cross-relation ownership (user.id / user.email)', () => {
 
   describe('remove — ownership guard by relation field', () => {
     it('N5: remove bob note as alice (user.id) — false', async () => {
-      const result = await service.remove(
-        3,
-        { name: 'user', key: 'id', id: 1, allow: false },
-      );
+      const result = await service.remove(3, {
+        name: 'user',
+        key: 'id',
+        id: 1,
+        allow: false,
+      });
       expect(result).toBe(false);
     });
 
     it('N6: remove bob note as alice (user.email) — false', async () => {
-      const result = await service.remove(
-        3,
-        { name: 'user', key: 'email', id: 'alice@user', allow: false },
-      );
+      const result = await service.remove(3, {
+        name: 'user',
+        key: 'email',
+        id: 'alice@user',
+        allow: false,
+      });
       expect(result).toBe(false);
     });
   });

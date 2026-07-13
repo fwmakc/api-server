@@ -1,4 +1,7 @@
-export const removePrivateFields = (result: any | any[], bind: any): any | any[] => {
+export const removePrivateFields = (
+  result: any | any[],
+  bind: any,
+): any | any[] => {
   const seen = new WeakSet();
   if (Array.isArray(result)) {
     result.forEach((entry) => entry && processDto(entry, bind, seen));

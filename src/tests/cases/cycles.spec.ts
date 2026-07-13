@@ -19,9 +19,7 @@ describe('Cycle protection in removePrivateFields', () => {
     const obj: any = { id: 1, name: 'root', secretA: 'hidden' };
     obj.self = obj;
 
-    expect(
-      removePrivateFields([obj], { allow: false }),
-    ).toBeDefined();
+    expect(removePrivateFields([obj], { allow: false })).toBeDefined();
   });
 
   it('C2: mutual cycle (A→B→A) does not crash', () => {
@@ -30,9 +28,7 @@ describe('Cycle protection in removePrivateFields', () => {
     a.b = b;
     b.a = a;
 
-    expect(
-      removePrivateFields([a], { allow: false }),
-    ).toBeDefined();
+    expect(removePrivateFields([a], { allow: false })).toBeDefined();
   });
 
   it('C3: entity with circular TypeORM relation loads without crash', async () => {

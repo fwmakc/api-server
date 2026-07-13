@@ -29,7 +29,10 @@ import {
 } from './dtos';
 
 @Injectable()
-export class TestAuthService extends CommonService<TestAuthDto, TestAuthEntity> {
+export class TestAuthService extends CommonService<
+  TestAuthDto,
+  TestAuthEntity
+> {
   constructor(
     @InjectRepository(TestAuthEntity)
     protected readonly repository: Repository<TestAuthEntity>,
@@ -77,7 +80,10 @@ export class TestAuthService extends CommonService<TestAuthDto, TestAuthEntity> 
 }
 
 @Injectable()
-export class TestArticleService extends CommonService<TestArticleDto, TestArticleEntity> {
+export class TestArticleService extends CommonService<
+  TestArticleDto,
+  TestArticleEntity
+> {
   constructor(
     @InjectRepository(TestArticleEntity)
     protected readonly repository: Repository<TestArticleEntity>,
@@ -87,7 +93,10 @@ export class TestArticleService extends CommonService<TestArticleDto, TestArticl
 }
 
 @Injectable()
-export class TestCommentService extends CommonService<TestCommentDto, TestCommentEntity> {
+export class TestCommentService extends CommonService<
+  TestCommentDto,
+  TestCommentEntity
+> {
   constructor(
     @InjectRepository(TestCommentEntity)
     protected readonly repository: Repository<TestCommentEntity>,
@@ -107,7 +116,10 @@ export class TestTagService extends CommonService<TestTagDto, TestTagEntity> {
 }
 
 @Injectable()
-export class TestProfileService extends CommonService<TestProfileDto, TestProfileEntity> {
+export class TestProfileService extends CommonService<
+  TestProfileDto,
+  TestProfileEntity
+> {
   constructor(
     @InjectRepository(TestProfileEntity)
     protected readonly repository: Repository<TestProfileEntity>,
@@ -117,7 +129,10 @@ export class TestProfileService extends CommonService<TestProfileDto, TestProfil
 }
 
 @Injectable()
-export class TestCycleAService extends CommonService<TestCycleADto, TestCycleAEntity> {
+export class TestCycleAService extends CommonService<
+  TestCycleADto,
+  TestCycleAEntity
+> {
   constructor(
     @InjectRepository(TestCycleAEntity)
     protected readonly repository: Repository<TestCycleAEntity>,
@@ -127,7 +142,10 @@ export class TestCycleAService extends CommonService<TestCycleADto, TestCycleAEn
 }
 
 @Injectable()
-export class TestCycleBService extends CommonService<TestCycleBDto, TestCycleBEntity> {
+export class TestCycleBService extends CommonService<
+  TestCycleBDto,
+  TestCycleBEntity
+> {
   constructor(
     @InjectRepository(TestCycleBEntity)
     protected readonly repository: Repository<TestCycleBEntity>,
@@ -137,7 +155,10 @@ export class TestCycleBService extends CommonService<TestCycleBDto, TestCycleBEn
 }
 
 @Injectable()
-export class TestUserService extends CommonService<TestUserDto, TestUserEntity> {
+export class TestUserService extends CommonService<
+  TestUserDto,
+  TestUserEntity
+> {
   constructor(
     @InjectRepository(TestUserEntity)
     protected readonly repository: Repository<TestUserEntity>,
@@ -147,7 +168,10 @@ export class TestUserService extends CommonService<TestUserDto, TestUserEntity> 
 }
 
 @Injectable()
-export class TestNoteService extends CommonService<TestNoteDto, TestNoteEntity> {
+export class TestNoteService extends CommonService<
+  TestNoteDto,
+  TestNoteEntity
+> {
   constructor(
     @InjectRepository(TestNoteEntity)
     protected readonly repository: Repository<TestNoteEntity>,
