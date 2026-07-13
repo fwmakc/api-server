@@ -8,7 +8,7 @@ export class BindDto {
     description: 'ID связанной записи',
   })
   @Field()
-  id?: number;
+  id?: number | string;
 
   @ApiProperty({
     required: false,

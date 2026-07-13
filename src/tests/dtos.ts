@@ -50,3 +50,16 @@ export class TestCycleBDto extends CommonDto {
   name?: string;
   secretB?: string;
 }
+
+@InputType()
+export class TestUserDto extends CommonDto {
+  email?: string;
+  name?: string;
+}
+
+@InputType()
+export class TestNoteDto extends CommonDto {
+  title?: string;
+  secret?: string;
+  user?: any;
+}

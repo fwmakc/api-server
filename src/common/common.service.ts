@@ -156,25 +156,9 @@ export class CommonService<Dto extends CommonDto, Entity extends BaseEntity> {
 
     if (bind.id !== undefined) {
       const relationName = bind.name || 'auth';
-      const key = bind.key || 'id';
-
-      if (key === 'id') {
-        dto[relationName] = { id: bind.id };
-      } else {
-        const relation = this.repository.metadata.relations.find(
-          (r) => r.propertyName === relationName,
-        );
-        if (relation) {
-          const relatedRepo = this.repository.manager.getRepository(
-            relation.inverseEntityMetadata.target,
-          );
-          const related = await relatedRepo.findOne({
-            where: { [key]: bind.id } as any,
-          });
-          if (related) {
-            dto[relationName] = { id: related.id };
-          }
-        }
+      const resolvedId = await this.resolveBindRelationId(bind);
+      if (resolvedId !== null) {
+        dto[relationName] = { id: resolvedId };
       }
     }
 
@@ -247,10 +231,37 @@ export class CommonService<Dto extends CommonDto, Entity extends BaseEntity> {
     return column?.type || 'int';
   }
 
+  private async resolveBindRelationId(
+    bind: BindDto,
+  ): Promise<number | string | null> {
+    const key = bind.key || 'id';
+    if (key === 'id') {
+      return bind.id;
+    }
+    const name = bind.name || 'auth';
+    const relation = this.repository.metadata.relations.find(
+      (r) => r.propertyName === name,
+    );
+    if (!relation) {
+      return null;
+    }
+    const relatedRepo = this.repository.manager.getRepository(
+      relation.inverseEntityMetadata.target,
+    );
+    const related = await relatedRepo.findOne({
+      where: { [key]: bind.id } as any,
+    });
+    return related ? related.id : null;
+  }
+
   async remove(id: number, bind: BindDto = { allow: true }): Promise<boolean> {
     const where: FindOptionsWhere<any> = { id };
     if (bind.id !== undefined && !bind.allow) {
-      where[bind.name || 'auth'] = { [bind.key || 'id']: bind.id };
+      const resolvedId = await this.resolveBindRelationId(bind);
+      if (resolvedId === null) {
+        return false;
+      }
+      where[bind.name || 'auth'] = { id: resolvedId };
     }
     try {
       const result = await this.repository.delete(where);
@@ -289,9 +300,13 @@ export class CommonService<Dto extends CommonDto, Entity extends BaseEntity> {
           if (find.where) {
             let resetWhere = parseWhereObject(find.where);
             if (bind.id !== undefined) {
+              const resolvedId = await this.resolveBindRelationId(bind);
               resetWhere = {
                 ...resetWhere,
-                [bind.name || 'auth']: { [bind.key || 'id']: bind.id },
+                [bind.name || 'auth']:
+                  resolvedId !== null
+                    ? { id: resolvedId }
+                    : { [bind.key || 'id']: bind.id },
               };
             }
             if (Object.keys(resetWhere).length > 0) {

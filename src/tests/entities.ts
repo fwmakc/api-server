@@ -177,6 +177,38 @@ export class TestCycleBEntity extends BaseEntity {
   a: any;
 }
 
+@ObjectType()
+@Entity({ name: 'test_users' })
+export class TestUserEntity extends BaseEntity {
+  @IdColumn()
+  id: number;
+
+  @VarcharColumn('email')
+  email: string;
+
+  @VarcharColumn('name')
+  name: string;
+}
+
+@ObjectType()
+@Entity({ name: 'test_notes' })
+export class TestNoteEntity extends BaseEntity {
+  @IdColumn()
+  id: number;
+
+  @VarcharColumn('title')
+  title: string;
+
+  @PrivateColumn()
+  @TextColumn('secret')
+  secret: string;
+
+  @Field(() => TestUserEntity, { nullable: true })
+  @ManyToOne(() => TestUserEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
+  user: TestUserEntity;
+}
+
 export const TestEntities = [
   TestAuthEntity,
   TestArticleEntity,
@@ -185,4 +217,6 @@ export const TestEntities = [
   TestProfileEntity,
   TestCycleAEntity,
   TestCycleBEntity,
+  TestUserEntity,
+  TestNoteEntity,
 ];

@@ -13,6 +13,8 @@ import {
   TestProfileEntity,
   TestCycleAEntity,
   TestCycleBEntity,
+  TestUserEntity,
+  TestNoteEntity,
 } from './entities';
 import {
   TestAuthDto,
@@ -22,6 +24,8 @@ import {
   TestProfileDto,
   TestCycleADto,
   TestCycleBDto,
+  TestUserDto,
+  TestNoteDto,
 } from './dtos';
 
 @Injectable()
@@ -127,6 +131,26 @@ export class TestCycleBService extends CommonService<TestCycleBDto, TestCycleBEn
   constructor(
     @InjectRepository(TestCycleBEntity)
     protected readonly repository: Repository<TestCycleBEntity>,
+  ) {
+    super();
+  }
+}
+
+@Injectable()
+export class TestUserService extends CommonService<TestUserDto, TestUserEntity> {
+  constructor(
+    @InjectRepository(TestUserEntity)
+    protected readonly repository: Repository<TestUserEntity>,
+  ) {
+    super();
+  }
+}
+
+@Injectable()
+export class TestNoteService extends CommonService<TestNoteDto, TestNoteEntity> {
+  constructor(
+    @InjectRepository(TestNoteEntity)
+    protected readonly repository: Repository<TestNoteEntity>,
   ) {
     super();
   }

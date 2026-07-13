@@ -11,6 +11,8 @@ import {
   TestProfileService,
   TestCycleAService,
   TestCycleBService,
+  TestUserService,
+  TestNoteService,
 } from './services';
 
 export const createTestModule = async (): Promise<TestingModule> => {
@@ -40,6 +42,8 @@ export const createTestModule = async (): Promise<TestingModule> => {
       TestProfileService,
       TestCycleAService,
       TestCycleBService,
+      TestUserService,
+      TestNoteService,
     ],
   }).compile();
 
@@ -58,6 +62,8 @@ const seedDatabase = async (moduleRef: TestingModule) => {
   const profileRepo = dataSource.getRepository('TestProfileEntity');
   const cycleARepo = dataSource.getRepository('TestCycleAEntity');
   const cycleBRepo = dataSource.getRepository('TestCycleBEntity');
+  const userRepo = dataSource.getRepository('TestUserEntity');
+  const noteRepo = dataSource.getRepository('TestNoteEntity');
 
   const [alice, bob, admin] = await authRepo.save([
     authRepo.create({ id: 1, username: 'alice@test', email: 'alice@test', password: await hash('password123', await genSalt(10)), isActivated: true, isSuperuser: false }),
@@ -99,4 +105,15 @@ const seedDatabase = async (moduleRef: TestingModule) => {
 
   cycleA.b = cycleB;
   await cycleARepo.save(cycleA);
+
+  const [userAlice, userBob] = await userRepo.save([
+    userRepo.create({ id: 1, email: 'alice@user', name: 'Alice' }),
+    userRepo.create({ id: 2, email: 'bob@user', name: 'Bob' }),
+  ]);
+
+  await noteRepo.save([
+    noteRepo.create({ id: 1, user: userAlice, title: 'Alice Note 1', secret: 'alice secret 1' }),
+    noteRepo.create({ id: 2, user: userAlice, title: 'Alice Note 2', secret: 'alice secret 2' }),
+    noteRepo.create({ id: 3, user: userBob, title: 'Bob Note', secret: 'bob secret' }),
+  ]);
 };
