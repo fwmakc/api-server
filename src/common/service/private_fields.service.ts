@@ -1,4 +1,5 @@
 export const removePrivateFields = async ({ result, repository }, bind) => {
+  const seen = new WeakSet();
   await Promise.all(
     result.map(
       (entrie) =>
@@ -9,29 +10,38 @@ export const removePrivateFields = async ({ result, repository }, bind) => {
             metadata: repository.metadata,
           },
           bind,
+          seen,
         ),
     ),
   );
   return result;
 };
 
-const processEntity = async ({ entrie, metadata }, bind) => {
-  if (!metadata.column || !Array.isArray(metadata.column)) {
+const processEntity = async ({ entrie, metadata }, bind, seen) => {
+  if (!entrie || typeof entrie !== 'object' || seen.has(entrie)) {
+    return;
+  }
+  seen.add(entrie);
+
+  if (!metadata.columns || !Array.isArray(metadata.columns)) {
     return;
   }
 
-  for (const column of metadata.column) {
+  for (const column of metadata.columns) {
     const { propertyName } = column;
-    const entityClass = metadata.target; // as Function;
+    const entityClass = metadata.target;
     const metadataValue = Reflect.getMetadata(
       'customMetadata',
       entityClass.prototype,
       propertyName,
     );
     if (metadataValue === 'private') {
-      const { allow, id, key, name } = bind;
-      const equal = +entrie?.[name || 'auth']?.[key || 'id'] === +id;
-      if (allow === false || !equal) {
+      const { allow, id, key = 'id', name = 'auth' } = bind;
+      const ownerId = entrie?.[name]?.[key];
+      const equal =
+        String(ownerId) === String(id) ||
+        String(entrie?.[name + 'Id']) === String(id);
+      if (!allow && !equal) {
         delete entrie[propertyName];
       }
     }
@@ -54,6 +64,7 @@ const processEntity = async ({ entrie, metadata }, bind) => {
                 metadata: relation.inverseEntityMetadata,
               },
               bind,
+              seen,
             ),
         ),
       );
@@ -64,6 +75,7 @@ const processEntity = async ({ entrie, metadata }, bind) => {
           metadata: relation.inverseEntityMetadata,
         },
         bind,
+        seen,
       );
     }
   }

@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["babel__generator", "Multer", "jest"]
+  }
+}

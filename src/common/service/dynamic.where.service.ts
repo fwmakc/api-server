@@ -83,9 +83,12 @@ const prepareDynamicWhereValue = (property, value, modifiers) => {
     case 'between':
       result = `${property}${ifNot} BETWEEN ${value}`;
       break;
-    case 'boolean':
-      result = `${property} ${sign} ${+value ? 'TRUE' : 'FALSE'}`;
+    case 'boolean': {
+      const sv = `${value}`.trim().toLowerCase();
+      const bv = sv === 'true' ? true : sv === 'false' ? false : Boolean(+value);
+      result = `${property} ${sign} ${bv ? 'TRUE' : 'FALSE'}`;
       break;
+    }
     case 'empty':
       result = `${property} IS${ifNot} NULL AND ${property} ${sign} ''`;
       break;

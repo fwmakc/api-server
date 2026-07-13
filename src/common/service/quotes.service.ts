@@ -1,7 +1,3 @@
-import * as dotenv from 'dotenv';
-
-dotenv.config();
-
 export const prepareQuotes = () => {
   const dbQuotes = process.env.DB_QUOTES;
 

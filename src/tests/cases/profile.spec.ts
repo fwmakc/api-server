@@ -1,0 +1,44 @@
+import { createTestModule } from '../app.testingModule';
+import { TestProfileService } from '../services';
+import { removePrivateFields } from '@src/common/service/private_fields.service';
+
+describe('@PrivateColumn — closed entity (profile)', () => {
+  let moduleRef: Awaited<ReturnType<typeof createTestModule>>;
+  let service: TestProfileService;
+
+  beforeAll(async () => {
+    moduleRef = await createTestModule();
+    service = moduleRef.get(TestProfileService);
+  });
+
+  afterAll(async () => {
+    await moduleRef.close();
+  });
+
+  it('N7a: admin sees internalNotes', async () => {
+    const profiles = await service.find(
+      { relations: [{ name: 'auth' }] },
+      { allow: true },
+    );
+    const aliceProfile = profiles.find((p) => +p.id === 1);
+    expect(aliceProfile).toBeDefined();
+    expect(aliceProfile.internalNotes).toBeDefined();
+  });
+
+  it('N7b: non-owner internalNotes stripped', async () => {
+    const profiles = await service.find(
+      { relations: [{ name: 'auth' }] },
+      { allow: true },
+    );
+    const repo = (service as any).repository;
+    await removePrivateFields(
+      { result: profiles, repository: repo },
+      { id: 2, name: 'auth', key: 'id', allow: false },
+    );
+    const aliceProfile = profiles.find((p) => +p.id === 1);
+    expect(aliceProfile.internalNotes).toBeUndefined();
+
+    const bobProfile = profiles.find((p) => +p.id === 2);
+    expect(bobProfile.internalNotes).toBeDefined();
+  });
+});

@@ -1,11 +1,7 @@
 import { ILike, Like } from 'typeorm';
-import * as dotenv from 'dotenv';
-
-dotenv.config();
-const dbType = process.env.DB_TYPE;
 
 export const prepareLike = () => {
-  if (dbType === 'postgres') {
+  if (process.env.DB_TYPE === 'postgres') {
     return 'ILIKE';
   }
 
@@ -13,7 +9,7 @@ export const prepareLike = () => {
 };
 
 export const prepareLikeOrm = (value) => {
-  if (dbType === 'postgres') {
+  if (process.env.DB_TYPE === 'postgres') {
     return ILike(value);
   }
 

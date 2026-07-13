@@ -40,22 +40,27 @@ export class CommonService<Dto extends CommonDto, Entity extends CommonEntity> {
       ...otherParams
     } = find;
 
-    const { id, name } = bind;
+    const { id, name, key = 'id', allow } = bind;
 
     let where = parseWhereObject(find.where);
     // "username.not.like": "%user%"
     // "username.and.not.like": ["%user1%", "%user2%"]
 
-    if (id !== undefined) {
-      where = { ...where, [name]: { id } };
+    if (id !== undefined && !allow) {
+      where = { ...where, [name]: { [key]: id } };
+    }
+
+    const relationNames = relations?.map((i) => i.name) || [];
+    if (id !== undefined && !relationNames.includes(name)) {
+      relationNames.push(name);
     }
 
     const params = {
       ...otherParams,
-      relations: relations?.map((i) => i.name),
+      relations: relationNames.length > 0 ? relationNames : undefined,
       where,
-      take,
-      skip,
+      take: take || undefined,
+      skip: skip || undefined,
     };
 
     try {
@@ -156,7 +161,27 @@ export class CommonService<Dto extends CommonDto, Entity extends CommonEntity> {
     // delete dto.updatedAt;
 
     if (bind.id !== undefined) {
-      dto[bind.name || 'auth'] = { id: bind.id };
+      const relationName = bind.name || 'auth';
+      const key = bind.key || 'id';
+
+      if (key === 'id') {
+        dto[relationName] = { id: bind.id };
+      } else {
+        const relation = this.repository.metadata.relations.find(
+          (r) => r.propertyName === relationName,
+        );
+        if (relation) {
+          const relatedRepo = this.repository.manager.getRepository(
+            relation.inverseEntityMetadata.target,
+          );
+          const related = await relatedRepo.findOne({
+            where: { [key]: bind.id } as any,
+          });
+          if (related) {
+            dto[relationName] = { id: related.id };
+          }
+        }
+      }
     }
 
     const entity: DeepPartial<any> = { ...dto };
@@ -216,13 +241,14 @@ export class CommonService<Dto extends CommonDto, Entity extends CommonEntity> {
   }
 
   async updateEntity(entity: DeepPartial<any>): Promise<any> {
-    return await this.repository.save(entity);
+    const { id, ...data } = entity;
+    await this.repository.update(id, data);
   }
 
   async remove(id: number, bind: BindDto = { allow: true }): Promise<boolean> {
     const where: FindOptionsWhere<any> = { id };
-    if (bind.id !== undefined) {
-      where[bind.name || 'auth'] = { id: bind.id };
+    if (bind.id !== undefined && !bind.allow) {
+      where[bind.name || 'auth'] = { [bind.key || 'id']: bind.id };
     }
     try {
       const result = await this.repository.delete(where);
@@ -237,6 +263,8 @@ export class CommonService<Dto extends CommonDto, Entity extends CommonEntity> {
     find: FindDto,
     bind: BindDto = { allow: true },
   ): Promise<boolean> {
+    this.validatePositionField(field);
+
     const entries = await this.find(find, bind);
 
     if (!entries) {
@@ -249,11 +277,20 @@ export class CommonService<Dto extends CommonDto, Entity extends CommonEntity> {
           const entityTarget: EntityTarget<Entity> = this.repository.target;
 
           if (find.where) {
-            const resetEntries: DeepPartial<any> = {
-              [field]: 0,
-            };
-
-            await transactionalManager.update(entityTarget, {}, resetEntries);
+            let resetWhere = parseWhereObject(find.where);
+            if (bind.id !== undefined) {
+              resetWhere = {
+                ...resetWhere,
+                [bind.name || 'auth']: { [bind.key || 'id']: bind.id },
+              };
+            }
+            if (Object.keys(resetWhere).length > 0) {
+              await transactionalManager.update(
+                entityTarget,
+                resetWhere,
+                { [field]: 0 } as DeepPartial<any>,
+              );
+            }
           }
 
           entries.forEach((entrie, index) => {
@@ -276,6 +313,8 @@ export class CommonService<Dto extends CommonDto, Entity extends CommonEntity> {
     position: number,
     bind: BindDto = { allow: true },
   ): Promise<boolean> {
+    this.validatePositionField(field);
+
     if (position === undefined || position === null) {
       return false;
     }
@@ -343,6 +382,27 @@ export class CommonService<Dto extends CommonDto, Entity extends CommonEntity> {
 
   bind(entrie, data) {
     return bind(entrie, data);
+  }
+
+  private validatePositionField(field: string) {
+    if (!field || typeof field !== 'string') {
+      throw new BadRequestException('Field name is required');
+    }
+    if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(field)) {
+      throw new BadRequestException(`Invalid field name: ${field}`);
+    }
+    const primaryColumns = this.repository.metadata.primaryColumns.map(
+      (c) => c.propertyName,
+    );
+    if (primaryColumns.includes(field)) {
+      throw new BadRequestException(`Cannot sort by primary key: ${field}`);
+    }
+    const columnNames = this.repository.metadata.columns.map(
+      (c) => c.propertyName,
+    );
+    if (!columnNames.includes(field)) {
+      throw new BadRequestException(`Unknown field: ${field}`);
+    }
   }
 
   error(e) {

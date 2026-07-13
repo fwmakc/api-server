@@ -3,6 +3,7 @@ import {
   Any,
   Between,
   Equal,
+  FindOperator,
   In,
   IsNull,
   LessThan,
@@ -11,6 +12,7 @@ import {
   MoreThanOrEqual,
   Not,
   Or,
+  Raw,
 } from 'typeorm';
 import { prepareLikeOrm } from './like.service';
 
@@ -28,6 +30,11 @@ export const parseWhereObject = (where) => {
       }
 
       parsed[property] = prepareAndOrValues(value, modifiers);
+      return;
+    }
+
+    if (value instanceof FindOperator) {
+      parsed[property] = value;
       return;
     }
 
@@ -97,7 +104,7 @@ const prepareWhereValue = (value, modifier) => {
       property = Boolean(+value);
       break;
     case 'empty':
-      property = Or(IsNull(), Equal(''));
+      property = Raw((alias) => `${alias} IS NULL OR ${alias} = ''`);
       break;
     case 'in':
       if (Array.isArray(value) && value.length > 0) {
