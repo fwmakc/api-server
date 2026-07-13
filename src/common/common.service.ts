@@ -23,6 +23,7 @@ import { parseWhereObject } from './service/where.service';
 import { removePrivateFields } from './service/private_fields.service';
 import { searchService } from './service/search.service';
 import { bind } from './service/bind.service';
+import { CsvService } from './service/csv.service';
 import { BindDto } from './dto/bind.dto';
 
 export class CommonService<Dto extends CommonDto, Entity extends BaseEntity> {
@@ -142,6 +143,37 @@ export class CommonService<Dto extends CommonDto, Entity extends BaseEntity> {
     find.select = { id: true };
     const result = await this.find(find, bind);
     return result && Array.isArray(result) ? result.length : 0;
+  }
+
+  async countDistinct(
+    field: string,
+    find: FindDto,
+  ): Promise<number> {
+    const qb = this.repository.createQueryBuilder('t');
+
+    const where = parseWhereObject(find.where);
+    if (where) qb.where(where);
+
+    const result = await qb
+      .select(`COUNT(DISTINCT t.${field})`, 'count')
+      .getRawOne();
+
+    return Number(result?.count || 0);
+  }
+
+  async csv(
+    find: FindDto,
+    filename: string,
+    bind: BindDto = { allow: true },
+  ): Promise<any> {
+    const csvService = new CsvService({
+      service: this,
+      find,
+      bind,
+      filename,
+    });
+
+    return csvService.execute();
   }
 
   async create(
