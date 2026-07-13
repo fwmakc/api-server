@@ -220,6 +220,12 @@ export class TestSecretEntity extends BaseEntity {
   account: TestAccountEntity;
 }
 
+@Entity({ name: 'test_dynamic' })
+export class TestDynamicEntity extends BaseEntity {
+  @IdColumn()
+  id: number;
+}
+
 export const TestEntities = [
   TestAccountEntity,
   TestArticleEntity,
@@ -231,4 +237,5 @@ export const TestEntities = [
   TestUserEntity,
   TestNoteEntity,
   TestSecretEntity,
+  TestDynamicEntity,
 ];

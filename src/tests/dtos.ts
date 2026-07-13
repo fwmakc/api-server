@@ -62,3 +62,5 @@ export class TestSecretDto extends CommonDto {
   lockedField?: string;
   account?: any;
 }
+
+export class TestDynamicDto extends CommonDto {}

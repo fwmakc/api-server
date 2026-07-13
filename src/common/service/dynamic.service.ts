@@ -26,14 +26,17 @@ export class DynamicService<
       .join(', ');
     const values = Object.values(entityData).join(', ');
 
+    const dbType = process.env.DB_TYPE;
+    const returningClause = dbType === 'postgres' ? ' RETURNING id' : '';
+
     try {
       const query = `
         INSERT INTO ${tableName}
         (${keys})
-        VALUES (${values});
+        VALUES (${values})${returningClause};
       `;
       const result = await this.repository.query(query);
-      return { id: result.insertId };
+      return { id: dbType === 'postgres' ? result[0]?.id : result.insertId };
     } catch (e) {
       this.error(e);
     }
@@ -64,16 +67,18 @@ export class DynamicService<
     }
   }
 
-  async find(find: FindDto, bind: BindDto): Promise<Entity[]> {
+  async find(
+    find: FindDto,
+    bind: BindDto = { allow: true },
+  ): Promise<Entity[]> {
     const { limit, offset, order, select } = find;
-    const { id, name } = bind;
+    const { id, name, allow } = bind;
 
     let where = parseDynamicWhereObject(find.where);
-    // "username.not.like": "%user%"
-    // "username.and.not.like": ["%user1%", "%user2%"]
 
-    if (id !== undefined) {
-      where = { ...where, [name]: id };
+    if (id !== undefined && !allow) {
+      const bindWhere = parseDynamicWhereObject({ [name]: id });
+      where = [...where, ...bindWhere];
     }
 
     try {

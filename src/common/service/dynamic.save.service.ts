@@ -35,7 +35,7 @@ export const parseDynamicSaveObject = (entity) => {
 };
 
 const escapeQuotes = (string) => {
-  return `${string || ''}`.replace(/['"\\]/giu, '\\$&');
+  return `${string || ''}`.replace(/['\\]/giu, '\\$&');
 };
 
 const parseDate = (dateValue) => {
