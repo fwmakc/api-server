@@ -1,9 +1,9 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { tokenValidateSimple } from './hidden.guard.service';
+import { tokenValidateSimple } from './secure.guard.service';
 
 @Injectable()
-export class GqlSimpleHiddenGuard implements CanActivate {
+export class GqlSimpleSecureGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = this.getRequest(context);
     const token = request.headers['authorization'];

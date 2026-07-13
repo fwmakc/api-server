@@ -16,10 +16,10 @@ import { RemoveDoc } from '@src/common/doc/remove.doc';
 import { SortPositionDoc } from '@src/common/doc/position_sort.doc';
 import { MovePositionDoc } from '@src/common/doc/position_move.doc';
 import { ApiType } from './type/api.type';
-import { GqlHiddenGuard } from './guard/gql.hidden.guard';
-import { GqlSimpleHiddenGuard } from './guard/gql.simple.hidden.guard';
-import { HiddenGuard } from './guard/hidden.guard';
-import { SimpleHiddenGuard } from './guard/simple.hidden.guard';
+import { GqlSecureGuard } from './guard/gql.secure.guard';
+import { GqlSimpleSecureGuard } from './guard/gql.simple.secure.guard';
+import { SecureGuard } from './guard/secure.guard';
+import { SimpleSecureGuard } from './guard/simple.secure.guard';
 
 export const Data = createParamDecorator(
   async (arg = '', context: ExecutionContext) => {
@@ -72,18 +72,18 @@ export const Doc = (type, classDto) => {
   }
 };
 
-export const Hidden = (apiType: ApiType = undefined) => {
+export const Secure = (apiType: ApiType = undefined) => {
   if (apiType === 'gql' || apiType === 'gqlNoBlock') {
-    return applyDecorators(UseGuards(GqlHiddenGuard));
+    return applyDecorators(UseGuards(GqlSecureGuard));
   }
 
-  return applyDecorators(UseGuards(HiddenGuard));
+  return applyDecorators(UseGuards(SecureGuard));
 };
 
-export const SimpleHidden = (apiType: ApiType = undefined) => {
+export const SimpleSecure = (apiType: ApiType = undefined) => {
   if (apiType === 'gql' || apiType === 'gqlNoBlock') {
-    return applyDecorators(UseGuards(GqlSimpleHiddenGuard));
+    return applyDecorators(UseGuards(GqlSimpleSecureGuard));
   }
 
-  return applyDecorators(UseGuards(SimpleHiddenGuard));
+  return applyDecorators(UseGuards(SimpleSecureGuard));
 };

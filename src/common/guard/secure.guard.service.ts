@@ -11,9 +11,9 @@ export function tokenValidate(token: string): boolean {
 
   const [tokenHashed, tokenTimestamp] = token.split('.');
 
-  const expires = Number(process.env.HIDDEN_EXPIRES);
-  const string = `${process.env.HIDDEN_SECRET}.${tokenTimestamp}`;
-  const method = `${process.env.HIDDEN_METHOD || 'MD5'}`.toLowerCase();
+  const expires = Number(process.env.SECURE_EXPIRES);
+  const string = `${process.env.SECURE_SECRET}.${tokenTimestamp}`;
+  const method = `${process.env.SECURE_METHOD || 'MD5'}`.toLowerCase();
   const hashed = hash(string, method);
 
   if (hashed !== tokenHashed) {
@@ -39,7 +39,7 @@ export function tokenValidateSimple(token: string): boolean {
     throw new UnauthorizedException('Token is missing');
   }
 
-  const word = process.env.HIDDEN_SIMPLE;
+  const word = process.env.SECURE_SIMPLE;
 
   if (!word) {
     throw new UnauthorizedException('Token not set on server');

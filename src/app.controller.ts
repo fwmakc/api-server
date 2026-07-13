@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { ApiExcludeController } from '@nestjs/swagger';
 import { AppService } from '@src/app.service';
 import { join } from 'path';
-import { Hidden, SimpleHidden } from './common/common.decorator';
+import { Secure, SimpleSecure } from './common/common.decorator';
 
 @ApiExcludeController()
 @Controller()
@@ -19,7 +19,7 @@ export class AppController {
     return this.appService.hello();
   }
 
-  @SimpleHidden()
+  @SimpleSecure()
   @Get('test')
   @Header('Content-Type', 'application/json')
   test() {
@@ -32,10 +32,10 @@ export class AppController {
     });
   }
 
-  @Hidden()
-  @Get('test/hidden')
+  @Secure()
+  @Get('test/secure')
   @Header('Content-Type', 'application/json')
-  hidden() {
+  secure() {
     return { status: 'ok' };
   }
 }
