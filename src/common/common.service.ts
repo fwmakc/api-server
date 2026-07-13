@@ -182,6 +182,67 @@ export class CommonService<Dto extends CommonDto, Entity extends BaseEntity> {
     return await this.repository.save(entity);
   }
 
+  getUniqueColumns(): Array<string> {
+    const uniques: Array<string> = [];
+    this.repository.metadata.indices.forEach((index) => {
+      if (index.isUnique) {
+        const name = index.columns?.[0]?.propertyName;
+        if (name) {
+          uniques.push(name);
+        }
+      }
+    });
+    return uniques;
+  }
+
+  async findUniqueEntrie(entity: DeepPartial<any>): Promise<any> {
+    const uniques = this.getUniqueColumns();
+    if (uniques.length === 0) {
+      return null;
+    }
+
+    const where = uniques
+      .filter(
+        (field) => entity[field] !== undefined && entity[field] !== null,
+      )
+      .map((field) => ({ [field]: entity[field] }));
+
+    if (where.length === 0) {
+      return null;
+    }
+
+    return await this.repository.findOne({
+      select: { id: true } as any,
+      where: where as any,
+    });
+  }
+
+  async upsert(
+    dto: Dto,
+    relations: Array<RelationsDto> = undefined,
+    bind: BindDto = { allow: true },
+  ): Promise<Entity> {
+    delete dto.id;
+
+    const entity: DeepPartial<any> = { ...dto };
+
+    if (bind.id !== undefined) {
+      const relationName = bind.name || 'auth';
+      const resolvedId = await this.resolveBindRelationId(bind);
+      if (resolvedId !== null) {
+        entity[relationName] = { id: resolvedId };
+      }
+    }
+
+    const existsEntrie = await this.findUniqueEntrie(entity);
+
+    if (existsEntrie?.id) {
+      return await this.update(existsEntrie.id, dto, relations, bind);
+    }
+
+    return await this.create(dto, relations, bind);
+  }
+
   async update(
     id: number,
     dto: Dto,

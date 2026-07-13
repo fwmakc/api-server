@@ -183,7 +183,7 @@ export class TestUserEntity extends BaseEntity {
   @IdColumn()
   id: number;
 
-  @VarcharColumn('email')
+  @VarcharColumn('email', 'normal', { index: 'unique' })
   email: string;
 
   @VarcharColumn('name')
