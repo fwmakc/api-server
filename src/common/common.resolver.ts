@@ -1,9 +1,9 @@
 import { Args, Mutation, Query } from '@nestjs/graphql';
 import { Type } from '@nestjs/common';
+import { BaseEntity } from 'typeorm';
 import { RelationsDto } from '@src/common/dto/relations.dto';
 import { CommonService } from '@src/common/common.service';
 import { CommonDto } from '@src/common/common.dto';
-import { CommonEntity } from '@src/common/common.entity';
 import { GraphQLJSONObject } from 'graphql-type-json';
 import { AuthDto } from '@src/auth/auth.dto';
 
@@ -14,7 +14,7 @@ export const CommonResolver = <T extends Type<unknown>>(
 ) => {
   class BaseResolver<
     Dto extends CommonDto,
-    Entity extends CommonEntity,
+    Entity extends BaseEntity,
     Service extends CommonService<Dto, Entity>,
   > {
     readonly service: Service;

@@ -7,11 +7,11 @@ import {
   DtoUpdatedColumn,
 } from '@src/common/common.column';
 import { TypeClients } from '@src/common/common.enum';
-import { ProtectedDto } from '@src/common/dto/protected.dto';
+import { CommonDto } from '@src/common/common.dto';
 import { ClientsRedirectsDto } from './clients_redirects/clients_redirects.dto';
 
 @InputType()
-export class ClientsDto extends ProtectedDto {
+export class ClientsDto extends CommonDto {
   @DtoCreatedColumn()
   createdAt?: Date;
 

@@ -1,5 +1,5 @@
 import { ObjectType } from '@nestjs/graphql';
-import { Entity } from 'typeorm';
+import { BaseEntity, Entity } from 'typeorm';
 import {
   BigIntColumn,
   BooleanColumn,
@@ -7,6 +7,7 @@ import {
   DateColumn,
   EnumColumn,
   FloatColumn,
+  IdColumn,
   IntColumn,
   JsonColumn,
   SmallIntColumn,
@@ -15,11 +16,13 @@ import {
   VarcharColumn,
 } from '@src/common/common.column';
 import { TypeValues } from '@src/common/common.enum';
-import { CommonEntity } from '@src/common/common.entity';
 
 @ObjectType()
 @Entity({ name: 'test' })
-export class TestEntity extends CommonEntity {
+export class TestEntity extends BaseEntity {
+  @IdColumn()
+  id: number;
+
   @CreatedColumn()
   createdAt?: Date;
 

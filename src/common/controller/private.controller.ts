@@ -6,16 +6,14 @@ import {
   ParseIntPipe,
   Type,
 } from '@nestjs/common';
+import { BaseEntity } from 'typeorm';
 import { RelationsDto } from '@src/common/dto/relations.dto';
 import { CommonService } from '@src/common/common.service';
-import { PrivateDto } from '@src/common/dto/private.dto';
-import { PrivateEntity } from '@src/common/entity/private.entity';
+import { CommonDto } from '@src/common/common.dto';
 import { ProtectedController } from '@src/common/controller/protected.controller';
 import { AuthDto } from '@src/auth/auth.dto';
 import { Auth, Self } from '@src/auth/auth.decorator';
 import { Data, Doc } from '@src/common/common.decorator';
-import { CommonEntity } from '@src/common/common.entity';
-import { CommonDto } from '@src/common/common.dto';
 import { BindDto } from '../dto/bind.dto';
 
 export const PrivateController = <T extends Type<unknown>>(
@@ -23,12 +21,13 @@ export const PrivateController = <T extends Type<unknown>>(
   classDto,
   classEntity: T,
   authTable = '',
+  authField = 'id',
 ) => {
   class BasePrivateController<
-    Dto extends PrivateDto | CommonDto,
-    Entity extends PrivateEntity | CommonEntity,
+    Dto extends CommonDto,
+    Entity extends BaseEntity,
     Service extends CommonService<Dto, Entity>,
-  > extends ProtectedController(name, classDto, classEntity, authTable)<
+  > extends ProtectedController(name, classDto, classEntity, authTable, authField)<
     Dto,
     Entity,
     Service
@@ -50,6 +49,7 @@ export const PrivateController = <T extends Type<unknown>>(
     ): Promise<Entity[]> {
       const bind: BindDto = this.service.bind(auth, {
         name: authTable,
+        key: authField,
         allow: auth?.isSuperuser,
       });
       return await this.service.find(
@@ -79,6 +79,7 @@ export const PrivateController = <T extends Type<unknown>>(
     ): Promise<Entity> {
       const bind: BindDto = this.service.bind(auth, {
         name: authTable,
+        key: authField,
         allow: auth?.isSuperuser,
       });
       return await this.service.findFirst(
@@ -105,6 +106,7 @@ export const PrivateController = <T extends Type<unknown>>(
     ): Promise<Entity[]> {
       const bind: BindDto = this.service.bind(auth, {
         name: authTable,
+        key: authField,
         allow: auth?.isSuperuser,
       });
       const result = await this.service.findMany(
@@ -132,6 +134,7 @@ export const PrivateController = <T extends Type<unknown>>(
     ): Promise<Entity> {
       const bind: BindDto = this.service.bind(auth, {
         name: authTable,
+        key: authField,
         allow: auth?.isSuperuser,
       });
       const result = await this.service.findOne(
@@ -160,6 +163,7 @@ export const PrivateController = <T extends Type<unknown>>(
     ): Promise<Entity[]> {
       const bind: BindDto = this.service.bind(auth, {
         name: authTable,
+        key: authField,
         allow: false,
       });
       return await this.service.find(
@@ -185,6 +189,7 @@ export const PrivateController = <T extends Type<unknown>>(
     ): Promise<number> {
       const bind: BindDto = this.service.bind(auth, {
         name: authTable,
+        key: authField,
         allow: auth?.isSuperuser,
       });
       return await this.service.count(

@@ -1,11 +1,11 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
 import { DtoColumn } from '@src/common/common.column';
-import { ClosedDto } from '@src/common/dto/closed.dto';
+import { CommonDto } from '@src/common/common.dto';
 import { SettingsDto } from '../settings.dto';
 
 @InputType()
-export class SettingsGroupsDto extends ClosedDto {
+export class SettingsGroupsDto extends CommonDto {
   @DtoColumn('Имя группы')
   name?: string;
 

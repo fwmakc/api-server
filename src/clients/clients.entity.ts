@@ -1,7 +1,10 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import {
-  Entity,
+  BaseEntity,
   Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
   // Generated,
 } from 'typeorm';
@@ -9,17 +12,26 @@ import {
   BooleanColumn,
   CreatedColumn,
   EnumColumn,
+  IdColumn,
   TextColumn,
   UpdatedColumn,
   VarcharColumn,
 } from '@src/common/common.column';
 import { TypeClients } from '@src/common/common.enum';
-import { ProtectedEntity } from '@src/common/entity/protected.entity';
+import { AuthEntity } from '@src/auth/auth.entity';
 import { ClientsRedirectsEntity } from './clients_redirects/clients_redirects.entity';
 
 @ObjectType()
 @Entity({ name: 'clients' })
-export class ClientsEntity extends ProtectedEntity {
+export class ClientsEntity extends BaseEntity {
+  @IdColumn()
+  id: number;
+
+  @Field(() => AuthEntity, { nullable: true })
+  @ManyToOne(() => AuthEntity)
+  @JoinColumn({ name: 'auth_id', referencedColumnName: 'id' })
+  auth: AuthEntity;
+
   @CreatedColumn()
   createdAt?: Date;
 

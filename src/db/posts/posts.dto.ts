@@ -1,12 +1,12 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
 import { DtoColumn } from '@src/common/common.column';
-import { ProtectedDto } from '@src/common/dto/protected.dto';
+import { CommonDto } from '@src/common/common.dto';
 import { PostsCategoriesDto } from './posts_categories/posts_categories.dto';
 import { PostsTagsDto } from './posts_tags/posts_tags.dto';
 
 @InputType()
-export class PostsDto extends ProtectedDto {
+export class PostsDto extends CommonDto {
   @DtoColumn('Дата и время создания записи, назначается автоматически')
   createdAt?: Date;
 

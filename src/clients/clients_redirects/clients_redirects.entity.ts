@@ -1,16 +1,19 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Entity, ManyToOne, JoinColumn } from 'typeorm';
+import { BaseEntity, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import {
   CreatedColumn,
+  IdColumn,
   UpdatedColumn,
   VarcharColumn,
 } from '@src/common/common.column';
-import { CommonEntity } from '@src/common/common.entity';
 import { ClientsEntity } from '../clients.entity';
 
 @ObjectType()
 @Entity({ name: 'clients_redirects' })
-export class ClientsRedirectsEntity extends CommonEntity {
+export class ClientsRedirectsEntity extends BaseEntity {
+  @IdColumn()
+  id: number;
+
   @CreatedColumn()
   createdAt?: Date;
 

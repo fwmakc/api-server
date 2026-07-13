@@ -12,17 +12,20 @@ import {
 import {
   BooleanColumn,
   CreatedColumn,
+  IdColumn,
   IntColumn,
   TextColumn,
   UpdatedColumn,
   VarcharColumn,
 } from '@src/common/common.column';
-import { CommonEntity } from '@src/common/common.entity';
 import { PrivateColumn } from '@src/common/decorator/private_column.decorator';
 
 @ObjectType()
 @Entity({ name: 'test_auth' })
-export class TestAuthEntity extends CommonEntity {
+export class TestAuthEntity extends BaseEntity {
+  @IdColumn()
+  id: number;
+
   @VarcharColumn('username')
   username: string;
 
@@ -41,7 +44,10 @@ export class TestAuthEntity extends CommonEntity {
 
 @ObjectType()
 @Entity({ name: 'test_articles' })
-export class TestArticleEntity extends CommonEntity {
+export class TestArticleEntity extends BaseEntity {
+  @IdColumn()
+  id: number;
+
   @CreatedColumn()
   createdAt?: Date;
 
@@ -78,7 +84,10 @@ export class TestArticleEntity extends CommonEntity {
 
 @ObjectType()
 @Entity({ name: 'test_comments' })
-export class TestCommentEntity extends CommonEntity {
+export class TestCommentEntity extends BaseEntity {
+  @IdColumn()
+  id: number;
+
   @VarcharColumn('text')
   text: string;
 
@@ -101,7 +110,10 @@ export class TestCommentEntity extends CommonEntity {
 
 @ObjectType()
 @Entity({ name: 'test_tags' })
-export class TestTagEntity extends CommonEntity {
+export class TestTagEntity extends BaseEntity {
+  @IdColumn()
+  id: number;
+
   @VarcharColumn('name')
   name: string;
 
@@ -112,7 +124,10 @@ export class TestTagEntity extends CommonEntity {
 
 @ObjectType()
 @Entity({ name: 'test_profiles' })
-export class TestProfileEntity extends CommonEntity {
+export class TestProfileEntity extends BaseEntity {
+  @IdColumn()
+  id: number;
+
   @TextColumn('bio')
   bio: string;
 
@@ -128,7 +143,10 @@ export class TestProfileEntity extends CommonEntity {
 
 @ObjectType()
 @Entity({ name: 'test_cycle_a' })
-export class TestCycleAEntity extends CommonEntity {
+export class TestCycleAEntity extends BaseEntity {
+  @IdColumn()
+  id: number;
+
   @VarcharColumn('name')
   name: string;
 
@@ -143,7 +161,10 @@ export class TestCycleAEntity extends CommonEntity {
 
 @ObjectType()
 @Entity({ name: 'test_cycle_b' })
-export class TestCycleBEntity extends CommonEntity {
+export class TestCycleBEntity extends BaseEntity {
+  @IdColumn()
+  id: number;
+
   @VarcharColumn('name')
   name: string;
 

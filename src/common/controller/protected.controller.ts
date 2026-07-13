@@ -8,16 +8,14 @@ import {
   Patch,
   Type,
 } from '@nestjs/common';
+import { BaseEntity } from 'typeorm';
 import { RelationsDto } from '@src/common/dto/relations.dto';
 import { CommonService } from '@src/common/common.service';
-import { ProtectedDto } from '@src/common/dto/protected.dto';
-import { ProtectedEntity } from '@src/common/entity/protected.entity';
+import { CommonDto } from '@src/common/common.dto';
 import { CommonController } from '@src/common/common.controller';
 import { AuthDto } from '@src/auth/auth.dto';
 import { Auth, Self } from '@src/auth/auth.decorator';
 import { Data, Doc } from '@src/common/common.decorator';
-import { CommonEntity } from '@src/common/common.entity';
-import { CommonDto } from '@src/common/common.dto';
 import { BindDto } from '../dto/bind.dto';
 
 export const ProtectedController = <T extends Type<unknown>>(
@@ -25,12 +23,13 @@ export const ProtectedController = <T extends Type<unknown>>(
   classDto,
   classEntity: T,
   authTable = '',
+  authField = 'id',
 ) => {
   class BaseProtectedController<
-    Dto extends ProtectedDto | CommonDto,
-    Entity extends ProtectedEntity | CommonEntity,
+    Dto extends CommonDto,
+    Entity extends BaseEntity,
     Service extends CommonService<Dto, Entity>,
-  > extends CommonController(name, classDto, classEntity)<
+  > extends CommonController(name, classDto, classEntity, authTable)<
     Dto,
     Entity,
     Service
@@ -47,6 +46,7 @@ export const ProtectedController = <T extends Type<unknown>>(
     ): Promise<Entity> {
       const bind: BindDto = this.service.bind(auth, {
         name: authTable,
+        key: authField,
         allow: auth?.isSuperuser,
       });
       return await this.service.create(dto, relations, bind);
@@ -63,6 +63,7 @@ export const ProtectedController = <T extends Type<unknown>>(
     ): Promise<Entity> {
       const bind: BindDto = this.service.bind(auth, {
         name: authTable,
+        key: authField,
         allow: auth?.isSuperuser,
       });
       const result = await this.service.update(
@@ -86,6 +87,7 @@ export const ProtectedController = <T extends Type<unknown>>(
     ): Promise<boolean> {
       const bind: BindDto = this.service.bind(auth, {
         name: authTable,
+        key: authField,
         allow: auth?.isSuperuser,
       });
       return await this.service.remove(id, bind);
@@ -106,6 +108,7 @@ export const ProtectedController = <T extends Type<unknown>>(
     ): Promise<boolean> {
       const bind: BindDto = this.service.bind(auth, {
         name: authTable,
+        key: authField,
         allow: auth?.isSuperuser,
       });
       const result = await this.service.sortPosition(
@@ -137,6 +140,7 @@ export const ProtectedController = <T extends Type<unknown>>(
     ): Promise<boolean> {
       const bind: BindDto = this.service.bind(auth, {
         name: authTable,
+        key: authField,
         allow: auth?.isSuperuser,
       });
       const result = await this.service.movePosition(id, field, position, bind);

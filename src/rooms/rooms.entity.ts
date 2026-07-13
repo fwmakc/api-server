@@ -1,12 +1,14 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Entity, OneToMany } from 'typeorm';
-import { CommonEntity } from '@src/common/common.entity';
+import { BaseEntity, Entity, OneToMany } from 'typeorm';
+import { IdColumn, VarcharColumn } from '@src/common/common.column';
 import { SocketsEntity } from '@src/sockets/sockets.entity';
-import { VarcharColumn } from '@src/common/common.column';
 
 @ObjectType()
 @Entity({ name: 'rooms' })
-export class RoomsEntity extends CommonEntity {
+export class RoomsEntity extends BaseEntity {
+  @IdColumn()
+  id: number;
+
   @VarcharColumn('title')
   title?: string;
 

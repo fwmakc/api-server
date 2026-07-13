@@ -1,8 +1,7 @@
 import * as moment from 'moment';
 import { BadRequestException } from '@nestjs/common';
-import { DeepPartial, EntityTarget, Repository } from 'typeorm';
+import { BaseEntity, DeepPartial, EntityTarget, Repository } from 'typeorm';
 import { CommonDto } from '@src/common/common.dto';
-import { CommonEntity } from '@src/common/common.entity';
 import { FindDto } from '../dto/find.dto';
 import { CommonService } from '../common.service';
 import { parseDynamicWhereObject } from './dynamic.where.service';
@@ -12,7 +11,7 @@ import { parseDynamicSaveObject } from './dynamic.save.service';
 
 export class DynamicService<
   Dto extends CommonDto,
-  Entity extends CommonEntity,
+  Entity extends BaseEntity,
 > extends CommonService<Dto, Entity> {
   // protected readonly repository: Repository<Entity>;
   protected readonly repository: Repository<any>;

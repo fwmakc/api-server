@@ -1,15 +1,24 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Entity } from 'typeorm';
+import { BaseEntity, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import {
   CreatedColumn,
+  IdColumn,
   UpdatedColumn,
   VarcharColumn,
 } from '@src/common/common.column';
-import { ProtectedEntity } from '@src/common/entity/protected.entity';
+import { AuthEntity } from '../auth.entity';
 
 @ObjectType()
 @Entity({ name: 'auth_confirm' })
-export class AuthConfirmEntity extends ProtectedEntity {
+export class AuthConfirmEntity extends BaseEntity {
+  @IdColumn()
+  id: number;
+
+  @Field(() => AuthEntity, { nullable: true })
+  @ManyToOne(() => AuthEntity)
+  @JoinColumn({ name: 'auth_id', referencedColumnName: 'id' })
+  auth: AuthEntity;
+
   @CreatedColumn()
   createdAt?: Date;
 

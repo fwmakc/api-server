@@ -1,6 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
 import {
   And,
+  BaseEntity,
   DeepPartial,
   EntityTarget,
   FindOptionsOrder,
@@ -15,7 +16,6 @@ import {
 import { RelationsDto } from '@src/common/dto/relations.dto';
 import { relationsOrder } from '@src/common/service/relations.service';
 import { CommonDto } from '@src/common/common.dto';
-import { CommonEntity } from '@src/common/common.entity';
 import { FindDto } from './dto/find.dto';
 import { FindManyDto } from './dto/find_many.dto';
 import { FindOneDto } from './dto/find_one.dto';
@@ -25,7 +25,7 @@ import { searchService } from './service/search.service';
 import { bind } from './service/bind.service';
 import { BindDto } from './dto/bind.dto';
 
-export class CommonService<Dto extends CommonDto, Entity extends CommonEntity> {
+export class CommonService<Dto extends CommonDto, Entity extends BaseEntity> {
   protected readonly repository: Repository<Entity>;
 
   async find(

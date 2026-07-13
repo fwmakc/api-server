@@ -4,10 +4,10 @@ import {
   DtoCreatedColumn,
   DtoUpdatedColumn,
 } from '@src/common/common.column';
-import { ProtectedDto } from '@src/common/dto/protected.dto';
+import { CommonDto } from '@src/common/common.dto';
 
 @InputType()
-export class AuthConfirmDto extends ProtectedDto {
+export class AuthConfirmDto extends CommonDto {
   @DtoCreatedColumn()
   createdAt?: Date;
 

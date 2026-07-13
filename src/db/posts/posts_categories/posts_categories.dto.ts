@@ -5,11 +5,11 @@ import {
   DtoCreatedColumn,
   DtoUpdatedColumn,
 } from '@src/common/common.column';
-import { ClosedDto } from '@src/common/dto/closed.dto';
+import { CommonDto } from '@src/common/common.dto';
 import { PostsDto } from '../posts.dto';
 
 @InputType()
-export class PostsCategoriesDto extends ClosedDto {
+export class PostsCategoriesDto extends CommonDto {
   @DtoCreatedColumn()
   createdAt?: Date;
 

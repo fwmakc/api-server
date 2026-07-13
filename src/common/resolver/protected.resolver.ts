@@ -1,13 +1,11 @@
 import { Args, Mutation } from '@nestjs/graphql';
 import { Type } from '@nestjs/common';
+import { BaseEntity } from 'typeorm';
 import { RelationsDto } from '@src/common/dto/relations.dto';
 import { CommonService } from '@src/common/common.service';
-import { ProtectedDto } from '@src/common/dto/protected.dto';
-import { ProtectedEntity } from '@src/common/entity/protected.entity';
 import { CommonResolver } from '@src/common/common.resolver';
 import { AuthDto } from '@src/auth/auth.dto';
 import { Auth, Self } from '@src/auth/auth.decorator';
-import { CommonEntity } from '@src/common/common.entity';
 import { CommonDto } from '@src/common/common.dto';
 import { BindDto } from '../dto/bind.dto';
 
@@ -16,10 +14,11 @@ export const ProtectedResolver = <T extends Type<unknown>>(
   classDto,
   classEntity: T,
   authTable = '',
+  authField = 'id',
 ) => {
   class BaseProtectedResolver<
-    Dto extends ProtectedDto | CommonDto,
-    Entity extends ProtectedEntity | CommonEntity,
+    Dto extends CommonDto,
+    Entity extends BaseEntity,
     Service extends CommonService<Dto, Entity>,
   > extends CommonResolver(name, classDto, classEntity)<Dto, Entity, Service> {
     readonly service: Service;
@@ -40,6 +39,7 @@ export const ProtectedResolver = <T extends Type<unknown>>(
     ): Promise<Entity> {
       const bind: BindDto = this.service.bind(auth, {
         name: authTable,
+        key: authField,
         allow: auth?.isSuperuser,
       });
       return await this.service.create(dto, relations, bind);
@@ -63,6 +63,7 @@ export const ProtectedResolver = <T extends Type<unknown>>(
     ): Promise<Entity> {
       const bind: BindDto = this.service.bind(auth, {
         name: authTable,
+        key: authField,
         allow: auth?.isSuperuser,
       });
       return await this.service.update(id, dto, relations, bind);
@@ -78,6 +79,7 @@ export const ProtectedResolver = <T extends Type<unknown>>(
     ): Promise<boolean> {
       const bind: BindDto = this.service.bind(auth, {
         name: authTable,
+        key: authField,
         allow: auth?.isSuperuser,
       });
       return await this.service.remove(id, bind);

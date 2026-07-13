@@ -2,11 +2,11 @@ import { Field, InputType } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
 import { DtoColumn, DtoEnumColumn } from '@src/common/common.column';
 import { TypeValues } from '@src/common/common.enum';
-import { ClosedDto } from '@src/common/dto/closed.dto';
+import { CommonDto } from '@src/common/common.dto';
 import { SettingsGroupsDto } from './settings_groups/settings_groups.dto';
 
 @InputType()
-export class SettingsDto extends ClosedDto {
+export class SettingsDto extends CommonDto {
   @DtoColumn('Имя для настройки')
   name?: string;
 

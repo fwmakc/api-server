@@ -6,11 +6,11 @@ import {
   DtoEnumColumn,
   DtoUpdatedColumn,
 } from '@src/common/common.column';
-import { PrivateDto } from '@src/common/dto/private.dto';
+import { CommonDto } from '@src/common/common.dto';
 import { TypeGenders } from '@src/common/common.enum';
 
 @InputType()
-export class PersonsDto extends PrivateDto {
+export class PersonsDto extends CommonDto {
   @DtoCreatedColumn()
   createdAt?: Date;
 

@@ -1,12 +1,20 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Entity, ManyToMany, JoinColumn, JoinTable, ManyToOne } from 'typeorm';
-import { ProtectedEntity } from '@src/common/entity/protected.entity';
+import {
+  BaseEntity,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+} from 'typeorm';
 import { PostsCategoriesEntity } from './posts_categories/posts_categories.entity';
 import { PostsTagsEntity } from './posts_tags/posts_tags.entity';
+import { AuthEntity } from '@src/auth/auth.entity';
 import {
   BooleanColumn,
   CreatedColumn,
   DateColumn,
+  IdColumn,
   TextColumn,
   UpdatedColumn,
   VarcharColumn,
@@ -14,7 +22,15 @@ import {
 
 @ObjectType()
 @Entity({ name: 'posts' })
-export class PostsEntity extends ProtectedEntity {
+export class PostsEntity extends BaseEntity {
+  @IdColumn()
+  id: number;
+
+  @Field(() => AuthEntity, { nullable: true })
+  @ManyToOne(() => AuthEntity)
+  @JoinColumn({ name: 'auth_id', referencedColumnName: 'id' })
+  auth: AuthEntity;
+
   @CreatedColumn()
   createdAt?: Date;
 

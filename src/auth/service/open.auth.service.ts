@@ -36,7 +36,7 @@ export class OpenAuthService {
     state: string,
   ): Promise<string> {
     const [{ uri }] = clientsDto.redirects;
-    delete clientsDto.auth;
+    delete (clientsDto as any).auth;
     delete clientsDto.redirects;
     const token = await this.tokenService.pair({ id });
     if (!token) {
@@ -89,7 +89,7 @@ export class OpenAuthService {
     const code = await Buffer.from(JSON.stringify(data)).toString('base64');
 
     clientsDto.code = code;
-    delete clientsDto.auth;
+    delete (clientsDto as any).auth;
     delete clientsDto.redirects;
     return await this.clientsService.update(
       clientsDto.id,

@@ -1,14 +1,12 @@
 import { Args, Query } from '@nestjs/graphql';
 import { Type } from '@nestjs/common';
+import { BaseEntity } from 'typeorm';
 import { RelationsDto } from '@src/common/dto/relations.dto';
 import { CommonService } from '@src/common/common.service';
-import { PrivateDto } from '@src/common/dto/private.dto';
-import { PrivateEntity } from '@src/common/entity/private.entity';
 import { GraphQLJSONObject } from 'graphql-type-json';
 import { ProtectedResolver } from '@src/common/resolver/protected.resolver';
 import { AuthDto } from '@src/auth/auth.dto';
 import { Auth, Self } from '@src/auth/auth.decorator';
-import { CommonEntity } from '@src/common/common.entity';
 import { CommonDto } from '@src/common/common.dto';
 import { BindDto } from '../dto/bind.dto';
 
@@ -17,12 +15,13 @@ export const PrivateResolver = <T extends Type<unknown>>(
   classDto,
   classEntity: T,
   authTable = '',
+  authField = 'id',
 ) => {
   class BasePrivateResolver<
-    Dto extends PrivateDto | CommonDto,
-    Entity extends PrivateEntity | CommonEntity,
+    Dto extends CommonDto,
+    Entity extends BaseEntity,
     Service extends CommonService<Dto, Entity>,
-  > extends ProtectedResolver(name, classDto, classEntity)<
+  > extends ProtectedResolver(name, classDto, classEntity, authTable, authField)<
     Dto,
     Entity,
     Service
@@ -55,6 +54,7 @@ export const PrivateResolver = <T extends Type<unknown>>(
     ): Promise<Entity[]> {
       const bind: BindDto = this.service.bind(auth, {
         name: authTable,
+        key: authField,
         allow: auth?.isSuperuser,
       });
       return await this.service.find(
@@ -83,6 +83,7 @@ export const PrivateResolver = <T extends Type<unknown>>(
     ): Promise<Entity> {
       const bind: BindDto = this.service.bind(auth, {
         name: authTable,
+        key: authField,
         allow: auth?.isSuperuser,
       });
       return await this.service.findOne({ id, relations }, bind);
@@ -114,6 +115,7 @@ export const PrivateResolver = <T extends Type<unknown>>(
     ): Promise<Entity> {
       const bind: BindDto = this.service.bind(auth, {
         name: authTable,
+        key: authField,
         allow: auth?.isSuperuser,
       });
       return await this.service.findFirst(
@@ -142,6 +144,7 @@ export const PrivateResolver = <T extends Type<unknown>>(
     ): Promise<Entity[]> {
       const bind: BindDto = this.service.bind(auth, {
         name: authTable,
+        key: authField,
         allow: auth?.isSuperuser,
       });
       return await this.service.findMany(
@@ -179,6 +182,7 @@ export const PrivateResolver = <T extends Type<unknown>>(
     ): Promise<Entity[]> {
       const bind: BindDto = this.service.bind(auth, {
         name: authTable,
+        key: authField,
         allow: false,
       });
       return await this.service.find(

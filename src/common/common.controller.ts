@@ -10,11 +10,11 @@ import {
   Patch,
   Type,
 } from '@nestjs/common';
+import { BaseEntity } from 'typeorm';
 import { RelationsDto } from '@src/common/dto/relations.dto';
 import { Data, Doc } from '@src/common/common.decorator';
 import { CommonService } from '@src/common/common.service';
 import { CommonDto } from '@src/common/common.dto';
-import { CommonEntity } from '@src/common/common.entity';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthDto } from '@src/auth/auth.dto';
 import { Auth, Self } from '@src/auth/auth.decorator';
@@ -28,7 +28,7 @@ export const CommonController = <T extends Type<unknown>>(
   @ApiTags(name)
   class BaseController<
     Dto extends CommonDto,
-    Entity extends CommonEntity,
+    Entity extends BaseEntity,
     Service extends CommonService<Dto, Entity>,
   > {
     readonly service: Service;

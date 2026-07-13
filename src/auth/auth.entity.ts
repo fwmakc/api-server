@@ -1,12 +1,18 @@
-import { Entity, Column, OneToMany, OneToOne } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 import {
   BooleanColumn,
   CreatedColumn,
+  IdColumn,
   UpdatedColumn,
   VarcharColumn,
 } from '@src/common/common.column';
-import { CommonEntity } from '@src/common/common.entity';
 import { ClientsEntity } from '@src/clients/clients.entity';
 import { UsersEntity } from '@src/db/users/users.entity';
 import { AuthConfirmEntity } from './auth_confirm/auth_confirm.entity';
@@ -15,7 +21,10 @@ import { AuthStrategiesEntity } from './auth_strategies/auth_strategies.entity';
 
 @ObjectType()
 @Entity({ name: 'auth' })
-export class AuthEntity extends CommonEntity {
+export class AuthEntity extends BaseEntity {
+  @IdColumn()
+  id: number;
+
   @CreatedColumn()
   createdAt?: Date;
 

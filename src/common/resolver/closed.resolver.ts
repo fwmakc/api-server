@@ -1,12 +1,12 @@
 import { Args, Mutation } from '@nestjs/graphql';
 import { RelationsDto } from '@src/common/dto/relations.dto';
 import { ForbiddenException, Type } from '@nestjs/common';
+import { BaseEntity } from 'typeorm';
 import { CommonService } from '@src/common/common.service';
-import { ClosedDto } from '@src/common/dto/closed.dto';
-import { ClosedEntity } from '@src/common/entity/closed.entity';
 import { CommonResolver } from '@src/common/common.resolver';
 import { AuthDto } from '@src/auth/auth.dto';
 import { Auth, Self } from '@src/auth/auth.decorator';
+import { CommonDto } from '@src/common/common.dto';
 
 export const ClosedResolver = <T extends Type<unknown>>(
   name: string,
@@ -14,8 +14,8 @@ export const ClosedResolver = <T extends Type<unknown>>(
   classEntity: T,
 ) => {
   class BaseClosedResolver<
-    Dto extends ClosedDto,
-    Entity extends ClosedEntity,
+    Dto extends CommonDto,
+    Entity extends BaseEntity,
     Service extends CommonService<Dto, Entity>,
   > extends CommonResolver(name, classDto, classEntity)<Dto, Entity, Service> {
     readonly service: Service;

@@ -1,11 +1,11 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Entity, ManyToOne, JoinColumn } from 'typeorm';
-import { ClosedEntity } from '@src/common/entity/closed.entity';
+import { BaseEntity, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { TypeValues } from '@src/common/common.enum';
 import { SettingsGroupsEntity } from './settings_groups/settings_groups.entity';
 import {
   BooleanColumn,
   EnumColumn,
+  IdColumn,
   PositionAscColumn,
   TextColumn,
   VarcharColumn,
@@ -13,7 +13,10 @@ import {
 
 @ObjectType()
 @Entity({ name: 'settings' })
-export class SettingsEntity extends ClosedEntity {
+export class SettingsEntity extends BaseEntity {
+  @IdColumn()
+  id: number;
+
   @VarcharColumn('name', 100)
   name?: string;
 

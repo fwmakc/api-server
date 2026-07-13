@@ -1,8 +1,8 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Entity, ManyToMany } from 'typeorm';
-import { ClosedEntity } from '@src/common/entity/closed.entity';
+import { BaseEntity, Entity, ManyToMany } from 'typeorm';
 import {
   CreatedColumn,
+  IdColumn,
   UpdatedColumn,
   VarcharColumn,
 } from '@src/common/common.column';
@@ -10,7 +10,10 @@ import { PostsEntity } from '../posts.entity';
 
 @ObjectType()
 @Entity({ name: 'posts_tags' })
-export class PostsTagsEntity extends ClosedEntity {
+export class PostsTagsEntity extends BaseEntity {
+  @IdColumn()
+  id: number;
+
   @CreatedColumn()
   createdAt?: Date;
 

@@ -10,9 +10,9 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { RelationsDto } from '@src/common/dto/relations.dto';
+import { BaseEntity } from 'typeorm';
 import { CommonService } from '@src/common/common.service';
-import { ClosedDto } from '@src/common/dto/closed.dto';
-import { ClosedEntity } from '@src/common/entity/closed.entity';
+import { CommonDto } from '@src/common/common.dto';
 import { CommonController } from '@src/common/common.controller';
 import { AuthDto } from '@src/auth/auth.dto';
 import { Auth, Self } from '@src/auth/auth.decorator';
@@ -24,8 +24,8 @@ export const ClosedController = <T extends Type<unknown>>(
   classEntity: T,
 ) => {
   class BaseClosedController<
-    Dto extends ClosedDto,
-    Entity extends ClosedEntity,
+    Dto extends CommonDto,
+    Entity extends BaseEntity,
     Service extends CommonService<Dto, Entity>,
   > extends CommonController(name, classDto, classEntity)<
     Dto,

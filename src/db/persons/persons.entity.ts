@@ -1,18 +1,27 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Entity } from 'typeorm';
-import { PrivateEntity } from '@src/common/entity/private.entity';
+import { BaseEntity, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { TypeGenders } from '@src/common/common.enum';
+import { AuthEntity } from '@src/auth/auth.entity';
 import {
   CreatedColumn,
   DateColumn,
   EnumColumn,
+  IdColumn,
   UpdatedColumn,
   VarcharColumn,
 } from '@src/common/common.column';
 
 @ObjectType()
 @Entity({ name: 'persons' })
-export class PersonsEntity extends PrivateEntity {
+export class PersonsEntity extends BaseEntity {
+  @IdColumn()
+  id: number;
+
+  @Field(() => AuthEntity, { nullable: true })
+  @ManyToOne(() => AuthEntity)
+  @JoinColumn({ name: 'auth_id', referencedColumnName: 'id' })
+  auth: AuthEntity;
+
   @CreatedColumn()
   createdAt?: Date;
 
