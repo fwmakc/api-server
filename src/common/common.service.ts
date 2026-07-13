@@ -52,11 +52,25 @@ export class CommonService<Dto extends CommonDto, Entity extends BaseEntity> {
     // "username.and.not.like": ["%user1%", "%user2%"]
 
     if (id !== undefined && !allow) {
-      where = { ...where, [name]: { [key]: id } };
+      const bindValue = { [key]: id };
+      if (name.includes('.')) {
+        const segments = name.split('.');
+        let nested: any = bindValue;
+        for (let i = segments.length - 1; i >= 0; i--) {
+          nested = { [segments[i]]: nested };
+        }
+        where = { ...where, ...nested };
+      } else {
+        where = { ...where, [name]: bindValue };
+      }
     }
 
     const relationNames = relations?.map((i) => i.name) || [];
-    if (id !== undefined && !relationNames.includes(name)) {
+    if (
+      id !== undefined &&
+      !name.includes('.') &&
+      !relationNames.includes(name)
+    ) {
       relationNames.push(name);
     }
 
@@ -81,6 +95,15 @@ export class CommonService<Dto extends CommonDto, Entity extends BaseEntity> {
             return contains ? i : false;
           })
           .filter(Boolean);
+      }
+
+      if (id !== undefined && !allow && name.includes('.')) {
+        const seen = new Set();
+        result = result.filter((item: any) => {
+          if (seen.has(item.id)) return false;
+          seen.add(item.id);
+          return true;
+        });
       }
 
       result = removePrivateFields(result, bind);
@@ -189,9 +212,11 @@ export class CommonService<Dto extends CommonDto, Entity extends BaseEntity> {
 
     if (bind.id !== undefined) {
       const relationName = bind.name || 'account';
-      const resolvedId = await this.resolveBindRelationId(bind);
-      if (resolvedId !== null) {
-        dto[relationName] = { id: resolvedId };
+      if (!relationName.includes('.')) {
+        const resolvedId = await this.resolveBindRelationId(bind);
+        if (resolvedId !== null) {
+          dto[relationName] = { id: resolvedId };
+        }
       }
     }
 
@@ -262,9 +287,11 @@ export class CommonService<Dto extends CommonDto, Entity extends BaseEntity> {
 
     if (bind.id !== undefined) {
       const relationName = bind.name || 'account';
-      const resolvedId = await this.resolveBindRelationId(bind);
-      if (resolvedId !== null) {
-        entity[relationName] = { id: resolvedId };
+      if (!relationName.includes('.')) {
+        const resolvedId = await this.resolveBindRelationId(bind);
+        if (resolvedId !== null) {
+          entity[relationName] = { id: resolvedId };
+        }
       }
     }
 
@@ -337,14 +364,19 @@ export class CommonService<Dto extends CommonDto, Entity extends BaseEntity> {
       return bind.id;
     }
     const name = bind.name || 'account';
-    const relation = this.repository.metadata.relations.find(
-      (r) => r.propertyName === name,
-    );
-    if (!relation) {
-      return null;
+    const segments = name.split('.');
+    let currentMetadata = this.repository.metadata;
+    for (const segment of segments) {
+      const relation = currentMetadata.relations.find(
+        (r) => r.propertyName === segment,
+      );
+      if (!relation) {
+        return null;
+      }
+      currentMetadata = relation.inverseEntityMetadata;
     }
     const relatedRepo = this.repository.manager.getRepository(
-      relation.inverseEntityMetadata.target,
+      currentMetadata.target,
     );
     const related = await relatedRepo.findOne({
       where: { [key]: bind.id } as any,
@@ -353,16 +385,14 @@ export class CommonService<Dto extends CommonDto, Entity extends BaseEntity> {
   }
 
   async remove(id: number, bind: BindDto = { allow: true }): Promise<boolean> {
-    const where: FindOptionsWhere<any> = { id };
     if (bind.id !== undefined && !bind.allow) {
-      const resolvedId = await this.resolveBindRelationId(bind);
-      if (resolvedId === null) {
+      const find = await this.findOne({ id, select: { id: true } }, bind);
+      if (!find) {
         return false;
       }
-      where[bind.name || 'account'] = { id: resolvedId };
     }
     try {
-      const result = await this.repository.delete(where);
+      const result = await this.repository.delete(id);
       return !!result?.affected;
     } catch (e) {
       this.error(e);

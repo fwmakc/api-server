@@ -16,7 +16,16 @@ function canRead(level: AccessLevel, bind: any, dto: any): boolean {
       if (bind.id === undefined) return false;
       {
         const { id, key = 'id', name = 'account' } = bind;
-        const ownerId = dto?.[name]?.[key];
+        let ownerEntity;
+        if (name.includes('.')) {
+          ownerEntity = name
+            .split('.')
+            .reduce((acc: any, segment: string) => acc?.[segment], dto);
+          if (!ownerEntity) return true;
+        } else {
+          ownerEntity = dto?.[name];
+        }
+        const ownerId = ownerEntity?.[key];
         const ownerIdFallback = dto?.[name + 'Id'];
         return (
           String(ownerId) === String(id) ||
