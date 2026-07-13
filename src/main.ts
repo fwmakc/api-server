@@ -1,17 +1,108 @@
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import * as Sentry from '@sentry/nestjs';
+import axios from 'axios';
 import redoc from 'redoc-express';
 import { join } from 'path';
 import { AppModule } from '@src/app.module';
 import * as cookieParser from 'cookie-parser';
 import * as fileStore from 'session-file-store';
+import * as morgan from 'morgan';
 import * as passport from 'passport';
 import * as session from 'express-session';
+import { initializeTransactionalContext } from 'typeorm-transactional';
 
 const FileStoreSession = fileStore(session);
 
+const DEFAULT_REQUEST_TIMEOUT = 30000;
+
+function startEventLoopMonitoring() {
+  const INTERVAL = 10000;
+  const LAG_THRESHOLD = 100;
+
+  let lastCheck = process.hrtime.bigint();
+  let maxLag = 0;
+  let lagCount = 0;
+
+  setInterval(() => {
+    const now = process.hrtime.bigint();
+    const lag =
+      Number(now - lastCheck - BigInt(INTERVAL * 1_000_000)) / 1_000_000;
+
+    lastCheck = now;
+
+    if (lag > maxLag) maxLag = lag;
+    if (lag > LAG_THRESHOLD) lagCount++;
+
+    const memory = process.memoryUsage();
+    const heapUsedMB = (memory.heapUsed / 1024 / 1024).toFixed(2);
+    const heapTotalMB = (memory.heapTotal / 1024 / 1024).toFixed(2);
+    const rssMB = (memory.rss / 1024 / 1024).toFixed(2);
+    const heapPercent = ((memory.heapUsed / memory.heapTotal) * 100).toFixed(1);
+
+    console.log('[METRICS]', {
+      eventLoop: {
+        lag: `${lag.toFixed(2)}ms`,
+        maxLag: `${maxLag.toFixed(2)}ms`,
+        lagEvents: lagCount,
+        status: lag > LAG_THRESHOLD ? 'SLOW' : 'OK',
+      },
+      memory: {
+        heap: `${heapUsedMB}/${heapTotalMB} MB (${heapPercent}%)`,
+        rss: `${rssMB} MB`,
+        status: Number(heapPercent) > 90 ? 'HIGH' : 'OK',
+      },
+      uptime: new Date(process.uptime() * 1000)
+        .toISOString()
+        .substr(11, 8),
+    });
+
+    if (process.uptime() % 60 < 10) {
+      maxLag = 0;
+      lagCount = 0;
+    }
+  }, INTERVAL);
+
+  let lastImmediate = Date.now();
+
+  function checkImmediate() {
+    const now = Date.now();
+    const delay = now - lastImmediate;
+
+    if (delay > 1000) {
+      console.warn('[EVENT LOOP BLOCKED]', {
+        delay: `${delay}ms`,
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    lastImmediate = now;
+    setImmediate(checkImmediate);
+  }
+
+  setImmediate(checkImmediate);
+}
+
 async function bootstrap() {
+  initializeTransactionalContext();
+
+  const requestTimeout = isNaN(parseInt(process.env.REQUEST_TIMEOUT))
+    ? DEFAULT_REQUEST_TIMEOUT
+    : parseInt(process.env.REQUEST_TIMEOUT);
+
+  axios.interceptors.request.use((config) => {
+    if (!config.timeout) {
+      config.timeout = requestTimeout;
+    }
+    return config;
+  });
+
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.SENTRY_ENV || 'localhost',
+  });
+
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     cors: {
       allowedHeaders: [
@@ -40,6 +131,10 @@ async function bootstrap() {
     },
     logger: console,
   });
+
+  if (process.env.MORGAN_LOG_FORMAT) {
+    app.use(morgan(process.env.MORGAN_LOG_FORMAT));
+  }
 
   if (process.env.PREFIX) {
     app.setGlobalPrefix(process.env.PREFIX);
@@ -91,6 +186,15 @@ async function bootstrap() {
 
   await app.listen(port, ip).then(() => {
     console.log(message);
+
+    if (process.env.METRICS_ENABLE === 'true') {
+      console.log('Starting performance monitoring...');
+      startEventLoopMonitoring();
+    }
+  });
+
+  process.on('SIGINT', () => {
+    app.close();
   });
 }
 bootstrap();
