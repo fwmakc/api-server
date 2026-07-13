@@ -960,105 +960,98 @@ Kаскадные операции позволяют автоматически
 - createdAt
 - updatedAt
 
-Для TypeORM это:
+Для TypeORM базовый класс — `BaseEntity` из TypeORM. Все сущности наследуются от него напрямую с явными колонками:
 
-    src/common/entity/common.entity.ts
+    import { BaseEntity } from 'typeorm';
 
-Для DTO это:
+    @Entity({ name: 'posts' })
+    export class PostsEntity extends BaseEntity {
+      @IdColumn() id: number;
+      @CreatedColumn() createdAt?: Date;
+      @UpdatedColumn() updatedAt?: Date;
+      ...
+    }
 
-    src/common/entity/common.dto.ts
+Для DTO базовый класс:
 
-Есть защищенные модели данных, которые требуют передачи id учетной записи. Они наследуются от базовой модели, но имеют дополнительное поле:
+    src/common/common.dto.ts
 
-- auth
-
-Для TypeORM это:
-
-    src/common/entity/protected.entity.ts
-    src/common/entity/private.entity.ts
-    src/common/entity/closed.entity.ts
-
-Для DTO это:
-
-    src/common/entity/protected.dto.ts
-    src/common/entity/private.dto.ts
-    src/common/entity/closed.dto.ts
-
-По-умолчанию, защищенные модели данных имеют к auth отношения многие-к-одному. Если вам нужно изменить отношения на один-к-одному, вы должны наследовать модель от одной из следующих сущностей:
-
-    src/common/entity/protected_one.entity.ts
-    src/common/entity/private_one.entity.ts
+> **Миграция (Phase 2)**: удалены `CommonEntity`, `ProtectedEntity`, `PrivateEntity`, `ClosedEntity`, `ProtectedOneEntity`, `PrivateOneEntity` и их DTO-маркеры. Политика доступа определяется только в контроллерах/резолверах через bind-механизм, а не в сущностях.
 
 [^ к оглавлению](#оглавление)
 
 ## Настройка модели данных
 
-Посмотрим, как реализована защищенная модель **posts**.
+Модель защиты определяется **только в контроллерах/резолверах** через механизм `bind`. Сущности и DTO не кодируют политику доступа.
 
-Контроллер, резолвер, DTO и сущность наследуются от базовых классов уровня **protected**. Это означает, что любой пользователь имеет доступ к чтению данных, но создание, изменение и удаление разрешены только владельцу.
+### Механизм bind
 
-Здесь между сущностью **auth** и моделью данных **posts** автоматически создаются отношения один-ко-многим.
+`bind` — это объект, который передаётся в сервисные методы для фильтрации по владельцу:
 
-Теперь посмотрим, как реализована защищенная модель **users**.
+- `id` — значение для матчинга (по умолчанию `auth.id`)
+- `key` — имя поля на сущности владельца (`'id'` по умолчанию, может быть `'email'`, `'username'`)
+- `name` — имя поля-связи на целевой сущности (`'auth'`, `'users'`, `'owner'`...)
+- `allow` — админ-байпас (`true` → не фильтровать по владельцу)
 
-Контроллер, резолвер, DTO и сущность наследуются от базовых классов уровня **private**. Это означает, что чтение, создание, изменение и удаление разрешены только владельцу.
+### Уровни доступа
 
-Кроме того, сущность UsersEntity наследует класс PrivateOneEntity. Он также создает связь между сущностью **auth** и моделью данных **users**, но с отношением один-к-одному.
+| Уровень | Админ | Фильтр | Контроллер |
+|---|---|---|---|
+| **common** | не нужен | нет | `CommonController` |
+| **protected** | `allow` байпасит | только запись | `ProtectedController` |
+| **private** | `allow` байпасит | чтение + запись | `PrivateController` |
+| **closed** | `if (!isSuperuser) throw` | нет (только админ) | `ClosedController` |
 
-> Не забываем, что отношения нужно устанавливать также и с другой стороны, т.е. со стороны сущности **auth**.
+### Пример: protected-модель posts
 
-Теперь предположим, что нам нужно переключить отношения модели **posts** с **auth** на **users**.
-
-Во-первых, для этого мы должны получать данные **users** при авторизации. Для этого в стратегии авторизации **AuthStrategy** (src/auth/auth.strategy.ts), в методе **validate**, при чтении данных авторизации, мы должны добавить отношения к таблице **users**:
-
-    const auth = await this.authService.findOne(id, [{ name: 'users' }]);
-
-Далее, в защищенных методах мы должны обращаться к полю **users.id** вместо **auth.id**. Для этого мы предусмотрели в контроллерах, резолверах и сервисных методах поле **authTable**.
-
-По-умолчанию оно пустое, и в этом случае, **id** будет браться из **auth**. Но если его задать как **users**, то поле **id** будет браться из **auth.users.id**.
-
-Например, в файле **src/posts/posts.controller.ts** поменять:
+Контроллер, резолвер наследуются от `ProtectedController` / `ProtectedResolver`. Чтение открыто, запись только владельцу.
 
 ```
 export class PostsController extends ProtectedController(
-  'Посты',
-  PostsEntity,
-  PostsDto,
-  'users',
-)...
+  'Посты', PostsDto, PostsEntity, 'auth', 'id',
+) { ... }
 ```
 
-И в файле **src/posts/posts.resolver.ts** поменять:
+Параметры: `name`, `classDto`, `classEntity`, `authTable` (имя связи), `authField` (поле для матчинга).
+
+### Переключение связи с auth на users
+
+По умолчанию связь определяется через `auth.id`. Чтобы переключить на `users`:
+
+1. В стратегии авторизации загрузить связь:
+
+       const auth = await this.authService.findOne(id, [{ name: 'users' }]);
+
+2. В контроллере указать `authTable`:
 
 ```
-export class PostsResolver extends ProtectedResolver(
-  'posts',
-  PostsEntity,
-  PostsDto,
-  'users',
-)...
+export class PostsController extends ProtectedController(
+  'Посты', PostsDto, PostsEntity, 'users',
+) { ... }
 ```
 
-Также нужно не забыть отвязать сущность **posts** от **auth**. Для этого в файле **src/posts/posts.entity.ts** поменять:
+3. В сущности объявить связь явно:
 
 ```
-export class PostsEntity extends CommonEntity {
-    @ManyToOne(() => UsersEntity)
-    @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
-    users: UsersEntity;
-    ...
+export class PostsEntity extends BaseEntity {
+  @IdColumn() id: number;
+  ...
+  @ManyToOne(() => UsersEntity)
+  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
+  users: UsersEntity;
+}
 ```
 
-По аналогии внести изменения в файл **src/posts/posts.dto.ts**:
+4. В DTO:
 
 ```
 export class PostsDto extends CommonDto {
-    @Field(() => UsersDto, { nullable: true })
-    users?: UsersDto;
-    ...
+  users?: any;
+  ...
+}
 ```
 
-[^ к оглавлению](#оглавление)
+[^ к оглавлению](#оглавлению)
 
 ## Генерация модели данных
 
@@ -4354,5 +4347,40 @@ token
 - название расширения,
 - название модуля (можно опустить),
 - сущность.
+
+## Слой actions
+
+Для разделения простых CRUD и сложной бизнес-логики используется паттерн разделения каталогов:
+
+- `db/` — простые CRUD-операции (контроллеры, резолверы, сервисы, сущности)
+- `actions/` — бизнес-процессы, orchestrация нескольких сервисов
+
+### Скелет
+
+```
+src/
+├── db/
+│   └── students/
+│       ├── students.module.ts
+│       ├── students.controller.ts    # CRUD: find, create, update, remove
+│       ├── students.resolver.ts
+│       ├── students.service.ts       # extends CommonService
+│       ├── students.entity.ts
+│       └── students.dto.ts
+├── actions/
+│   └── students/
+│       ├── students.actions.module.ts
+│       ├── students.actions.controller.ts  # upsert, import, export...
+│       ├── students.actions.service.ts     # orchestrates multiple services
+│       └── handler/
+│           └── upsert.handler.ts           # business logic
+```
+
+### Когда использовать
+
+- `db/` — стандартный CRUD через `CommonController` / `ProtectedController` / `PrivateController`
+- `actions/` — когда нужно вызвать несколько сервисов, транзакции, внешние API, сложную валидацию
+
+> Сервисы из `db/` не зависят от `actions/`. Сервисы из `actions/` импортируют сервисы из `db/`.
 
 [^ к оглавлению](#оглавление)
