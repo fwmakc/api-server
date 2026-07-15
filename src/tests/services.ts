@@ -2,10 +2,10 @@ import { compare } from 'bcryptjs';
 import { Repository } from 'typeorm';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CommonService } from '@src/common/common.service';
-import { DynamicService } from '@src/common/service/dynamic.service';
-import { RelationsDto } from '@src/common/dto/relations.dto';
-import { BindDto } from '@src/common/dto/bind.dto';
+import { CommonService } from '@lms/common';
+import { DynamicService } from '@lms/common';
+import { RelationsDto } from '@lms/common';
+import { BindDto } from '@lms/common';
 import {
   TestAccountEntity,
   TestArticleEntity,

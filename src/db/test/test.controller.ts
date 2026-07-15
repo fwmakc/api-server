@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { EntityController } from '@src/common/entity.controller';
+import { EntityController } from '@lms/common';
 import { TestDto } from './test.dto';
 import { TestEntity } from './test.entity';
 import { TestService } from './test.service';

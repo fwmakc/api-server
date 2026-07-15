@@ -7,11 +7,11 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { RelationsDto } from '@src/common/dto/relations.dto';
-import { CommonService } from '@src/common/common.service';
+import { RelationsDto } from '@lms/common';
+import { CommonService } from '@lms/common';
 import { PersonsDto } from './persons.dto';
 import { PersonsEntity } from './persons.entity';
-import { BindDto } from '@src/common/dto/bind.dto';
+import { BindDto } from '@lms/common';
 
 @Injectable()
 export class PersonsService extends CommonService<PersonsDto, PersonsEntity> {

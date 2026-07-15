@@ -3,7 +3,7 @@ import { createTestModule } from '../app.testingModule';
 import { TestArticleService, TestProfileService } from '../services';
 import { TestArticleDto, TestProfileDto } from '../dtos';
 import { TestArticleEntity, TestProfileEntity } from '../entities';
-import { EntityController } from '@src/common/entity.controller';
+import { EntityController } from '@lms/common';
 
 const ArticleBase = EntityController({
   name: 'Articles',

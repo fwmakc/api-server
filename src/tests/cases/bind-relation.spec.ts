@@ -1,6 +1,6 @@
 import { createTestModule } from '../app.testingModule';
 import { TestNoteService } from '../services';
-import { removePrivateFields } from '@src/common/service/private_fields.service';
+import { removePrivateFields } from '@lms/common';
 
 describe('bind — cross-relation ownership (user.id / user.email)', () => {
   let moduleRef: Awaited<ReturnType<typeof createTestModule>>;

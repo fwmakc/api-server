@@ -1,5 +1,5 @@
 import { BaseEntity, Entity, JoinColumn, ManyToOne } from 'typeorm';
-import { TypeValues } from '@src/common/common.enum';
+import { TypeValues } from '@lms/common';
 import { SettingsGroupsEntity } from './settings_groups/settings_groups.entity';
 import {
   BooleanColumn,
@@ -8,7 +8,7 @@ import {
   PositionAscColumn,
   TextColumn,
   VarcharColumn,
-} from '@src/common/common.column';
+} from '@lms/common';
 
 @Entity({ name: 'settings' })
 export class SettingsEntity extends BaseEntity {

@@ -5,7 +5,7 @@ import {
   IdColumn,
   UpdatedColumn,
   VarcharColumn,
-} from '@src/common/common.column';
+} from '@lms/common';
 
 @Entity({ name: 'accounts' })
 export class AccountEntity extends BaseEntity {

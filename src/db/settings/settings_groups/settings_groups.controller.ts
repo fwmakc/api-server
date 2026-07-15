@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { EntityController } from '@src/common/entity.controller';
+import { EntityController } from '@lms/common';
 import { SettingsGroupsDto } from './settings_groups.dto';
 import { SettingsGroupsEntity } from './settings_groups.entity';
 import { SettingsGroupsService } from './settings_groups.service';

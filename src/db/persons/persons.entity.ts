@@ -1,5 +1,5 @@
 import { BaseEntity, Entity, JoinColumn, ManyToOne } from 'typeorm';
-import { TypeGenders } from '@src/common/common.enum';
+import { TypeGenders } from '@lms/common';
 import { AccountEntity } from '@src/account/account.entity';
 import {
   CreatedColumn,
@@ -8,7 +8,7 @@ import {
   IdColumn,
   UpdatedColumn,
   VarcharColumn,
-} from '@src/common/common.column';
+} from '@lms/common';
 
 @Entity({ name: 'persons' })
 export class PersonsEntity extends BaseEntity {

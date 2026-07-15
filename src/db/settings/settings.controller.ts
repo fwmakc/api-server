@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { EntityController } from '@src/common/entity.controller';
+import { EntityController } from '@lms/common';
 import { SettingsDto } from './settings.dto';
 import { SettingsEntity } from './settings.entity';
 import { SettingsService } from './settings.service';

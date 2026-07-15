@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CommonService } from '@src/common/common.service';
+import { CommonService } from '@lms/common';
 import { TestDto } from './test.dto';
 import { TestEntity } from './test.entity';
 

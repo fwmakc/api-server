@@ -4,9 +4,9 @@ import {
   DtoEnumColumn,
   DtoJsonColumn,
   DtoUpdatedColumn,
-} from '@src/common/common.column';
-import { TypeValues } from '@src/common/common.enum';
-import { CommonDto } from '@src/common/common.dto';
+} from '@lms/common';
+import { TypeValues } from '@lms/common';
+import { CommonDto } from '@lms/common';
 
 export class TestDto extends CommonDto {
   @DtoCreatedColumn()

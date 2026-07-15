@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { ApiExcludeController } from '@nestjs/swagger';
 import { AppService } from '@src/app.service';
 import { join } from 'path';
-import { Secure, SimpleSecure } from './common/common.decorator';
+import { Secure, SimpleSecure } from '@lms/common';
 
 @ApiExcludeController()
 @Controller()

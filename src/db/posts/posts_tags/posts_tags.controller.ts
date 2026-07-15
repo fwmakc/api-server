@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { EntityController } from '@src/common/entity.controller';
+import { EntityController } from '@lms/common';
 import { PostsTagsDto } from './posts_tags.dto';
 import { PostsTagsEntity } from './posts_tags.entity';
 import { PostsTagsService } from './posts_tags.service';

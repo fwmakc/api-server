@@ -1,5 +1,5 @@
 import { createTestModule } from '../app.testingModule';
-import { removePrivateFields } from '@src/common/service/private_fields.service';
+import { removePrivateFields } from '@lms/common';
 import { TestCycleAService } from '../services';
 
 describe('Cycle protection in removePrivateFields', () => {

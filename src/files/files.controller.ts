@@ -7,7 +7,7 @@ import {
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiExcludeController } from '@nestjs/swagger';
 import { Multer } from 'multer';
-import { Data } from '@src/common/common.decorator';
+import { Data } from '@lms/common';
 import { FilesService } from './files.service';
 import { OptionsFilesDto } from './dto/options.files.dto';
 

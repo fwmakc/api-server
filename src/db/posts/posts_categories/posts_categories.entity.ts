@@ -4,7 +4,7 @@ import {
   IdColumn,
   UpdatedColumn,
   VarcharColumn,
-} from '@src/common/common.column';
+} from '@lms/common';
 import { PostsEntity } from '../posts.entity';
 
 @Entity({ name: 'posts_categories' })

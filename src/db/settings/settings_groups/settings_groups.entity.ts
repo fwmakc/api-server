@@ -5,7 +5,7 @@ import {
   IdColumn,
   PositionAscColumn,
   VarcharColumn,
-} from '@src/common/common.column';
+} from '@lms/common';
 
 @Entity({ name: 'settings_groups' })
 export class SettingsGroupsEntity extends BaseEntity {
