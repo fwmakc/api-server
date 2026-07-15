@@ -1,4 +1,5 @@
 import { PassportModule } from '@nestjs/passport';
+import { AuthClientModule } from './auth-client/auth-client.module';
 import { AccountModule } from './account/account.module';
 import { ClientsModule } from './clients/clients.module';
 import { FilesModule } from './files/files.module';
@@ -15,6 +16,7 @@ import { TestModule } from './db/test/test.module';
 
 export default [
   PassportModule,
+  AuthClientModule,
   AccountModule,
   ClientsModule,
   FilesModule,

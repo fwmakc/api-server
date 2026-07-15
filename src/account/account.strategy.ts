@@ -7,13 +7,13 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { passportJwtSecret } from 'jwks-rsa';
-import { AccountService } from './account.service';
+import { AuthClientService } from '@src/auth-client/auth-client.service';
 
 @Injectable()
 export class AccountStrategy extends PassportStrategy(Strategy) {
   constructor(
     private readonly configService: ConfigService,
-    private readonly accountService: AccountService,
+    private readonly authClientService: AuthClientService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -34,8 +34,8 @@ export class AccountStrategy extends PassportStrategy(Strategy) {
     if (!type || type !== 'access') {
       throw new UnauthorizedException('Invalid token or expired!');
     }
-    const account = await this.accountService.findOne({ id });
-    if (!account.id || (!account.isActivated && !key)) {
+    const account = await this.authClientService.getAccountInfo(id);
+    if (!account || (!account.isActivated && !key)) {
       throw new ForbiddenException('You have no rights!');
     }
     return account;
