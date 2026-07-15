@@ -11,19 +11,21 @@ API backend service with RESTful based on Nest.js and TypeORM
 
 Для примера бэк уже содержит несколько базовых сущностей. Обычно они нужны в любой системе в том или ином виде, так что вы можете использовать их не только в качестве примера, но и для работы.
 
-# Roadmap: Разделение на микросервисы
+# Roadmap: Разделение на микросервисы — ВЫПОЛНЕНО
 
-> Подробный план: [Issue #6](https://github.com/fwmakc/api-server/issues/6)
+> План: [Issue #6](https://github.com/fwmakc/api-server/issues/6)
 
-Планируется разделение монолита на 5 независимых серверов:
+Монолит разделён на 5 независимых серверов + общий пакет:
 
 ```
 fwmakc/servers/
 ├── api-server/          ← CRUD engine + доменные сущности (этот репозиторий)
-├── auth-server/         ← OAuth2 provider + client (JWKS, RS256)
-├── file-server/         ← Загрузка/обработка/S3+CDN
-├── message-server/      ← Уведомления: email, мессенджеры, очереди, воркеры
-└── chat-server/         ← WebSocket чат (на базе sockets/rooms)
+├── auth-server/         ← OAuth2 provider: JWT (RS256), JWKS, account, token, clients
+├── file-server/         ← Загрузка/обработка файлов (port 3002)
+├── message-server/      ← Уведомления: email, Redis event consumer (port 3003)
+├── chat-server/         ← WebSocket чат (port 3004)
+├── gateway/             ← Nginx reverse proxy + docker-compose
+└── shared/              ← @lms/common — общий CRUD engine + event bus (npm package)
 ```
 
 ### Архитектура взаимодействия
@@ -43,20 +45,22 @@ fwmakc/servers/
 ```
 
 - **API Gateway (Nginx)** — единая точка входа, path-based routing, SSL, CORS
-- **JWT (RS256 + JWKS)** — auth-server подписывает токены приватным ключом, остальные проверяют через публичный (JWKS endpoint)
-- **Sync:** сервисы общаются по HTTP с `client_credentials` grant (CRUD, экшены)
-- **Async:** Redis Streams (события) + BullMQ (очереди задач) для уведомлений
-- **Security:** два слоя — gateway (транспорт) + сервисы (JWKS verify + authorization)
+- **JWT (RS256 + JWKS)** — auth-server подписывает токены RSA приватным ключом, остальные проверяют через `/.well-known/jwks.json`
+- **Sync:** api-server → auth-server HTTP call (`X-Internal-Key` header) для проверки `isActivated`
+- **Async:** Redis Streams через `@nestjs/microservices` (auth-server эмитит, message-server консьюмит)
+- **Shared:** общий CRUD engine + event bus в npm-пакете `@lms/common` (репозиторий `shared/`)
 
-### Что переезжает
+### Что переехало
 
 | Модуль | Куда |
 |--------|------|
-| `account/`, `token/`, `clients/`, `account_strategies/` | → auth-server |
+| `account/` (auth, token, strategies, sessions, confirm) | → auth-server |
+| `clients/` (controller, redirects) | → auth-server |
 | `mail/` | → message-server |
 | `files/` | → file-server |
 | `sockets/`, `rooms/` | → chat-server |
-| `common/`, `db/` | Остаются в api-server |
+| `common/` | → `@lms/common` (shared npm package) |
+| `db/`, `account/` (entity, service, strategy, dto) | Остаются в api-server |
 
 # TO DO
 
