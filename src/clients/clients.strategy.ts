@@ -2,6 +2,7 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import { passportJwtSecret } from 'jwks-rsa';
 import { ClientsEntity } from '@src/clients/clients.entity';
 import { ClientsService } from '@src/clients/clients.service';
 
@@ -15,11 +16,17 @@ export class ClientsStrategy extends PassportStrategy(Strategy, 'clients') {
       jwtFromRequest: ExtractJwt.fromExtractors([
         ExtractJwt.fromBodyField('client_secret'),
         ExtractJwt.fromHeader('client_secret'),
-        // ExtractJwt.fromAuthHeaderAsBearerToken(),
       ]),
-      // jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: !configService.get('JWT_EXPIRES'),
-      secretOrKey: configService.get('JWT_SECRET'),
+      secretOrKeyProvider: passportJwtSecret({
+        jwksUri: `${configService.get(
+          'AUTH_SERVER_URL',
+        )}/.well-known/jwks.json`,
+        cache: true,
+        rateLimit: true,
+        jwksRequestsPerMinute: 5,
+      }),
+      algorithms: ['RS256'],
       passReqToCallback: true,
     });
   }

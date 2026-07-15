@@ -48,6 +48,7 @@
     "fs": "^0.0.1-security",
     "js-yaml": "^4.1.0",
     "json-2-csv": "^5.5.9",
+    "jwks-rsa": "^4.1.0",
     "mime-types": "^2.1.35",
     "moment": "^2.29.4",
     "morgan": "^1.10.1",

@@ -6,6 +6,7 @@ import {
   UnauthorizedException,
   Injectable,
 } from '@nestjs/common';
+import { passportJwtSecret } from 'jwks-rsa';
 import { PersonsService } from './persons.service';
 
 @Injectable()
@@ -17,7 +18,15 @@ export class PersonsStrategy extends PassportStrategy(Strategy, 'persons') {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: !configService.get('JWT_EXPIRES'),
-      secretOrKey: configService.get('JWT_SECRET'),
+      secretOrKeyProvider: passportJwtSecret({
+        jwksUri: `${configService.get(
+          'AUTH_SERVER_URL',
+        )}/.well-known/jwks.json`,
+        cache: true,
+        rateLimit: true,
+        jwksRequestsPerMinute: 5,
+      }),
+      algorithms: ['RS256'],
       passReqToCallback: true,
     });
   }
