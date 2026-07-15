@@ -7,13 +7,9 @@ import redoc from 'redoc-express';
 import { join } from 'path';
 import { AppModule } from '@src/app.module';
 import * as cookieParser from 'cookie-parser';
-import * as fileStore from 'session-file-store';
 import * as morgan from 'morgan';
 import * as passport from 'passport';
-import * as session from 'express-session';
 import { initializeTransactionalContext } from 'typeorm-transactional';
-
-const FileStoreSession = fileStore(session);
 
 const DEFAULT_REQUEST_TIMEOUT = 30000;
 
@@ -157,22 +153,8 @@ async function bootstrap() {
     app.use(`${process.env.SWAGGER_PREFIX_REDOC}`, redoc(redocConfig));
   }
 
-  console.log('SESSION_EXPIRES', Number(process.env.SESSION_EXPIRES));
-
   app.use(cookieParser());
-  app.use(
-    session({
-      secret: process.env.SESSION_SECRET,
-      saveUninitialized: false,
-      resave: false,
-      cookie: {
-        maxAge: Number(process.env.SESSION_EXPIRES) || -3600,
-      },
-      store: new FileStoreSession({}),
-    }),
-  );
   app.use(passport.initialize());
-  app.use(passport.session());
 
   app.useStaticAssets(join(process.env.ROOT_PATH, 'public'));
   app.setBaseViewsDir(join(process.env.ROOT_PATH, 'views/static'));

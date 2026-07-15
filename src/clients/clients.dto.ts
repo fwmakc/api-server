@@ -1,4 +1,3 @@
-import { ApiProperty } from '@nestjs/swagger';
 import {
   DtoColumn,
   DtoCreatedColumn,
@@ -7,7 +6,6 @@ import {
 } from '@src/common/common.column';
 import { TypeClients } from '@src/common/common.enum';
 import { CommonDto } from '@src/common/common.dto';
-import { ClientsRedirectsDto } from './clients_redirects/clients_redirects.dto';
 
 export class ClientsDto extends CommonDto {
   @DtoCreatedColumn()
@@ -59,11 +57,4 @@ export class ClientsDto extends CommonDto {
     'Поле с разрешенным редиректом, по которому сервер будет отправлять данные авторизации',
   )
   redirect_uri?: string;
-
-  @ApiProperty({
-    required: false,
-    description: 'Данные редиректов, связанных с этим клиентским приложением',
-    type: () => [ClientsRedirectsDto],
-  })
-  redirects?: ClientsRedirectsDto[];
 }

@@ -1,12 +1,4 @@
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  // Generated,
-} from 'typeorm';
+import { BaseEntity, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import {
   BooleanColumn,
   CreatedColumn,
@@ -18,7 +10,6 @@ import {
 } from '@src/common/common.column';
 import { TypeClients } from '@src/common/common.enum';
 import { AccountEntity } from '@src/account/account.entity';
-import { ClientsRedirectsEntity } from './clients_redirects/clients_redirects.entity';
 
 @Entity({ name: 'clients' })
 export class ClientsEntity extends BaseEntity {
@@ -64,9 +55,4 @@ export class ClientsEntity extends BaseEntity {
 
   @BooleanColumn('is_published', true)
   isPublished: boolean;
-
-  @OneToMany(() => ClientsRedirectsEntity, (redirect) => redirect.client, {
-    cascade: true,
-  })
-  redirects: ClientsRedirectsEntity[];
 }
