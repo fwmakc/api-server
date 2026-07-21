@@ -49,9 +49,10 @@ jobs:
         with:
           node-version: 18
 
-      - name: Create test database
+      - name: Create test databases
         run: |
           PGPASSWORD=1234 psql -h localhost -U root -d postgres -c "CREATE DATABASE api_server_test;"
+          PGPASSWORD=1234 psql -h localhost -U root -d postgres -c "CREATE DATABASE api_server_http_test;"
 
       - name: Install dependencies
         run: npm install
