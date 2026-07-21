@@ -68,3 +68,9 @@ export class TestDynamicDto extends CommonDto {}
 export class TestCourseDto extends CommonDto {
   title?: string;
 }
+
+export class TestEnrollDto extends CommonDto {
+  status?: string;
+  course?: any;
+  student?: any;
+}

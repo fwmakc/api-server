@@ -6,9 +6,9 @@ import { Strategy as JwtStrategy } from 'passport-jwt';
 import * as jwt from 'jsonwebtoken';
 import { EntityController } from '@core/common';
 import { TestEntities } from './entities';
-import { TestArticleEntity, TestCourseEntity } from './entities';
-import { TestArticleDto, TestCourseDto } from './dtos';
-import { TestArticleService, TestCourseService } from './services';
+import { TestArticleEntity, TestCourseEntity, TestEnrollEntity } from './entities';
+import { TestArticleDto, TestCourseDto, TestEnrollDto } from './dtos';
+import { TestArticleService, TestCourseService, TestEnrollService } from './services';
 import { seedDatabase } from './app.testingModule';
 
 const TEST_SECRET = 'test-jwt-secret';
@@ -41,6 +41,8 @@ class HttpPublicController extends EntityController({
   name: 'http_public',
   dto: TestArticleDto,
   entity: TestArticleEntity,
+  operations: { read: 'public', create: 'public', update: 'public', delete: 'public' },
+  relations: ['account', 'comments', 'comments.account', 'tags'],
 })<TestArticleDto, TestArticleEntity, TestArticleService> {
   constructor(readonly service: TestArticleService) {
     super();
@@ -53,6 +55,7 @@ class HttpAccountController extends EntityController({
   dto: TestArticleDto,
   entity: TestArticleEntity,
   operations: { read: 'account', create: 'account', update: 'account', delete: 'account' },
+  relations: ['account', 'comments', 'comments.account', 'tags'],
 })<TestArticleDto, TestArticleEntity, TestArticleService> {
   constructor(readonly service: TestArticleService) {
     super();
@@ -65,6 +68,7 @@ class HttpOwnerController extends EntityController({
   dto: TestArticleDto,
   entity: TestArticleEntity,
   operations: { read: 'owner', create: 'owner', update: 'owner', delete: 'owner' },
+  relations: ['account', 'comments', 'comments.account', 'tags'],
 })<TestArticleDto, TestArticleEntity, TestArticleService> {
   constructor(readonly service: TestArticleService) {
     super();
@@ -77,6 +81,7 @@ class HttpAdminController extends EntityController({
   dto: TestArticleDto,
   entity: TestArticleEntity,
   operations: { read: 'public', create: 'admin', update: 'admin', delete: 'admin' },
+  relations: ['account', 'comments', 'comments.account', 'tags'],
 })<TestArticleDto, TestArticleEntity, TestArticleService> {
   constructor(readonly service: TestArticleService) {
     super();
@@ -89,6 +94,7 @@ class HttpAdminStrictController extends EntityController({
   dto: TestArticleDto,
   entity: TestArticleEntity,
   operations: { read: 'admin', create: 'admin', update: 'admin', delete: 'admin' },
+  relations: ['account', 'comments', 'comments.account', 'tags'],
 })<TestArticleDto, TestArticleEntity, TestArticleService> {
   constructor(readonly service: TestArticleService) {
     super();
@@ -101,6 +107,7 @@ class HttpClosedController extends EntityController({
   dto: TestArticleDto,
   entity: TestArticleEntity,
   operations: { read: 'closed', create: 'closed', update: 'closed', delete: 'closed' },
+  relations: ['account', 'comments', 'comments.account', 'tags'],
 })<TestArticleDto, TestArticleEntity, TestArticleService> {
   constructor(readonly service: TestArticleService) {
     super();
@@ -113,6 +120,7 @@ class HttpMixedController extends EntityController({
   dto: TestArticleDto,
   entity: TestArticleEntity,
   operations: { read: 'public', create: 'owner', update: 'admin', delete: 'closed' },
+  relations: ['account', 'comments', 'comments.account', 'tags'],
 })<TestArticleDto, TestArticleEntity, TestArticleService> {
   constructor(readonly service: TestArticleService) {
     super();
@@ -126,8 +134,23 @@ class HttpCourseController extends EntityController({
   entity: TestCourseEntity,
   accountTable: 'enrolls.student.account',
   operations: { read: 'owner', create: 'admin', update: 'admin', delete: 'admin' },
+  relations: ['enrolls', 'enrolls.student', 'enrolls.course', 'enrolls.student.account'],
 })<TestCourseDto, TestCourseEntity, TestCourseService> {
   constructor(readonly service: TestCourseService) {
+    super();
+  }
+}
+
+@Controller('http-enrolls')
+class HttpEnrollController extends EntityController({
+  name: 'http_enrolls',
+  dto: TestEnrollDto,
+  entity: TestEnrollEntity,
+  accountTable: 'student.account',
+  operations: { read: 'owner', create: 'owner', update: 'owner', delete: 'owner' },
+  relations: ['course', 'student', 'student.account', 'course.enrolls'],
+})<TestEnrollDto, TestEnrollEntity, TestEnrollService> {
+  constructor(readonly service: TestEnrollService) {
     super();
   }
 }
@@ -164,8 +187,9 @@ export const createHttpTestApp = async (): Promise<{
       HttpClosedController,
       HttpMixedController,
       HttpCourseController,
+      HttpEnrollController,
     ],
-    providers: [TestArticleService, TestCourseService, MockJwtStrategy],
+    providers: [TestArticleService, TestCourseService, TestEnrollService, MockJwtStrategy],
   }).compile();
 
   await seedDatabase(moduleRef);
