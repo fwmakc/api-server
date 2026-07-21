@@ -56,7 +56,7 @@ export const createTestModule = async (): Promise<TestingModule> => {
   return moduleRef;
 };
 
-const seedDatabase = async (moduleRef: TestingModule) => {
+export const seedDatabase = async (moduleRef: TestingModule) => {
   const dataSource = moduleRef.get(DataSource);
 
   const accountRepo = dataSource.getRepository('TestAccountEntity');
