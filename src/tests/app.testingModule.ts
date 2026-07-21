@@ -15,6 +15,7 @@ import {
   TestNoteService,
   TestSecretService,
   DynamicTestService,
+  TestCourseService,
 } from './services';
 
 export const createTestModule = async (): Promise<TestingModule> => {
@@ -48,6 +49,7 @@ export const createTestModule = async (): Promise<TestingModule> => {
       TestNoteService,
       TestSecretService,
       DynamicTestService,
+      TestCourseService,
     ],
   }).compile();
 
@@ -69,6 +71,9 @@ export const seedDatabase = async (moduleRef: TestingModule) => {
   const userRepo = dataSource.getRepository('TestUserEntity');
   const noteRepo = dataSource.getRepository('TestNoteEntity');
   const secretRepo = dataSource.getRepository('TestSecretEntity');
+  const studentRepo = dataSource.getRepository('TestStudentEntity');
+  const enrollRepo = dataSource.getRepository('TestEnrollEntity');
+  const courseRepo = dataSource.getRepository('TestCourseEntity');
 
   const [alice, bob, admin] = await accountRepo.save([
     accountRepo.create({
@@ -228,6 +233,46 @@ export const seedDatabase = async (moduleRef: TestingModule) => {
       hiddenField: 'also-hidden',
       adminPrice: 200,
       lockedField: 'also-locked',
+    }),
+  ]);
+
+  // ── Enrollment access control seed ──
+  // Students linked to accounts via email = username
+  const [studentAlice, studentBob] = await studentRepo.save([
+    studentRepo.create({ id: 1, email: 'alice@test' }),
+    studentRepo.create({ id: 2, email: 'bob@test' }),
+  ]);
+
+  const [course1, course2, course3] = await courseRepo.save([
+    courseRepo.create({ id: 1, title: 'Algebra' }),
+    courseRepo.create({ id: 2, title: 'Physics' }),
+    courseRepo.create({ id: 3, title: 'Programming' }),
+  ]);
+
+  await enrollRepo.save([
+    enrollRepo.create({
+      id: 1,
+      course: course1,
+      student: studentAlice,
+      status: 'active',
+    }),
+    enrollRepo.create({
+      id: 2,
+      course: course2,
+      student: studentBob,
+      status: 'active',
+    }),
+    enrollRepo.create({
+      id: 3,
+      course: course3,
+      student: studentAlice,
+      status: 'active',
+    }),
+    enrollRepo.create({
+      id: 4,
+      course: course3,
+      student: studentBob,
+      status: 'completed',
     }),
   ]);
 };

@@ -64,3 +64,7 @@ export class TestSecretDto extends CommonDto {
 }
 
 export class TestDynamicDto extends CommonDto {}
+
+export class TestCourseDto extends CommonDto {
+  title?: string;
+}

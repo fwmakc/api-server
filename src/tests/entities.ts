@@ -24,7 +24,7 @@ export class TestAccountEntity extends BaseEntity {
   @IdColumn()
   id: number;
 
-  @VarcharColumn('username')
+  @VarcharColumn('username', 'normal', { index: 'unique' })
   username: string;
 
   @VarcharColumn('email')
@@ -226,6 +226,54 @@ export class TestDynamicEntity extends BaseEntity {
   id: number;
 }
 
+@Entity({ name: 'test_students' })
+export class TestStudentEntity extends BaseEntity {
+  @IdColumn()
+  id: number;
+
+  @VarcharColumn('email')
+  email: string;
+
+  @OneToMany(() => TestEnrollEntity, (e) => e.student)
+  enrolls: TestEnrollEntity[];
+
+  @OneToOne(() => TestAccountEntity)
+  @JoinColumn({ name: 'email', referencedColumnName: 'username' })
+  account: TestAccountEntity;
+}
+
+@Entity({ name: 'test_courses' })
+export class TestCourseEntity extends BaseEntity {
+  @IdColumn()
+  id: number;
+
+  @VarcharColumn('title')
+  title: string;
+
+  @OneToMany(() => TestEnrollEntity, (e) => e.course)
+  enrolls: TestEnrollEntity[];
+}
+
+@Entity({ name: 'test_enrolls' })
+export class TestEnrollEntity extends BaseEntity {
+  @IdColumn()
+  id: number;
+
+  @VarcharColumn('status')
+  status: string;
+
+  @CreatedColumn()
+  createdAt?: Date;
+
+  @ManyToOne(() => TestCourseEntity, (c) => c.enrolls, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'course_id', referencedColumnName: 'id' })
+  course: TestCourseEntity;
+
+  @ManyToOne(() => TestStudentEntity, (s) => s.enrolls, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'student_id', referencedColumnName: 'id' })
+  student: TestStudentEntity;
+}
+
 export const TestEntities = [
   TestAccountEntity,
   TestArticleEntity,
@@ -238,4 +286,7 @@ export const TestEntities = [
   TestNoteEntity,
   TestSecretEntity,
   TestDynamicEntity,
+  TestStudentEntity,
+  TestEnrollEntity,
+  TestCourseEntity,
 ];

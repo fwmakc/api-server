@@ -18,6 +18,7 @@ import {
   TestNoteEntity,
   TestSecretEntity,
   TestDynamicEntity,
+  TestCourseEntity,
 } from './entities';
 import {
   TestAccountDto,
@@ -31,6 +32,7 @@ import {
   TestNoteDto,
   TestSecretDto,
   TestDynamicDto,
+  TestCourseDto,
 } from './dtos';
 
 @Injectable()
@@ -206,6 +208,19 @@ export class DynamicTestService extends DynamicService<
   constructor(
     @InjectRepository(TestDynamicEntity)
     protected readonly repository: Repository<any>,
+  ) {
+    super();
+  }
+}
+
+@Injectable()
+export class TestCourseService extends CommonService<
+  TestCourseDto,
+  TestCourseEntity
+> {
+  constructor(
+    @InjectRepository(TestCourseEntity)
+    protected readonly repository: Repository<TestCourseEntity>,
   ) {
     super();
   }

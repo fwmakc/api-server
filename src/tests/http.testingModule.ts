@@ -6,9 +6,9 @@ import { Strategy as JwtStrategy } from 'passport-jwt';
 import * as jwt from 'jsonwebtoken';
 import { EntityController } from '@core/common';
 import { TestEntities } from './entities';
-import { TestArticleEntity } from './entities';
-import { TestArticleDto } from './dtos';
-import { TestArticleService } from './services';
+import { TestArticleEntity, TestCourseEntity } from './entities';
+import { TestArticleDto, TestCourseDto } from './dtos';
+import { TestArticleService, TestCourseService } from './services';
 import { seedDatabase } from './app.testingModule';
 
 const TEST_SECRET = 'test-jwt-secret';
@@ -119,6 +119,19 @@ class HttpMixedController extends EntityController({
   }
 }
 
+@Controller('http-courses')
+class HttpCourseController extends EntityController({
+  name: 'http_courses',
+  dto: TestCourseDto,
+  entity: TestCourseEntity,
+  accountTable: 'enrolls.student.account',
+  operations: { read: 'owner', create: 'admin', update: 'admin', delete: 'admin' },
+})<TestCourseDto, TestCourseEntity, TestCourseService> {
+  constructor(readonly service: TestCourseService) {
+    super();
+  }
+}
+
 export const createHttpTestApp = async (): Promise<{
   app: INestApplication;
   moduleRef: TestingModule;
@@ -150,8 +163,9 @@ export const createHttpTestApp = async (): Promise<{
       HttpAdminStrictController,
       HttpClosedController,
       HttpMixedController,
+      HttpCourseController,
     ],
-    providers: [TestArticleService, MockJwtStrategy],
+    providers: [TestArticleService, TestCourseService, MockJwtStrategy],
   }).compile();
 
   await seedDatabase(moduleRef);
