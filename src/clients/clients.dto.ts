@@ -3,9 +3,9 @@ import {
   DtoCreatedColumn,
   DtoEnumColumn,
   DtoUpdatedColumn,
-} from '@lms/common';
-import { TypeClients } from '@lms/common';
-import { CommonDto } from '@lms/common';
+} from '@core/common';
+import { TypeClients } from '@core/common';
+import { CommonDto } from '@core/common';
 
 export class ClientsDto extends CommonDto {
   @DtoCreatedColumn()

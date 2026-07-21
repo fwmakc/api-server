@@ -1,4 +1,4 @@
-import { CommonDto } from '@lms/common';
+import { CommonDto } from '@core/common';
 
 export class TestAccountDto extends CommonDto {
   username?: string;

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { DtoColumn } from '@lms/common';
-import { CommonDto } from '@lms/common';
+import { DtoColumn } from '@core/common';
+import { CommonDto } from '@core/common';
 import { SettingsDto } from '../settings.dto';
 
 export class SettingsGroupsDto extends CommonDto {

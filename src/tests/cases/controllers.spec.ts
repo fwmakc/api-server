@@ -3,7 +3,7 @@ import { createTestModule } from '../app.testingModule';
 import { TestArticleService } from '../services';
 import { TestArticleDto } from '../dtos';
 import { TestArticleEntity } from '../entities';
-import { EntityController } from '@lms/common';
+import { EntityController } from '@core/common';
 
 describe('Controllers — EntityController access levels', () => {
   let moduleRef: Awaited<ReturnType<typeof createTestModule>>;

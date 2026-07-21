@@ -16,8 +16,8 @@ import {
   TextColumn,
   UpdatedColumn,
   VarcharColumn,
-} from '@lms/common';
-import { FieldAccess } from '@lms/common';
+} from '@core/common';
+import { FieldAccess } from '@core/common';
 
 @Entity({ name: 'test_accounts' })
 export class TestAccountEntity extends BaseEntity {

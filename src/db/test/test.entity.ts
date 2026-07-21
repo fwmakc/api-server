@@ -13,8 +13,8 @@ import {
   TextColumn,
   UpdatedColumn,
   VarcharColumn,
-} from '@lms/common';
-import { TypeValues } from '@lms/common';
+} from '@core/common';
+import { TypeValues } from '@core/common';
 
 @Entity({ name: 'test' })
 export class TestEntity extends BaseEntity {

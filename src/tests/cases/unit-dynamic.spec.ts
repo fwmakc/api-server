@@ -6,7 +6,7 @@ describe('Unit — dynamic SQL services', () => {
 
     beforeAll(async () => {
       ({ parseDynamicWhereObject } = await import(
-        '@lms/common'
+        '@core/common'
       ));
     });
 
@@ -173,7 +173,7 @@ describe('Unit — dynamic SQL services', () => {
 
     beforeAll(async () => {
       ({ parseDynamicSaveObject } = await import(
-        '@lms/common'
+        '@core/common'
       ));
     });
 
@@ -241,7 +241,7 @@ describe('Unit — dynamic SQL services', () => {
       process.env.DB_TYPE = 'postgres';
       jest.resetModules();
       const { prepareParams } = await import(
-        '@lms/common'
+        '@core/common'
       );
       const result = prepareParams({ name: 'test', count: 1 }) as any;
       expect(result.name).toBe('$1');
@@ -252,7 +252,7 @@ describe('Unit — dynamic SQL services', () => {
       process.env.DB_TYPE = 'mysql';
       jest.resetModules();
       const { prepareParams } = await import(
-        '@lms/common'
+        '@core/common'
       );
       const result = prepareParams({ name: 'test', count: 1 }) as any;
       expect(result.name).toBe('?');
@@ -270,7 +270,7 @@ describe('Unit — dynamic SQL services', () => {
     let mockResponse: any;
 
     beforeAll(async () => {
-      ({ Cookie } = await import('@lms/common'));
+      ({ Cookie } = await import('@core/common'));
     });
 
     beforeEach(() => {

@@ -7,8 +7,8 @@ import {
   TextColumn,
   UpdatedColumn,
   VarcharColumn,
-} from '@lms/common';
-import { TypeClients } from '@lms/common';
+} from '@core/common';
+import { TypeClients } from '@core/common';
 import { AccountEntity } from '@src/account/account.entity';
 
 @Entity({ name: 'clients' })

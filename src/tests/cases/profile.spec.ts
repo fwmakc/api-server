@@ -1,6 +1,6 @@
 import { createTestModule } from '../app.testingModule';
 import { TestProfileService } from '../services';
-import { removePrivateFields } from '@lms/common';
+import { removePrivateFields } from '@core/common';
 
 describe('@FieldAccess — closed entity (profile)', () => {
   let moduleRef: Awaited<ReturnType<typeof createTestModule>>;

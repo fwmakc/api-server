@@ -17,7 +17,7 @@ import {
   TextColumn,
   UpdatedColumn,
   VarcharColumn,
-} from '@lms/common';
+} from '@core/common';
 
 @Entity({ name: 'posts' })
 export class PostsEntity extends BaseEntity {
