@@ -108,6 +108,21 @@ describe('HTTP Access Control — full guard pipeline', () => {
         .set('Authorization', `Bearer ${ALICE_TOKEN}`)
         .expect(200);
     });
+
+    it('findOne with token → 200', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/http-public/find/1')
+        .set('Authorization', `Bearer ${ALICE_TOKEN}`)
+        .expect(200);
+      expect(+res.body.id).toBe(1);
+    });
+
+    it('count with token → 200', async () => {
+      await request(app.getHttpServer())
+        .get('/http-public/count')
+        .set('Authorization', `Bearer ${ALICE_TOKEN}`)
+        .expect(200);
+    });
   });
 
   // ═══════════════════════════════════════════════════════════
@@ -117,6 +132,12 @@ describe('HTTP Access Control — full guard pipeline', () => {
     it('find without token → 401', async () => {
       await request(app.getHttpServer())
         .get('/http-account/find')
+        .expect(401);
+    });
+
+    it('findOne without token → 401', async () => {
+      await request(app.getHttpServer())
+        .get('/http-account/find/1')
         .expect(401);
     });
 
@@ -198,6 +219,12 @@ describe('HTTP Access Control — full guard pipeline', () => {
         .expect(401);
     });
 
+    it('findOne without token → 401', async () => {
+      await request(app.getHttpServer())
+        .get('/http-owner/find/1')
+        .expect(401);
+    });
+
     it('find with alice → 200 (only own records)', async () => {
       const res = await request(app.getHttpServer())
         .get('/http-owner/find')
@@ -243,6 +270,20 @@ describe('HTTP Access Control — full guard pipeline', () => {
       expect(res.body.length).toBe(2);
     });
 
+    it('self without token → 401', async () => {
+      await request(app.getHttpServer())
+        .get('/http-owner/self')
+        .expect(401);
+    });
+
+    it('self with admin → 200 (admin owns no records)', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/http-owner/self')
+        .set('Authorization', `Bearer ${ADMIN_TOKEN}`)
+        .expect(200);
+      expect(Array.isArray(res.body)).toBe(true);
+    });
+
     it('create without token → 401', async () => {
       await request(app.getHttpServer())
         .post('/http-owner/create')
@@ -257,6 +298,15 @@ describe('HTTP Access Control — full guard pipeline', () => {
         .set('Authorization', `Bearer ${ALICE_TOKEN}`)
         .expect(201);
       expect(res.body.title).toBe('Owner Created');
+    });
+
+    it('create with admin → 201 (bypass)', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/http-owner/create')
+        .send({ create: { title: 'Owner Admin Created' }, relations: [] })
+        .set('Authorization', `Bearer ${ADMIN_TOKEN}`)
+        .expect(201);
+      expect(res.body.title).toBe('Owner Admin Created');
     });
 
     it('update without token → 401', async () => {
@@ -345,6 +395,20 @@ describe('HTTP Access Control — full guard pipeline', () => {
     it('find without token → 200 (read is public)', async () => {
       await request(app.getHttpServer())
         .get('/http-admin/find')
+        .expect(200);
+    });
+
+    it('find with non-superuser → 200 (read is public)', async () => {
+      await request(app.getHttpServer())
+        .get('/http-admin/find')
+        .set('Authorization', `Bearer ${ALICE_TOKEN}`)
+        .expect(200);
+    });
+
+    it('find with superuser → 200', async () => {
+      await request(app.getHttpServer())
+        .get('/http-admin/find')
+        .set('Authorization', `Bearer ${ADMIN_TOKEN}`)
         .expect(200);
     });
 
@@ -447,6 +511,79 @@ describe('HTTP Access Control — full guard pipeline', () => {
       expect(Array.isArray(res.body)).toBe(true);
       expect(res.body.length).toBeGreaterThanOrEqual(3);
     });
+
+    it('create without token → 401', async () => {
+      await request(app.getHttpServer())
+        .post('/http-admin-strict/create')
+        .send({ create: { title: 'Hack' }, relations: [] })
+        .expect(401);
+    });
+
+    it('create with non-superuser → 403', async () => {
+      await request(app.getHttpServer())
+        .post('/http-admin-strict/create')
+        .send({ create: { title: 'Hack' }, relations: [] })
+        .set('Authorization', `Bearer ${ALICE_TOKEN}`)
+        .expect(403);
+    });
+
+    it('create with superuser → 201', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/http-admin-strict/create')
+        .send({ create: { title: 'Strict Admin Created' }, relations: [] })
+        .set('Authorization', `Bearer ${ADMIN_TOKEN}`)
+        .expect(201);
+      expect(res.body.title).toBe('Strict Admin Created');
+    });
+
+    it('update without token → 401', async () => {
+      await request(app.getHttpServer())
+        .patch('/http-admin-strict/update/1')
+        .send({ update: { title: 'Hack' }, relations: [] })
+        .expect(401);
+    });
+
+    it('update with non-superuser → 403', async () => {
+      await request(app.getHttpServer())
+        .patch('/http-admin-strict/update/1')
+        .send({ update: { title: 'Hack' }, relations: [] })
+        .set('Authorization', `Bearer ${ALICE_TOKEN}`)
+        .expect(403);
+    });
+
+    it('update with superuser → 200', async () => {
+      const res = await request(app.getHttpServer())
+        .patch('/http-admin-strict/update/1')
+        .send({ update: { title: 'Strict Admin Updated' }, relations: [] })
+        .set('Authorization', `Bearer ${ADMIN_TOKEN}`)
+        .expect(200);
+      expect(res.body.title).toBe('Strict Admin Updated');
+    });
+
+    it('remove without token → 401', async () => {
+      await request(app.getHttpServer())
+        .delete('/http-admin-strict/remove/999')
+        .expect(401);
+    });
+
+    it('remove with non-superuser → 403', async () => {
+      await request(app.getHttpServer())
+        .delete('/http-admin-strict/remove/999')
+        .set('Authorization', `Bearer ${ALICE_TOKEN}`)
+        .expect(403);
+    });
+
+    it('remove with superuser → 200', async () => {
+      const created = await request(app.getHttpServer())
+        .post('/http-admin-strict/create')
+        .send({ create: { title: 'Strict To Delete' }, relations: [] })
+        .set('Authorization', `Bearer ${ADMIN_TOKEN}`);
+
+      await request(app.getHttpServer())
+        .delete(`/http-admin-strict/remove/${created.body.id}`)
+        .set('Authorization', `Bearer ${ADMIN_TOKEN}`)
+        .expect(200);
+    });
   });
 
   // ═══════════════════════════════════════════════════════════
@@ -527,6 +664,13 @@ describe('HTTP Access Control — full guard pipeline', () => {
         .expect(200);
     });
 
+    it('find with token → 200 (public read)', async () => {
+      await request(app.getHttpServer())
+        .get('/http-mixed/find')
+        .set('Authorization', `Bearer ${ALICE_TOKEN}`)
+        .expect(200);
+    });
+
     it('create without token → 401 (owner create)', async () => {
       await request(app.getHttpServer())
         .post('/http-mixed/create')
@@ -541,6 +685,22 @@ describe('HTTP Access Control — full guard pipeline', () => {
         .set('Authorization', `Bearer ${ALICE_TOKEN}`)
         .expect(201);
       expect(res.body.title).toBe('Mixed Created');
+    });
+
+    it('create with admin → 201 (admin bypasses owner)', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/http-mixed/create')
+        .send({ create: { title: 'Mixed Admin Created' }, relations: [] })
+        .set('Authorization', `Bearer ${ADMIN_TOKEN}`)
+        .expect(201);
+      expect(res.body.title).toBe('Mixed Admin Created');
+    });
+
+    it('update without token → 401 (admin update)', async () => {
+      await request(app.getHttpServer())
+        .patch('/http-mixed/update/1')
+        .send({ update: { title: 'Hack' }, relations: [] })
+        .expect(401);
     });
 
     it('update with alice → 403 (admin update)', async () => {
@@ -558,6 +718,19 @@ describe('HTTP Access Control — full guard pipeline', () => {
         .set('Authorization', `Bearer ${ADMIN_TOKEN}`)
         .expect(200);
       expect(res.body.title).toBe('Mixed Admin Updated');
+    });
+
+    it('remove without token → 404 (closed delete)', async () => {
+      await request(app.getHttpServer())
+        .delete('/http-mixed/remove/1')
+        .expect(404);
+    });
+
+    it('remove with non-superuser → 404 (closed delete)', async () => {
+      await request(app.getHttpServer())
+        .delete('/http-mixed/remove/1')
+        .set('Authorization', `Bearer ${ALICE_TOKEN}`)
+        .expect(404);
     });
 
     it('remove with admin → 404 (closed delete)', async () => {
