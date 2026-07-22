@@ -113,8 +113,9 @@ fwmakc/servers/
  - [Описание модели данных](#описание-модели-данных)
  - [Настройка модели данных](#настройка-модели-данных)
  - [Генерация модели данных](#генерация-модели-данных)
- - [Защита полей](#защита-полей)
-- [Контроллеры и контроллеры](#контроллеры-и-контроллеры)
+  - [Защита полей](#защита-полей)
+  - [Проверка защиты — примеры curl](#проверка-защиты--примеры-curl)
+ - [Контроллеры и контроллеры](#контроллеры-и-контроллеры)
  - [Аргументы запросов](#аргументы-запросов)
  - [Методы запросов](#методы-запросов)
  - [Пути запросов](#пути-запросов)
@@ -1174,6 +1175,139 @@ secretNotes: string;
 - **Сущности не в реестре** — новые сущности удаляются (консервативное поведение по умолчанию).
 
 Это защищает от создания и изменения связанных сущностей через вложенные DTO при `cascade: true`.
+
+[^ к оглавлению](#оглавление)
+
+## Проверка защиты — примеры curl
+
+Ниже приведены положительные и негативные кейсы для каждого уровня защиты. Примеры используют сущность **posts** (`operations: { read: 'public', create: 'owner', update: 'owner', delete: 'owner' }`) с полями:
+
+- `secretNotes` — `@FieldAccess({ read: 'owner', write: 'owner' })` — приватные заметки автора
+- `viewCount` — `@FieldAccess({ write: 'closed' })` — системный счётчик (только для чтения)
+
+### Подготовка
+
+```bash
+BASE="http://localhost:5000"    # PORT и PREFIX из .env
+TOKEN="<jwt-пользователя>"       # получить через auth-server
+ADMIN_TOKEN="<jwt-админа>"       # токен суперпользователя (isSuperuser: true)
+```
+
+### Уровни доступа (operations)
+
+#### read: public — чтение без авторизации
+
+```bash
+# [+] Посты доступны всем (read: public)
+curl -s "$BASE/posts/find" | jq '.[0] | {id, title}'
+# {"id": 1, "title": "..."}
+
+# [-] Персонажи требуют авторизации (read: owner)
+curl -s "$BASE/persons/find"
+# 401 Unauthorized
+```
+
+#### create: owner — создание только авторизованным
+
+```bash
+# [+] Создание поста с токеном
+curl -s -X POST "$BASE/posts/create" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"create": {"title": "Мой пост", "content": "Текст"}}' | jq '.id'
+# 1
+
+# [-] Без токена — отказ
+curl -s -X POST "$BASE/posts/create" \
+  -H "Content-Type: application/json" \
+  -d '{"create": {"title": "Пост", "content": "Текст"}}'
+# 401 Unauthorized
+```
+
+#### update: owner — изменение только своих записей
+
+```bash
+# [+] Обновление своего поста
+curl -s -X PATCH "$BASE/posts/update/1" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"update": {"title": "Новое название"}}' | jq '.title'
+# "Новое название"
+
+# [-] Обновление чужого поста — 404 (bind фильтрует по account_id)
+curl -s -X PATCH "$BASE/posts/update/1" \
+  -H "Authorization: Bearer $OTHER_USER_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"update": {"title": "Взлом"}}'
+# 404 Not Found
+```
+
+#### create: admin — только суперпользователи
+
+```bash
+# [+] Админ создаёт категорию
+curl -s -X POST "$BASE/posts/categories/create" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"create": {"title": "Новости"}}' | jq '.id'
+# 1
+
+# [-] Обычный пользователь — отказ
+curl -s -X POST "$BASE/posts/categories/create" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"create": {"title": "Новости"}}'
+# 403 Forbidden
+```
+
+### Защита полей (@FieldAccess)
+
+#### read: owner — стрипинг при чтении
+
+```bash
+# [-] Без relations — secretNotes стрипается (нельзя проверить владельца)
+curl -s "$BASE/posts/find" \
+  -H "Authorization: Bearer $TOKEN" | jq '.[0] | {title, secretNotes}'
+# {"title": "Мой пост"} — secretNotes нет
+
+# [+] С relation account — secretNotes виден на своих постах
+curl -G -s "$BASE/posts/find" \
+  -H "Authorization: Bearer $TOKEN" \
+  --data-urlencode 'relations=[{"name":"account"}]' | \
+  jq '.[0] | {title, secretNotes}'
+# {"title": "Мой пост", "secretNotes": "приватная заметка"}
+```
+
+#### write: closed — стрипинг при записи
+
+```bash
+# [-] viewCount игнорируется при создании (write: closed)
+curl -s -X POST "$BASE/posts/create" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"create": {"title": "Тест", "content": "Текст", "viewCount": 999999}}' | \
+  jq '.viewCount'
+# null — поле стрипнуто
+
+# [-] viewCount игнорируется при обновлении
+curl -s -X PATCH "$BASE/posts/update/1" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"update": {"viewCount": 999999}}' | jq '.viewCount'
+# 0 — не изменилось
+```
+
+#### write: owner — запись владельцем
+
+```bash
+# [+] secretNotes обновляется владельцем (write: owner)
+curl -s -X PATCH "$BASE/posts/update/1" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"update": {"secretNotes": "новая заметка"}, "relations": [{"name":"account"}]}' | \
+  jq '.secretNotes'
+# "новая заметка"
+```
 
 [^ к оглавлению](#оглавление)
 

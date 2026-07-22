@@ -14,9 +14,11 @@ import {
   CreatedColumn,
   DateColumn,
   IdColumn,
+  IntColumn,
   TextColumn,
   UpdatedColumn,
   VarcharColumn,
+  FieldAccess,
 } from 'api-server-toolkit';
 
 @Entity({ name: 'posts' })
@@ -45,6 +47,14 @@ export class PostsEntity extends BaseEntity {
 
   @BooleanColumn('is_published')
   isPublished: boolean;
+
+  @FieldAccess({ read: 'owner', write: 'owner' })
+  @TextColumn('secret_notes')
+  secretNotes: string;
+
+  @FieldAccess({ write: 'closed' })
+  @IntColumn('view_count')
+  viewCount: number;
 
   @ManyToOne(() => PostsCategoriesEntity, (category) => category.posts, {
     onDelete: 'SET NULL',
