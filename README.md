@@ -48,7 +48,7 @@ fwmakc/servers/
 - **JWT (RS256 + JWKS)** — auth-server подписывает токены RSA приватным ключом, остальные проверяют через `/.well-known/jwks.json`
 - **Sync:** api-server → auth-server HTTP call (`X-Internal-Key` header) для проверки `isActivated`
 - **Async:** Redis Streams через `@nestjs/microservices` (auth-server эмитит, message-server консьюмит)
-- **Shared:** общий CRUD engine + event bus в npm-пакете `api-server-toolkit` (репозиторий `shared/`)
+- **Shared:** общий CRUD engine в npm-пакете `api-server-toolkit` (репозиторий `api-server-toolkit/`)
 
 ### Что переехало
 
