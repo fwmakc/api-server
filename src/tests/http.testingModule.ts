@@ -155,6 +155,42 @@ class HttpEnrollController extends EntityController({
   }
 }
 
+@Controller('http-partial')
+class HttpPartialRelationsController extends EntityController({
+  name: 'http_partial',
+  dto: TestArticleDto,
+  entity: TestArticleEntity,
+  operations: { read: 'public' },
+  relations: ['account'],
+})<TestArticleDto, TestArticleEntity, TestArticleService> {
+  constructor(readonly service: TestArticleService) {
+    super();
+  }
+}
+
+@Controller('http-no-relations')
+class HttpNoRelationsController extends EntityController({
+  name: 'http_no_relations',
+  dto: TestArticleDto,
+  entity: TestArticleEntity,
+  operations: { read: 'public' },
+})<TestArticleDto, TestArticleEntity, TestArticleService> {
+  constructor(readonly service: TestArticleService) {
+    super();
+  }
+}
+
+@Controller('http-default')
+class HttpDefaultController extends EntityController({
+  name: 'http_default',
+  dto: TestArticleDto,
+  entity: TestArticleEntity,
+})<TestArticleDto, TestArticleEntity, TestArticleService> {
+  constructor(readonly service: TestArticleService) {
+    super();
+  }
+}
+
 export const createHttpTestApp = async (): Promise<{
   app: INestApplication;
   moduleRef: TestingModule;
@@ -188,6 +224,9 @@ export const createHttpTestApp = async (): Promise<{
       HttpMixedController,
       HttpCourseController,
       HttpEnrollController,
+      HttpPartialRelationsController,
+      HttpNoRelationsController,
+      HttpDefaultController,
     ],
     providers: [TestArticleService, TestCourseService, TestEnrollService, MockJwtStrategy],
   }).compile();

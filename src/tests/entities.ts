@@ -27,6 +27,7 @@ export class TestAccountEntity extends BaseEntity {
   @VarcharColumn('username', 'normal', { index: 'unique' })
   username: string;
 
+  @FieldAccess({ read: 'owner' })
   @VarcharColumn('email')
   email: string;
 

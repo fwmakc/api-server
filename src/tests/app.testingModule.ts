@@ -276,5 +276,11 @@ export const seedDatabase = async (moduleRef: TestingModule) => {
       student: studentBob,
       status: 'completed',
     }),
+    enrollRepo.create({
+      id: 5,
+      course: course1,
+      student: studentAlice,
+      status: 'pending',
+    }),
   ]);
 };

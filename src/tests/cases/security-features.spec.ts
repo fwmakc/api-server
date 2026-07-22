@@ -180,5 +180,56 @@ describe('Security features — service-level', () => {
         ),
       ).rejects.toThrow();
     });
+
+    it('create course with ToMany-first-segment bind → no auto-assign, no crash', async () => {
+      const courseBind = { id: 1, name: 'enrolls.student.account', key: 'id', allow: false };
+      await expect(
+        courseService.create(
+          { title: 'ToManySkipUnique' } as any,
+          undefined,
+          courseBind,
+        ),
+      ).resolves.not.toThrow();
+
+      const found = await courseService.find(
+        { where: { title: 'ToManySkipUnique' } as any },
+        { allow: true },
+      );
+      expect(found.length).toBe(1);
+      expect((found[0] as any).title).toBe('ToManySkipUnique');
+    });
+  });
+
+  // ── Pagination with duplicate JOINs ──
+  describe('Pagination with duplicate JOINs', () => {
+    it('course 1 has 2 Alice enrolls → alice sees it once (not duplicated)', async () => {
+      const all = await courseService.find({}, aliceBind);
+      // Alice enrolled in course 1 (enrolls 1,5) and course 3 (enroll 3)
+      expect(all.length).toBe(2);
+      const ids = all.map((c: any) => +c.id).sort();
+      expect(ids).toEqual([1, 3]);
+    });
+
+    it('limit=1 offset=0 returns 1 course despite duplicate JOINs', async () => {
+      const first = await courseService.find(
+        { limit: 1, offset: 0 },
+        aliceBind,
+      );
+      expect(first.length).toBe(1);
+    });
+
+    it('limit=1 offset=1 returns the other course (not a duplicate)', async () => {
+      const first = await courseService.find(
+        { limit: 1, offset: 0 },
+        aliceBind,
+      );
+      const second = await courseService.find(
+        { limit: 1, offset: 1 },
+        aliceBind,
+      );
+      expect(first.length).toBe(1);
+      expect(second.length).toBe(1);
+      expect(+first[0].id).not.toBe(+second[0].id);
+    });
   });
 });
