@@ -1,11 +1,12 @@
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Module } from '@nestjs/common';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
 import { DataSource } from 'typeorm';
 import { addTransactionalDataSource } from 'typeorm-transactional';
 import { getDbConfig } from '@config/db.config';
+import { RemovePrivateFieldsInterceptor } from 'api-server-toolkit';
 import { AppController } from '@src/app.controller';
 import { AppService } from '@src/app.service';
 import AppImports from './app.imports';
@@ -30,6 +31,10 @@ import AppImports from './app.imports';
     {
       provide: APP_FILTER,
       useClass: SentryGlobalFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: RemovePrivateFieldsInterceptor,
     },
     AppService,
   ],
