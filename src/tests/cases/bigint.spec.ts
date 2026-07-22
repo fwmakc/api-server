@@ -1,6 +1,6 @@
 import { createTestModule } from '../app.testingModule';
 import { TestArticleService } from '../services';
-import { SafeIdPipe } from '@core/common';
+import { SafeIdPipe } from 'api-server-toolkit';
 import { BadRequestException } from '@nestjs/common';
 
 describe('BigInt precision', () => {

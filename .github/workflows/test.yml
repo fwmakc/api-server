@@ -28,22 +28,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Checkout shared (@core/common)
-        uses: actions/checkout@v4
-        with:
-          repository: fwmakc/shared
-          path: shared-src
-
-      - name: Build @core/common tarball
-        run: |
-          cd shared-src
-          npm install
-          npm run build
-          npm pack
-          cd ..
-          mkdir -p ../shared
-          cp shared-src/core-common-1.0.0.tgz ../shared/
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:

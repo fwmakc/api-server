@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CommonService } from '@core/common';
+import { CommonService } from 'api-server-toolkit';
 import { PostsCategoriesDto } from './posts_categories.dto';
 import { PostsCategoriesEntity } from './posts_categories.entity';
 

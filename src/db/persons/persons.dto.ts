@@ -4,9 +4,9 @@ import {
   DtoCreatedColumn,
   DtoEnumColumn,
   DtoUpdatedColumn,
-} from '@core/common';
-import { CommonDto } from '@core/common';
-import { TypeGenders } from '@core/common';
+} from 'api-server-toolkit';
+import { CommonDto } from 'api-server-toolkit';
+import { TypeGenders } from 'api-server-toolkit';
 
 export class PersonsDto extends CommonDto {
   @DtoCreatedColumn()

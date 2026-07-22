@@ -4,9 +4,9 @@ import {
   DtoEnumColumn,
   DtoJsonColumn,
   DtoUpdatedColumn,
-} from '@core/common';
-import { TypeValues } from '@core/common';
-import { CommonDto } from '@core/common';
+} from 'api-server-toolkit';
+import { TypeValues } from 'api-server-toolkit';
+import { CommonDto } from 'api-server-toolkit';
 
 export class TestDto extends CommonDto {
   @DtoCreatedColumn()

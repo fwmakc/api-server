@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { EntityController } from '@core/common';
+import { EntityController } from 'api-server-toolkit';
 import { PostsCategoriesDto } from './posts_categories.dto';
 import { PostsCategoriesEntity } from './posts_categories.entity';
 import { PostsCategoriesService } from './posts_categories.service';

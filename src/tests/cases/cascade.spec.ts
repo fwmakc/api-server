@@ -11,8 +11,8 @@ import {
   TestCycleAEntity,
   TestCycleBEntity,
 } from '../entities';
-import { sanitizeForSave } from '@core/common';
-import { PermissionRegistry } from '@core/common';
+import { sanitizeForSave } from 'api-server-toolkit';
+import { PermissionRegistry } from 'api-server-toolkit';
 
 describe('sanitizeForSave — cascade protection', () => {
   let moduleRef: Awaited<ReturnType<typeof createTestModule>>;

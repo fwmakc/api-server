@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { DtoColumn } from '@core/common';
-import { CommonDto } from '@core/common';
+import { DtoColumn } from 'api-server-toolkit';
+import { CommonDto } from 'api-server-toolkit';
 import { PostsCategoriesDto } from './posts_categories/posts_categories.dto';
 import { PostsTagsDto } from './posts_tags/posts_tags.dto';
 

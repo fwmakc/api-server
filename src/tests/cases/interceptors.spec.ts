@@ -1,6 +1,6 @@
 import { ExecutionContext, CallHandler } from '@nestjs/common';
-import { AddClientIpInterceptor } from '@core/common';
-import { RemovePrivateFieldsInterceptor } from '@core/common';
+import { AddClientIpInterceptor } from 'api-server-toolkit';
+import { RemovePrivateFieldsInterceptor } from 'api-server-toolkit';
 
 describe('interceptors — unit', () => {
   const mockRequest = (extras: any = {}) =>

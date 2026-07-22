@@ -17,7 +17,7 @@ import {
   TextColumn,
   UpdatedColumn,
   VarcharColumn,
-} from '@core/common';
+} from 'api-server-toolkit';
 
 @Entity({ name: 'posts' })
 export class PostsEntity extends BaseEntity {

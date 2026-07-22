@@ -1,4 +1,4 @@
-import { CommonDto } from '@core/common';
+import { CommonDto } from 'api-server-toolkit';
 
 export class TestAccountDto extends CommonDto {
   username?: string;

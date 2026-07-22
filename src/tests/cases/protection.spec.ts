@@ -3,7 +3,7 @@ import { createTestModule } from '../app.testingModule';
 import { TestArticleService, TestProfileService } from '../services';
 import { TestArticleDto, TestProfileDto } from '../dtos';
 import { TestArticleEntity, TestProfileEntity } from '../entities';
-import { EntityController } from '@core/common';
+import { EntityController } from 'api-server-toolkit';
 
 const ArticleBase = EntityController({
   name: 'Articles',
@@ -57,12 +57,12 @@ describe('Protection — controller-level access control', () => {
 
   it('N12: non-owner update → NotFoundException', async () => {
     await expect(
-      articleController.update(3, { title: 'Hacked' } as any, [], aliceAuth),
+      articleController.update('3', { title: 'Hacked' } as any, [], aliceAuth),
     ).rejects.toThrow(NotFoundException);
   });
 
   it('N13: non-owner remove → false', async () => {
-    const result = await articleController.remove(3, aliceAuth);
+    const result = await articleController.remove('3', aliceAuth);
     expect(result).toBe(false);
   });
 
@@ -101,7 +101,7 @@ describe('Protection — controller-level access control', () => {
   });
 
   it('N17: non-admin remove → ForbiddenException', async () => {
-    await expect(profileController.remove(1, aliceAuth)).rejects.toThrow(
+    await expect(profileController.remove('1', aliceAuth)).rejects.toThrow(
       ForbiddenException,
     );
   });

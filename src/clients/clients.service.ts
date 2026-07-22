@@ -1,8 +1,8 @@
 import { Repository } from 'typeorm';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CommonService } from '@core/common';
-import { RelationsDto } from '@core/common';
+import { CommonService } from 'api-server-toolkit';
+import { RelationsDto } from 'api-server-toolkit';
 import { ClientsDto } from './clients.dto';
 import { ClientsEntity } from './clients.entity';
 

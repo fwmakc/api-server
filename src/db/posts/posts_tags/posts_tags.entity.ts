@@ -4,7 +4,7 @@ import {
   IdColumn,
   UpdatedColumn,
   VarcharColumn,
-} from '@core/common';
+} from 'api-server-toolkit';
 import { PostsEntity } from '../posts.entity';
 
 @Entity({ name: 'posts_tags' })

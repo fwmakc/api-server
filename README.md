@@ -25,7 +25,7 @@ fwmakc/servers/
 ├── message-server/      ← Уведомления: email, Redis event consumer (port 3003)
 ├── chat-server/         ← WebSocket чат (port 3004)
 ├── gateway/             ← Nginx reverse proxy + docker-compose
-└── shared/              ← @core/common — общий CRUD engine + event bus (npm package)
+└── shared/              ← api-server-toolkit — общий CRUD engine + event bus (npm package)
 ```
 
 ### Архитектура взаимодействия
@@ -48,7 +48,7 @@ fwmakc/servers/
 - **JWT (RS256 + JWKS)** — auth-server подписывает токены RSA приватным ключом, остальные проверяют через `/.well-known/jwks.json`
 - **Sync:** api-server → auth-server HTTP call (`X-Internal-Key` header) для проверки `isActivated`
 - **Async:** Redis Streams через `@nestjs/microservices` (auth-server эмитит, message-server консьюмит)
-- **Shared:** общий CRUD engine + event bus в npm-пакете `@core/common` (репозиторий `shared/`)
+- **Shared:** общий CRUD engine + event bus в npm-пакете `api-server-toolkit` (репозиторий `shared/`)
 
 ### Что переехало
 
@@ -59,7 +59,7 @@ fwmakc/servers/
 | `mail/` | → message-server |
 | `files/` | → file-server |
 | `sockets/`, `rooms/` | → chat-server |
-| `common/` | → `@core/common` (shared npm package) |
+| `common/` | → `api-server-toolkit` (shared npm package) |
 | `db/`, `account/` (entity, service, strategy, dto) | Остаются в api-server |
 
 # TO DO

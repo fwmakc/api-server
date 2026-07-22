@@ -1,5 +1,5 @@
 import { BaseEntity, Entity, JoinColumn, ManyToOne } from 'typeorm';
-import { TypeValues } from '@core/common';
+import { TypeValues } from 'api-server-toolkit';
 import { SettingsGroupsEntity } from './settings_groups/settings_groups.entity';
 import {
   BooleanColumn,
@@ -8,7 +8,7 @@ import {
   PositionAscColumn,
   TextColumn,
   VarcharColumn,
-} from '@core/common';
+} from 'api-server-toolkit';
 
 @Entity({ name: 'settings' })
 export class SettingsEntity extends BaseEntity {

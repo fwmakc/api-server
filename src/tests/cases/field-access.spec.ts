@@ -1,6 +1,6 @@
 import { createTestModule } from '../app.testingModule';
 import { TestSecretService } from '../services';
-import { removePrivateFields } from '@core/common';
+import { removePrivateFields } from 'api-server-toolkit';
 
 describe('@FieldAccess — field-level access control', () => {
   let moduleRef: Awaited<ReturnType<typeof createTestModule>>;

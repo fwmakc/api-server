@@ -1,5 +1,5 @@
 import { createTestModule } from '../app.testingModule';
-import { removePrivateFields } from '@core/common';
+import { removePrivateFields } from 'api-server-toolkit';
 import { TestCycleAService } from '../services';
 
 describe('Cycle protection in removePrivateFields', () => {

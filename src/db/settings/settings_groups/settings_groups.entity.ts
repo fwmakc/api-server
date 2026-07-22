@@ -5,7 +5,7 @@ import {
   IdColumn,
   PositionAscColumn,
   VarcharColumn,
-} from '@core/common';
+} from 'api-server-toolkit';
 
 @Entity({ name: 'settings_groups' })
 export class SettingsGroupsEntity extends BaseEntity {

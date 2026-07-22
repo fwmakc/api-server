@@ -13,8 +13,8 @@ import {
   TextColumn,
   UpdatedColumn,
   VarcharColumn,
-} from '@core/common';
-import { TypeValues } from '@core/common';
+} from 'api-server-toolkit';
+import { TypeValues } from 'api-server-toolkit';
 
 @Entity({ name: 'test' })
 export class TestEntity extends BaseEntity {

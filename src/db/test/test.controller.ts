@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { EntityController } from '@core/common';
+import { EntityController } from 'api-server-toolkit';
 import { TestDto } from './test.dto';
 import { TestEntity } from './test.entity';
 import { TestService } from './test.service';

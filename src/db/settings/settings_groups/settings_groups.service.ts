@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CommonService } from '@core/common';
+import { CommonService } from 'api-server-toolkit';
 import { SettingsGroupsDto } from './settings_groups.dto';
 import { SettingsGroupsEntity } from './settings_groups.entity';
 

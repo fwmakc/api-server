@@ -5,7 +5,7 @@ import {
   IdColumn,
   UpdatedColumn,
   VarcharColumn,
-} from '@core/common';
+} from 'api-server-toolkit';
 
 @Entity({ name: 'accounts' })
 export class AccountEntity extends BaseEntity {

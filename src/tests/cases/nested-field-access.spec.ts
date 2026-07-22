@@ -1,6 +1,6 @@
 import { createTestModule } from '../app.testingModule';
 import { TestArticleService, TestCourseService } from '../services';
-import { removePrivateFields } from '@core/common';
+import { removePrivateFields } from 'api-server-toolkit';
 
 describe('Nested field access — computeNestedBind propagation', () => {
   let moduleRef: Awaited<ReturnType<typeof createTestModule>>;

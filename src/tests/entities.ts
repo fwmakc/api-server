@@ -16,8 +16,8 @@ import {
   TextColumn,
   UpdatedColumn,
   VarcharColumn,
-} from '@core/common';
-import { FieldAccess } from '@core/common';
+} from 'api-server-toolkit';
+import { FieldAccess } from 'api-server-toolkit';
 
 @Entity({ name: 'test_accounts' })
 export class TestAccountEntity extends BaseEntity {

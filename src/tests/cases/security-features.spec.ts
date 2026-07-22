@@ -1,6 +1,6 @@
 import { createTestModule } from '../app.testingModule';
 import { TestCourseService, TestEnrollService } from '../services';
-import { PermissionRegistry } from '@core/common';
+import { PermissionRegistry } from 'api-server-toolkit';
 import { TestEnrollEntity } from '../entities';
 
 // ═══════════════════════════════════════════════════════════════

@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { EntityController } from '@core/common';
+import { EntityController } from 'api-server-toolkit';
 import { PersonsDto } from './persons.dto';
 import { PersonsEntity } from './persons.entity';
 import { PersonsService } from './persons.service';
