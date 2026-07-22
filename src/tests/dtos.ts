@@ -12,6 +12,8 @@ export class TestArticleDto extends CommonDto {
   title?: string;
   content?: string;
   secretNotes?: string;
+  adminNotes?: string;
+  lockedNotes?: string;
   position?: number;
   account?: any;
 }
@@ -60,6 +62,8 @@ export class TestSecretDto extends CommonDto {
   hiddenField?: string;
   adminPrice?: number;
   lockedField?: string;
+  accountNote?: string;
+  accountWrite?: string;
   account?: any;
 }
 

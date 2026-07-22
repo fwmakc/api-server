@@ -62,6 +62,14 @@ export class TestArticleEntity extends BaseEntity {
   @TextColumn('secret_notes')
   secretNotes: string;
 
+  @FieldAccess({ write: 'admin' })
+  @VarcharColumn('admin_notes')
+  adminNotes: string;
+
+  @FieldAccess({ write: 'closed' })
+  @VarcharColumn('locked_notes')
+  lockedNotes: string;
+
   @IntColumn('position')
   position: number;
 
@@ -215,6 +223,14 @@ export class TestSecretEntity extends BaseEntity {
   @FieldAccess({ write: 'closed' })
   @VarcharColumn('locked_field')
   lockedField: string;
+
+  @FieldAccess({ read: 'account' })
+  @VarcharColumn('account_note')
+  accountNote: string;
+
+  @FieldAccess({ write: 'account' })
+  @VarcharColumn('account_write')
+  accountWrite: string;
 
   @ManyToOne(() => TestAccountEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'account_id', referencedColumnName: 'id' })

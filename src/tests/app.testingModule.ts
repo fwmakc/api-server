@@ -226,6 +226,8 @@ export const seedDatabase = async (moduleRef: TestingModule) => {
       hiddenField: 'should-never-appear',
       adminPrice: 100,
       lockedField: 'cannot-be-changed',
+      accountNote: 'visible to logged-in users',
+      accountWrite: 'initial',
     }),
     secretRepo.create({
       id: 2,
@@ -235,6 +237,8 @@ export const seedDatabase = async (moduleRef: TestingModule) => {
       hiddenField: 'also-hidden',
       adminPrice: 200,
       lockedField: 'also-locked',
+      accountNote: 'bob note',
+      accountWrite: 'bob initial',
     }),
   ]);
 

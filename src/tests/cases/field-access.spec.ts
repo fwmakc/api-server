@@ -1,7 +1,7 @@
 import { createTestModule } from '../app.testingModule';
 import { TestSecretService } from '../services';
 import { removePrivateFields, stripWriteFields } from 'api-server-toolkit';
-import { TestSecretEntity } from '../entities';
+import { TestSecretEntity, TestArticleEntity } from '../entities';
 
 describe('@FieldAccess — field-level access control', () => {
   let moduleRef: Awaited<ReturnType<typeof createTestModule>>;
@@ -142,6 +142,45 @@ describe('@FieldAccess — field-level access control', () => {
     });
   });
 
+  describe('account-level access (read: account / write: account)', () => {
+    it('FA12: logged-in user sees accountNote (read: account)', async () => {
+      const result = await service.find(
+        { relations: [{ name: 'account' }] },
+        { allow: true },
+      );
+      removePrivateFields(result, { id: 1, name: 'account', key: 'id', allow: false });
+      const alice = result.find((s) => +s.id === 1);
+      expect(alice.accountNote).toBe('visible to logged-in users');
+    });
+
+    it('FA13: anonymous cannot see accountNote (read: account)', async () => {
+      const result = await service.find(
+        { relations: [{ name: 'account' }] },
+        { allow: true },
+      );
+      removePrivateFields(result, { id: undefined, name: 'account', key: 'id', allow: false });
+      result.forEach((s) => {
+        expect(s.accountNote).toBeUndefined();
+      });
+    });
+
+    it('FA14: logged-in user can write accountWrite (write: account)', async () => {
+      const result = await service.update(
+        1,
+        { accountWrite: 'updated by logged-in' } as any,
+        undefined,
+        { id: 1, name: 'account', key: 'id', allow: false },
+      );
+      expect(result.accountWrite).toBe('updated by logged-in');
+    });
+
+    it('FA15: anonymous cannot write accountWrite (write: account)', async () => {
+      const dto: any = { accountWrite: 'anonymous inject' };
+      stripWriteFields(dto, TestSecretEntity, null);
+      expect(dto.accountWrite).toBeUndefined();
+    });
+  });
+
   describe('stripWriteFields — unit (null bind = anonymous)', () => {
     it('FA11: null bind strips all non-public write fields', () => {
       const dto: any = {
@@ -153,6 +192,34 @@ describe('@FieldAccess — field-level access control', () => {
       expect(dto.name).toBe('Test');
       expect(dto.adminPrice).toBeUndefined();
       expect(dto.lockedField).toBeUndefined();
+    });
+
+    it('FA16: null bind strips write: owner fields on TestArticleEntity', () => {
+      const dto: any = {
+        title: 'Hello',
+        secretNotes: 'private',
+        adminNotes: 'admin only',
+        lockedNotes: 'locked',
+      };
+      stripWriteFields(dto, TestArticleEntity, null);
+      expect(dto.title).toBe('Hello');
+      expect(dto.secretNotes).toBeUndefined();
+      expect(dto.adminNotes).toBeUndefined();
+      expect(dto.lockedNotes).toBeUndefined();
+    });
+
+    it('FA17: owner bind allows write: owner field but strips admin/closed', () => {
+      const dto: any = {
+        title: 'Hello',
+        secretNotes: 'my notes',
+        adminNotes: 'try admin',
+        lockedNotes: 'try locked',
+      };
+      stripWriteFields(dto, TestArticleEntity, { id: 1, name: 'account', key: 'id', allow: false });
+      expect(dto.title).toBe('Hello');
+      expect(dto.secretNotes).toBe('my notes');
+      expect(dto.adminNotes).toBeUndefined();
+      expect(dto.lockedNotes).toBeUndefined();
     });
   });
 });
