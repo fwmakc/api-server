@@ -1,7 +1,12 @@
 import { createTestModule } from '../app.testingModule';
 import { TestSecretService } from '../services';
 import { removePrivateFields, stripWriteFields } from 'api-server-toolkit';
-import { TestSecretEntity, TestArticleEntity } from '../entities';
+import {
+  TestSecretEntity,
+  TestArticleEntity,
+  TestCommentEntity,
+  TestAccountEntity,
+} from '../entities';
 
 describe('@FieldAccess — field-level access control', () => {
   let moduleRef: Awaited<ReturnType<typeof createTestModule>>;
@@ -220,6 +225,78 @@ describe('@FieldAccess — field-level access control', () => {
       expect(dto.secretNotes).toBe('my notes');
       expect(dto.adminNotes).toBeUndefined();
       expect(dto.lockedNotes).toBeUndefined();
+    });
+  });
+
+  describe('accountId fallback — ownership via FK when relation not loaded', () => {
+    it('FA18: canRead uses accountId fallback when account relation is absent', () => {
+      const own = new TestArticleEntity();
+      own.id = 10;
+      own.title = 'Own';
+      own.secretNotes = 'visible via FK';
+      (own as any).accountId = 1;
+
+      removePrivateFields(own, { id: 1, name: 'account', key: 'id', allow: false });
+      expect(own.secretNotes).toBe('visible via FK');
+
+      const other = new TestArticleEntity();
+      other.id = 11;
+      other.title = 'Other';
+      other.secretNotes = 'should be stripped';
+      (other as any).accountId = 2;
+
+      removePrivateFields(other, { id: 1, name: 'account', key: 'id', allow: false });
+      expect(other.secretNotes).toBeUndefined();
+    });
+  });
+
+  describe('computeNestedBind with dot-path — multi-hop ownership', () => {
+    it('FA19: nested fields visible through article.account chain (owner)', () => {
+      const alice = new TestAccountEntity();
+      alice.id = 1;
+      alice.email = 'alice@test.com';
+
+      const article = new TestArticleEntity();
+      article.id = 1;
+      article.title = 'Article';
+      article.secretNotes = 'article secret';
+      article.account = alice;
+
+      const comment = new TestCommentEntity();
+      comment.id = 1;
+      comment.text = 'Alice comment';
+      comment.authorIp = '127.0.0.1';
+      comment.article = article;
+
+      removePrivateFields(comment, { id: 1, name: 'article.account', key: 'id', allow: false });
+
+      expect(comment.authorIp).toBe('127.0.0.1');
+      expect(comment.article.secretNotes).toBe('article secret');
+      expect(comment.article.account.email).toBe('alice@test.com');
+    });
+
+    it('FA20: nested fields stripped through article.account chain (non-owner)', () => {
+      const bob = new TestAccountEntity();
+      bob.id = 2;
+      bob.email = 'bob@test.com';
+
+      const article = new TestArticleEntity();
+      article.id = 3;
+      article.title = 'Bob Article';
+      article.secretNotes = 'bob secret';
+      article.account = bob;
+
+      const comment = new TestCommentEntity();
+      comment.id = 2;
+      comment.text = 'Bob comment';
+      comment.authorIp = '192.168.1.1';
+      comment.article = article;
+
+      removePrivateFields(comment, { id: 1, name: 'article.account', key: 'id', allow: false });
+
+      expect(comment.authorIp).toBeUndefined();
+      expect(comment.article.secretNotes).toBeUndefined();
+      expect(comment.article.account.email).toBeUndefined();
     });
   });
 });

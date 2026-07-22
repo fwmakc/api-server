@@ -163,4 +163,22 @@ describe('HTTP Field Access — @FieldAccess via interceptor', () => {
     const otherComment = art1.comments.find((c: any) => +c.id === 2);
     expect(otherComment.authorIp).toBeUndefined();
   });
+
+  it('HFA10: admin update allows write:admin, strips write:closed', async () => {
+    const res = await request(app.getHttpServer())
+      .patch('/http-admin/update/1')
+      .set('Authorization', `Bearer ${ADMIN_TOKEN}`)
+      .send({
+        update: {
+          title: 'Admin Updated',
+          adminNotes: 'admin sets via update',
+          lockedNotes: 'always stripped',
+        },
+      })
+      .expect(200);
+
+    expect(res.body.title).toBe('Admin Updated');
+    expect(res.body.adminNotes).toBe('admin sets via update');
+    expect(res.body.lockedNotes).toBeFalsy();
+  });
 });
