@@ -1,6 +1,7 @@
 import { createTestModule } from '../app.testingModule';
 import { TestSecretService } from '../services';
-import { removePrivateFields } from 'api-server-toolkit';
+import { removePrivateFields, stripWriteFields } from 'api-server-toolkit';
+import { TestSecretEntity } from '../entities';
 
 describe('@FieldAccess — field-level access control', () => {
   let moduleRef: Awaited<ReturnType<typeof createTestModule>>;
@@ -45,6 +46,29 @@ describe('@FieldAccess — field-level access control', () => {
       const result = await service.find({}, { allow: true });
       removePrivateFields(result, { allow: true });
       result.forEach((s) => {
+        expect(s.hiddenField).toBeUndefined();
+      });
+    });
+
+    it('FA8: admin sees adminCode after removePrivateFields with admin bind', async () => {
+      const result = await service.find(
+        { relations: [{ name: 'account' }] },
+        { allow: true },
+      );
+      removePrivateFields(result, { allow: true });
+      const alice = result.find((s) => +s.id === 1);
+      expect(alice.adminCode).toBeDefined();
+      expect(alice.adminCode).toBe('AC-001');
+    });
+
+    it('FA9: anonymous bind strips all non-public read fields', async () => {
+      const result = await service.find(
+        { relations: [{ name: 'account' }] },
+        { allow: true },
+      );
+      removePrivateFields(result, { id: undefined, name: 'account', key: 'id', allow: false });
+      result.forEach((s) => {
+        expect(s.adminCode).toBeUndefined();
         expect(s.hiddenField).toBeUndefined();
       });
     });
@@ -99,6 +123,36 @@ describe('@FieldAccess — field-level access control', () => {
       expect(result.name).toBe('New Secret');
       expect(result.adminPrice).not.toBe(777);
       expect(result.lockedField).not.toBe('injected');
+    });
+
+    it('FA10: admin create strips lockedField (write: closed)', async () => {
+      const result = await service.create(
+        {
+          name: 'Admin Secret',
+          adminPrice: 100,
+          lockedField: 'admin-injected',
+        } as any,
+        undefined,
+        { allow: true },
+      );
+      expect(result).toBeDefined();
+      expect(result.name).toBe('Admin Secret');
+      expect(+result.adminPrice).toBe(100);
+      expect(result.lockedField).not.toBe('admin-injected');
+    });
+  });
+
+  describe('stripWriteFields — unit (null bind = anonymous)', () => {
+    it('FA11: null bind strips all non-public write fields', () => {
+      const dto: any = {
+        name: 'Test',
+        adminPrice: 999,
+        lockedField: 'locked',
+      };
+      stripWriteFields(dto, TestSecretEntity, null);
+      expect(dto.name).toBe('Test');
+      expect(dto.adminPrice).toBeUndefined();
+      expect(dto.lockedField).toBeUndefined();
     });
   });
 });

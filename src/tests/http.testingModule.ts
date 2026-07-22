@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PassportModule, PassportStrategy } from '@nestjs/passport';
 import { Strategy as JwtStrategy } from 'passport-jwt';
 import * as jwt from 'jsonwebtoken';
-import { EntityController } from 'api-server-toolkit';
+import { EntityController, RemovePrivateFieldsInterceptor } from 'api-server-toolkit';
 import { TestEntities } from './entities';
 import { TestArticleEntity, TestCourseEntity, TestEnrollEntity } from './entities';
 import { TestArticleDto, TestCourseDto, TestEnrollDto } from './dtos';
@@ -234,6 +234,7 @@ export const createHttpTestApp = async (): Promise<{
   await seedDatabase(moduleRef);
 
   const app = moduleRef.createNestApplication();
+  app.useGlobalInterceptors(new RemovePrivateFieldsInterceptor());
   await app.init();
 
   return { app, moduleRef };

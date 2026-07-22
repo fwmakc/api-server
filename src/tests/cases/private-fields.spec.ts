@@ -89,4 +89,17 @@ describe('@FieldAccess({ read: "owner" }) — field-level access control', () =>
     expect(aliceComment.authorIp).toBeDefined();
     expect(bobComment.authorIp).toBeUndefined();
   });
+
+  describe('write access (write: owner)', () => {
+    it('P22: owner can write secretNotes (write: owner)', async () => {
+      const result = await service.update(
+        1,
+        { secretNotes: 'owner updated notes' } as any,
+        undefined,
+        { id: 1, name: 'account', key: 'id', allow: false },
+      );
+      expect(result).toBeDefined();
+      expect(result.secretNotes).toBe('owner updated notes');
+    });
+  });
 });
