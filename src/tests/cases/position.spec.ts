@@ -113,12 +113,13 @@ describe('sortPosition / movePosition', () => {
     expect(bobArticle.position).toBeGreaterThanOrEqual(1);
   });
 
-  it('P35: sortPosition with empty where + limit — documents edge case', async () => {
-    const result = await service.sortPosition(
-      'position',
-      { where: {}, limit: 1, order: { id: 'ASC' } },
-      { allow: true },
-    );
-    expect(result).toBe(true);
+  it('P35: sortPosition with empty where + limit — rejected (ambiguous scope)', async () => {
+    await expect(
+      service.sortPosition(
+        'position',
+        { where: {}, limit: 1, order: { id: 'ASC' } },
+        { allow: true },
+      ),
+    ).rejects.toThrow('limit/offset');
   });
 });
