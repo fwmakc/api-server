@@ -25,7 +25,7 @@ fwmakc/servers/
 ├── message-server/      ← Уведомления: email, Redis event consumer (port 3003)
 ├── chat-server/         ← WebSocket чат (port 3004)
 ├── gateway/             ← Nginx reverse proxy + docker-compose
-└── shared/              ← api-server-toolkit — общий CRUD engine + event bus (npm package)
+└── api-server-toolkit/  ← api-server-toolkit — общий CRUD engine, guards, decorators (npm package)
 ```
 
 ### Архитектура взаимодействия
