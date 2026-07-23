@@ -1,4 +1,3 @@
-import { ForbiddenException } from '@nestjs/common';
 import { createTestModule } from '../app.testingModule';
 import { TestArticleService } from '../services';
 import { TestArticleDto } from '../dtos';
@@ -168,30 +167,6 @@ describe('Controllers — EntityController access levels', () => {
       controller.service = articleService;
     });
 
-    it('CC10: create by non-superuser throws ForbiddenException', async () => {
-      await expect(
-        controller.create({ title: 'Forbidden' } as any, undefined, {
-          id: 1,
-          isSuperuser: false,
-        } as any),
-      ).rejects.toThrow(ForbiddenException);
-    });
-
-    it('CC11: update by non-superuser throws ForbiddenException', async () => {
-      await expect(
-        controller.update(1, { title: 'Hack' } as any, undefined, {
-          id: 1,
-          isSuperuser: false,
-        } as any),
-      ).rejects.toThrow(ForbiddenException);
-    });
-
-    it('CC12: remove by non-superuser throws ForbiddenException', async () => {
-      await expect(
-        controller.remove(1, { id: 1, isSuperuser: false } as any),
-      ).rejects.toThrow(ForbiddenException);
-    });
-
     it('CC13: create by superuser succeeds', async () => {
       const result = await controller.create(
         { title: 'Admin Created' } as any,
@@ -211,30 +186,6 @@ describe('Controllers — EntityController access levels', () => {
       );
       expect(result).toBeDefined();
       expect(result.title).toBe('Admin Updated');
-    });
-
-    it('CC15: sortPosition by non-superuser throws', async () => {
-      await expect(
-        controller.sortPosition(
-          'position',
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          { id: 1, isSuperuser: false } as any,
-        ),
-      ).rejects.toThrow(ForbiddenException);
-    });
-
-    it('CC16: movePosition by non-superuser throws', async () => {
-      await expect(
-        controller.movePosition(1, 'position', 2, {
-          id: 1,
-          isSuperuser: false,
-        } as any),
-      ).rejects.toThrow(ForbiddenException);
     });
 
     it('CC16a: remove by superuser succeeds', async () => {
@@ -442,15 +393,6 @@ describe('Controllers — EntityController access levels', () => {
       );
       expect(result).toBeDefined();
       expect(result.title).toBe('Mixed Owner Created');
-    });
-
-    it('CC28: update by non-superuser throws ForbiddenException', async () => {
-      await expect(
-        controller.update(1, { title: 'Hack' } as any, undefined, {
-          id: 1,
-          isSuperuser: false,
-        } as any),
-      ).rejects.toThrow(ForbiddenException);
     });
 
     it('CC29: update by superuser succeeds', async () => {

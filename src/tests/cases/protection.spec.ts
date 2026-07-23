@@ -1,4 +1,4 @@
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { createTestModule } from '../app.testingModule';
 import { TestArticleService, TestProfileService } from '../services';
 import { TestArticleDto, TestProfileDto } from '../dtos';
@@ -84,12 +84,6 @@ describe('Protection — controller-level access control', () => {
     expect(result.title).toBe('Admin Edit');
   });
 
-  it('N15: non-admin create → ForbiddenException', async () => {
-    await expect(
-      profileController.create({ bio: 'hack' } as any, [], aliceAuth),
-    ).rejects.toThrow(ForbiddenException);
-  });
-
   it('N16: admin create → success', async () => {
     const result: any = await profileController.create(
       { bio: 'admin created' } as any,
@@ -100,9 +94,4 @@ describe('Protection — controller-level access control', () => {
     expect(result.bio).toBe('admin created');
   });
 
-  it('N17: non-admin remove → ForbiddenException', async () => {
-    await expect(profileController.remove('1', aliceAuth)).rejects.toThrow(
-      ForbiddenException,
-    );
-  });
 });

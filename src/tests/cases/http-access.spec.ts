@@ -484,6 +484,22 @@ describe('HTTP Access Control — full guard pipeline', () => {
         .set('Authorization', `Bearer ${ADMIN_TOKEN}`)
         .expect(200);
     });
+
+    it('sortPosition with non-superuser → 403', async () => {
+      await request(app.getHttpServer())
+        .post('/http-admin/position/sort')
+        .send({ field: 'position', where: {}, order: { id: 'ASC' } })
+        .set('Authorization', `Bearer ${ALICE_TOKEN}`)
+        .expect(403);
+    });
+
+    it('movePosition with non-superuser → 403', async () => {
+      await request(app.getHttpServer())
+        .post('/http-admin/position/move/1')
+        .send({ field: 'position', position: 2 })
+        .set('Authorization', `Bearer ${ALICE_TOKEN}`)
+        .expect(403);
+    });
   });
 
   // ═══════════════════════════════════════════════════════════
