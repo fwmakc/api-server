@@ -13,6 +13,7 @@ import {
 } from '../entities';
 import { sanitizeForSave } from 'api-server-toolkit';
 import { PermissionRegistry } from 'api-server-toolkit';
+import { EntityManager } from 'typeorm';
 
 describe('sanitizeForSave — cascade protection', () => {
   let moduleRef: Awaited<ReturnType<typeof createTestModule>>;
@@ -20,6 +21,7 @@ describe('sanitizeForSave — cascade protection', () => {
   let tagService: TestTagService;
   let articleMetadata: any;
   let cycleAService: TestCycleAService;
+  let manager: EntityManager;
 
   beforeAll(async () => {
     moduleRef = await createTestModule();
@@ -27,6 +29,7 @@ describe('sanitizeForSave — cascade protection', () => {
     tagService = moduleRef.get(TestTagService);
     cycleAService = moduleRef.get(TestCycleAService);
     articleMetadata = (articleService as any).repository.metadata;
+    manager = (articleService as any).repository.manager;
   });
 
   afterAll(async () => {
@@ -36,27 +39,27 @@ describe('sanitizeForSave — cascade protection', () => {
   });
 
   describe('unit — direct sanitizeForSave calls', () => {
-    it('C1: existing entity in relation stripped to { id }', () => {
+    it('C1: existing entity in relation stripped to { id }', async () => {
       const entity = {
         title: 'Test',
         account: { id: 2, username: 'hacker', password: 'stolen' },
       };
-      sanitizeForSave(entity, articleMetadata, { allow: true });
+      await sanitizeForSave(entity, articleMetadata, { allow: true }, manager);
       expect(entity.account).toEqual({ id: 2 });
       expect((entity.account as any).username).toBeUndefined();
       expect((entity.account as any).password).toBeUndefined();
     });
 
-    it('C2: new entity not in registry → stripped (null → deleted)', () => {
+    it('C2: new entity not in registry → stripped (null → deleted)', async () => {
       const entity = {
         title: 'Test',
         account: { username: 'newuser', password: '123' },
       };
-      sanitizeForSave(entity, articleMetadata, { allow: true });
+      await sanitizeForSave(entity, articleMetadata, { allow: true }, manager);
       expect(entity.account).toBeUndefined();
     });
 
-    it('C3: new entity in registry, create: public → kept', () => {
+    it('C3: new entity in registry, create: public → kept', async () => {
       PermissionRegistry.set(TestTagEntity, {
         create: 'public',
         read: 'public',
@@ -67,13 +70,13 @@ describe('sanitizeForSave — cascade protection', () => {
         title: 'Test',
         tags: [{ name: 'new-tag' }, { id: 1, name: 'should-strip' }],
       };
-      sanitizeForSave(entity, articleMetadata, { allow: true });
+      await sanitizeForSave(entity, articleMetadata, { allow: true }, manager);
       expect(entity.tags).toHaveLength(2);
       expect(entity.tags[0]).toEqual({ name: 'new-tag' });
       expect(entity.tags[1]).toEqual({ id: 1 });
     });
 
-    it('C4: new entity in registry, create: admin → stripped for non-admin', () => {
+    it('C4: new entity in registry, create: admin → stripped for non-admin', async () => {
       PermissionRegistry.set(TestTagEntity, {
         create: 'admin',
         read: 'public',
@@ -84,16 +87,16 @@ describe('sanitizeForSave — cascade protection', () => {
         title: 'Test',
         tags: [{ name: 'new-tag' }, { id: 1 }],
       };
-      sanitizeForSave(entity, articleMetadata, {
+      await sanitizeForSave(entity, articleMetadata, {
         id: 1,
         name: 'account',
         allow: false,
-      });
+      }, manager);
       expect(entity.tags).toHaveLength(1);
       expect(entity.tags[0]).toEqual({ id: 1 });
     });
 
-    it('C5: new entity in registry, create: admin → kept for admin', () => {
+    it('C5: new entity in registry, create: admin → kept for admin', async () => {
       PermissionRegistry.set(TestTagEntity, {
         create: 'admin',
         read: 'public',
@@ -104,12 +107,12 @@ describe('sanitizeForSave — cascade protection', () => {
         title: 'Test',
         tags: [{ name: 'admin-tag' }],
       };
-      sanitizeForSave(entity, articleMetadata, { allow: true });
+      await sanitizeForSave(entity, articleMetadata, { allow: true }, manager);
       expect(entity.tags).toHaveLength(1);
       expect(entity.tags[0]).toEqual({ name: 'admin-tag' });
     });
 
-    it('C6: new entity in registry, create: closed → always stripped', () => {
+    it('C6: new entity in registry, create: closed → always stripped', async () => {
       PermissionRegistry.set(TestTagEntity, {
         create: 'closed',
         read: 'public',
@@ -120,12 +123,12 @@ describe('sanitizeForSave — cascade protection', () => {
         title: 'Test',
         tags: [{ name: 'new-tag' }, { id: 1 }],
       };
-      sanitizeForSave(entity, articleMetadata, { allow: true });
+      await sanitizeForSave(entity, articleMetadata, { allow: true }, manager);
       expect(entity.tags).toHaveLength(1);
       expect(entity.tags[0]).toEqual({ id: 1 });
     });
 
-    it('C7: array of mixed items filtered correctly', () => {
+    it('C7: array of mixed items filtered correctly', async () => {
       PermissionRegistry.set(TestTagEntity, {
         create: 'public',
         read: 'public',
@@ -142,7 +145,7 @@ describe('sanitizeForSave — cascade protection', () => {
           { name: 'also-keep' },
         ],
       };
-      sanitizeForSave(entity, articleMetadata, { allow: true });
+      await sanitizeForSave(entity, articleMetadata, { allow: true }, manager);
       expect(entity.tags).toHaveLength(4);
       expect(entity.tags[0]).toEqual({ id: 1 });
       expect(entity.tags[1]).toEqual({ name: 'keep-me' });
@@ -150,9 +153,9 @@ describe('sanitizeForSave — cascade protection', () => {
       expect(entity.tags[3]).toEqual({ name: 'also-keep' });
     });
 
-    it('C8: no relations in entity → no change', () => {
+    it('C8: no relations in entity → no change', async () => {
       const entity = { title: 'Simple', content: 'No relations' };
-      sanitizeForSave(entity, articleMetadata, { allow: true });
+      await sanitizeForSave(entity, articleMetadata, { allow: true }, manager);
       expect(entity).toEqual({ title: 'Simple', content: 'No relations' });
     });
   });
@@ -179,6 +182,13 @@ describe('sanitizeForSave — cascade protection', () => {
     });
 
     it('C10: create with existing tag id → tag linked', async () => {
+      PermissionRegistry.set(TestTagEntity, {
+        create: 'public',
+        read: 'public',
+        update: 'public',
+        delete: 'public',
+      });
+
       const result = await articleService.create(
         {
           title: 'Tag Link Test',
@@ -201,7 +211,7 @@ describe('sanitizeForSave — cascade protection', () => {
   });
 
   describe('circular references', () => {
-    it('C11: circular reference does not cause infinite loop', () => {
+    it('C11: circular reference does not cause infinite loop', async () => {
       const cycleAMetadata = (cycleAService as any).repository.metadata;
 
       const a: any = { id: 1, name: 'A', secretA: 'secret' };
@@ -209,7 +219,7 @@ describe('sanitizeForSave — cascade protection', () => {
       a.b = b;
       b.a = a;
 
-      sanitizeForSave(a, cycleAMetadata, { allow: true });
+      await sanitizeForSave(a, cycleAMetadata, { allow: true }, manager);
 
       expect(a.b).toEqual({ id: 2 });
     });

@@ -202,12 +202,12 @@ describe('Unit — dynamic SQL services', () => {
       const result = parseDynamicSaveObject({ data: { key: "val'ue" } });
       expect(result.data).toContain(`'`);
       expect(result.data).toContain('key');
-      expect(result.data).toContain(`val\\'ue`);
+      expect(result.data).toContain(`val''ue`);
     });
 
     it('S6: string with single quote — escaped', () => {
       const result = parseDynamicSaveObject({ name: "O'Brien" });
-      expect(result.name).toBe(`'O\\'Brien'`);
+      expect(result.name).toBe(`'O''Brien'`);
     });
 
     it('S7: ISO date string — formatted', () => {
