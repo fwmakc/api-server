@@ -116,6 +116,7 @@ describe('Controllers — EntityController access levels', () => {
         undefined,
         undefined,
         undefined,
+        undefined,
         { id: 1, isSuperuser: false } as any,
       );
       expect(result).toBe(2);
@@ -242,6 +243,7 @@ describe('Controllers — EntityController access levels', () => {
 
     it('CC19: count returns total without account', async () => {
       const result = await controller.count(
+        undefined,
         undefined,
         undefined,
         undefined,
