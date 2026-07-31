@@ -55,4 +55,18 @@ describe('Relations — eager/lazy loading', () => {
     expect(result.comments.length).toBe(2);
     expect(result.tags.length).toBe(1);
   });
+
+  it('P26: findOne with join: true uses TypeORM JOIN', async () => {
+    const result = await service.findOne({
+      id: 1,
+      join: true,
+      relations: [{ name: 'account' }, { name: 'comments' }, { name: 'tags' }],
+    });
+    expect(result).toBeDefined();
+    expect(result.account).toBeDefined();
+    expect(result.account.username).toBe('alice@test');
+    expect(result.comments.length).toBe(2);
+    expect(result.tags.length).toBe(1);
+    expect(result.tags[0].name).toBe('news');
+  });
 });
