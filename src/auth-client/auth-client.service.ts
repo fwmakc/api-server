@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import axios from 'axios';
+import { httpGet } from 'api-server-toolkit';
 
 export interface AccountInfo {
   id: number;
@@ -30,9 +30,9 @@ export class AuthClientService {
     }
 
     try {
-      const { data } = await axios.get<AccountInfo>(
+      const { data } = await httpGet(
         `${this.baseUrl}/account/internal/info/${id}`,
-        { headers: { 'X-Internal-Key': this.internalKey }, timeout: 5000 },
+        { headers: { 'X-Internal-Api-Key': this.internalKey }, timeout: 5000 },
       );
 
       this.cache.set(id, { data, expires: Date.now() + this.CACHE_TTL });

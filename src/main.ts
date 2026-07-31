@@ -2,7 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as Sentry from '@sentry/nestjs';
-import axios from 'axios';
 import redoc from 'redoc-express';
 import { join } from 'path';
 import { AppModule } from '@src/app.module';
@@ -84,13 +83,6 @@ async function bootstrap() {
   const requestTimeout = isNaN(parseInt(process.env.REQUEST_TIMEOUT))
     ? DEFAULT_REQUEST_TIMEOUT
     : parseInt(process.env.REQUEST_TIMEOUT);
-
-  axios.interceptors.request.use((config) => {
-    if (!config.timeout) {
-      config.timeout = requestTimeout;
-    }
-    return config;
-  });
 
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
