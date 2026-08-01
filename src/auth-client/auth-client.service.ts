@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { httpGet } from 'api-server-toolkit';
+import { httpGet } from 'api-server-toolkit/helper';
 
 export interface AccountInfo {
   id: number;
