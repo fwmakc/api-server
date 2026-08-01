@@ -18,7 +18,7 @@ API backend service with RESTful based on Nest.js and TypeORM
 Монолит разделён на 5 независимых серверов + общий пакет:
 
 ```
-fwmakc/servers/
+servers/
 ├── api-server/          ← CRUD engine + доменные сущности (этот репозиторий)
 ├── auth-server/         ← OAuth2 provider: JWT (RS256), JWKS, account, token, clients
 ├── file-server/         ← Загрузка/обработка файлов (port 3002)
