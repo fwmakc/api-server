@@ -1,25 +1,30 @@
-FROM node:18 AS builder
+FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
+COPY api-server/package*.json ./
+RUN npm install --legacy-peer-deps --ignore-scripts
 
-COPY . .
+COPY api-server-toolkit/dist ./node_modules/api-server-toolkit/dist
+COPY api-server-toolkit/src ./node_modules/api-server-toolkit/src
+
+COPY api-server/ .
 RUN npm run build
 
 # --- Runner ---
 
-FROM node:18-slim AS runner
+FROM node:18-alpine AS runner
 
 WORKDIR /app
 
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
-COPY public/ ./public/
 
 ENV NODE_ENV=production
 ENV ROOT_PATH=.
+USER node
 EXPOSE 5000
+HEALTHCHECK --interval=10s --timeout=3s --retries=5 --start-period=15s \
+  CMD wget -qO- http://localhost:5000/health || exit 1
 
 CMD ["node", "dist/main"]
