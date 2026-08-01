@@ -9,13 +9,14 @@ import { getDbConfig } from '@config/db.config';
 import { RemovePrivateFieldsInterceptor } from 'api-server-toolkit';
 import { AppController } from '@src/app.controller';
 import { AppService } from '@src/app.service';
+import { HealthModule } from '@src/health/health.module';
 import AppImports from './app.imports';
 
 @Module({
   controllers: [AppController],
   imports: [
     SentryModule.forRoot(),
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -26,6 +27,7 @@ import AppImports from './app.imports';
       },
     }),
     ...AppImports,
+    HealthModule,
   ],
   providers: [
     {

@@ -1,9 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as Sentry from '@sentry/nestjs';
 import redoc from 'redoc-express';
-import { join } from 'path';
+import helmet from 'helmet';
 import { AppModule } from '@src/app.module';
 import * as cookieParser from 'cookie-parser';
 import * as morgan from 'morgan';
@@ -13,6 +14,7 @@ import { initializeTransactionalContext } from 'typeorm-transactional';
 const DEFAULT_REQUEST_TIMEOUT = 30000;
 
 function startEventLoopMonitoring() {
+  const logger = new Logger('Metrics');
   const INTERVAL = 10000;
   const LAG_THRESHOLD = 100;
 
@@ -36,20 +38,9 @@ function startEventLoopMonitoring() {
     const rssMB = (memory.rss / 1024 / 1024).toFixed(2);
     const heapPercent = ((memory.heapUsed / memory.heapTotal) * 100).toFixed(1);
 
-    console.log('[METRICS]', {
-      eventLoop: {
-        lag: `${lag.toFixed(2)}ms`,
-        maxLag: `${maxLag.toFixed(2)}ms`,
-        lagEvents: lagCount,
-        status: lag > LAG_THRESHOLD ? 'SLOW' : 'OK',
-      },
-      memory: {
-        heap: `${heapUsedMB}/${heapTotalMB} MB (${heapPercent}%)`,
-        rss: `${rssMB} MB`,
-        status: Number(heapPercent) > 90 ? 'HIGH' : 'OK',
-      },
-      uptime: new Date(process.uptime() * 1000).toISOString().substr(11, 8),
-    });
+    logger.log(
+      `eventLoop lag=${lag.toFixed(2)}ms max=${maxLag.toFixed(2)}ms events=${lagCount} ${lag > LAG_THRESHOLD ? 'SLOW' : 'OK'} | heap=${heapUsedMB}/${heapTotalMB}MB (${heapPercent}%) rss=${rssMB}MB ${Number(heapPercent) > 90 ? 'HIGH' : 'OK'} | uptime=${new Date(process.uptime() * 1000).toISOString().substr(11, 8)}`,
+    );
 
     if (process.uptime() % 60 < 10) {
       maxLag = 0;
@@ -64,10 +55,7 @@ function startEventLoopMonitoring() {
     const delay = now - lastImmediate;
 
     if (delay > 1000) {
-      console.warn('[EVENT LOOP BLOCKED]', {
-        delay: `${delay}ms`,
-        timestamp: new Date().toISOString(),
-      });
+      logger.warn(`Event loop blocked for ${delay}ms at ${new Date().toISOString()}`);
     }
 
     lastImmediate = now;
@@ -115,8 +103,18 @@ async function bootstrap() {
       preflightContinue: false,
       optionsSuccessStatus: 204,
     },
-    logger: console,
+    logger: ['error', 'warn', 'log'],
   });
+
+  app.use(helmet());
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
 
   if (process.env.MORGAN_LOG_FORMAT) {
     app.use(morgan(process.env.MORGAN_LOG_FORMAT));
@@ -148,25 +146,26 @@ async function bootstrap() {
   app.use(cookieParser());
   app.use(passport.initialize());
 
-  app.useStaticAssets(join(process.env.ROOT_PATH, 'public'));
-  app.setBaseViewsDir(join(process.env.ROOT_PATH, 'views/static'));
-  app.setViewEngine('ejs');
-
   const port = process.env.PORT || 5000;
   const ip = process.env.IP || 'localhost';
-  const message = `Server running \n in ${process.env.NODE_ENV} mode on ${port} port \n at http://${ip}:${port}`;
+  const logger = new Logger('Bootstrap');
 
-  await app.listen(port, ip).then(() => {
-    console.log(message);
+  await app.listen(port, ip);
+  logger.log(
+    `Server running in ${process.env.NODE_ENV} mode on port ${port} at http://${ip}:${port}`,
+  );
 
-    if (process.env.METRICS_ENABLE === 'true') {
-      console.log('Starting performance monitoring...');
-      startEventLoopMonitoring();
-    }
-  });
+  if (process.env.METRICS_ENABLE === 'true') {
+    logger.log('Starting performance monitoring...');
+    startEventLoopMonitoring();
+  }
 
   process.on('SIGINT', () => {
     app.close();
   });
 }
-bootstrap();
+
+bootstrap().catch((err) => {
+  console.error('Failed to start api server:', err);
+  process.exit(1);
+});

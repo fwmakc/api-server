@@ -27,8 +27,6 @@ export class AppController {
       dir: join(__dirname),
       prefix: join(this.configService.get<string>('PREFIX')),
       rootPath: join(this.configService.get<string>('ROOT_PATH')),
-      uploadsPath: join(this.configService.get<string>('UPLOADS_PATH')),
-      views: join(this.configService.get<string>('ROOT_PATH'), 'views/mail'),
     });
   }
 

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "types": ["babel__generator", "multer"],
+    "types": ["babel__generator"],
     "typeRoots": ["node_modules/@types"],
     "module": "commonjs",
     "declaration": true,
