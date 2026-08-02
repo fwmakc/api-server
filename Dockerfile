@@ -5,6 +5,7 @@ WORKDIR /app
 COPY api-server/package*.json ./
 RUN npm install --legacy-peer-deps --ignore-scripts
 
+COPY api-server-toolkit/package.json ./node_modules/api-server-toolkit/package.json
 COPY api-server-toolkit/dist ./node_modules/api-server-toolkit/dist
 COPY api-server-toolkit/src ./node_modules/api-server-toolkit/src
 

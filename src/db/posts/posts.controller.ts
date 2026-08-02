@@ -15,6 +15,7 @@ export class PostsController extends EntityController({
     update: 'owner',
     delete: 'owner',
   },
+  relations: ['tags', 'category', 'account'],
 })<PostsDto, PostsEntity, PostsService> {
   constructor(readonly service: PostsService) {
     super();
