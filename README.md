@@ -285,12 +285,12 @@ When a service makes a breaking change (e.g., toolkit 2.x → 3.0.0):
 
 | Service | Version |
 |---------|---------|
-| [api-server-toolkit](https://github.com/fwmakc/api-server-toolkit) | v2.1.0 |
+| [api-server-toolkit](https://github.com/fwmakc/api-server-toolkit) | v2.2.0 |
 | [event-server](https://github.com/fwmakc/event-server) | v2.0.0 |
 | [auth-server](https://github.com/fwmakc/auth-server) | v2.0.0 |
 | [message-server](https://github.com/fwmakc/message-server) | v2.0.0 |
 | [file-server](https://github.com/fwmakc/file-server) | v2.0.0 |
 | [chat-server](https://github.com/fwmakc/chat-server) | v2.0.0 |
-| [api-server](https://github.com/fwmakc/api-server) | v2.0.0 |
-| [gateway-server](https://github.com/fwmakc/gateway-server) | v2.0.0 |
+| [api-server](https://github.com/fwmakc/api-server) | v2.0.1 |
+| [gateway-server](https://github.com/fwmakc/gateway-server) | v2.0.1 |
 | [scaffold](https://github.com/fwmakc/scaffold) | v2.0.0 |
