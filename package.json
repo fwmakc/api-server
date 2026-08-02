@@ -4,6 +4,21 @@
   "description": "API backend service with REST based on Nest.js and TypeORM",
   "private": true,
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "github:fwmakc/api-server"
+  },
+  "keywords": [
+    "nestjs",
+    "rest-api",
+    "crud",
+    "typeorm",
+    "swagger"
+  ],
+  "bugs": {
+    "url": "https://github.com/fwmakc/api-server/issues"
+  },
+  "homepage": "https://github.com/fwmakc/api-server#readme",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",

@@ -1,5 +1,9 @@
 # API Server
 
+[![Tests](https://github.com/fwmakc/api-server/actions/workflows/test.yml/badge.svg)](https://github.com/fwmakc/api-server/actions/workflows/test.yml)
+[![Version](https://img.shields.io/badge/version-v2.0.0-blue)](https://github.com/fwmakc/api-server/releases)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/fwmakc/api-server/blob/master/LICENSE)
+
 > Domain CRUD server — reference implementation for building your own application.
 
 ## What is this?
