@@ -190,6 +190,47 @@ public access and tighten per entity.
 **Migrating from a monolith?** This service IS the monolith minus auth, files, email, and
 events (those were extracted to separate services). Add your domain entities here.
 
+## AI-Friendly Documentation
+
+This service is designed for AI-assisted development. You can feed context
+to any LLM (ChatGPT, Claude, Cursor, Copilot) and get code that follows
+all conventions — without reading the entire codebase.
+
+### ai-context.md
+Auto-generated structured reference: every controller, route, service,
+entity, and DTO. Run `npm run ai-context` to regenerate. Feed it to any
+LLM and ask it to generate a new entity — it produces code that matches
+your conventions on the first try.
+
+### ai-declarations.md
+Toolkit TypeScript type declarations, shipped inside `api-server-toolkit/`.
+The LLM knows every column type, guard, and decorator available.
+
+### Swagger UI
+Interactive API exploration at `/swagger` — test endpoints live,
+see request/response schemas, copy curl commands.
+
+### ReDoc
+Clean, readable documentation at `/redoc` — share with your team,
+generate client SDKs.
+
+### Why this matters
+Traditional onboarding for a new service: read the source code for days.
+AI-assisted onboarding: feed `ai-context.md` to an LLM, ask it to create
+a new entity with relations, access control, and Swagger docs. It produces
+correct code that follows all patterns — first time, every time.
+
+## Backend-Only — Bring Your Own Frontend
+
+This service provides the complete backend CRUD API. No frontend included.
+
+All APIs are REST + JSON, fully documented via Swagger/ReDoc. Build your
+frontend in React, Vue, Next.js, Nuxt, React Native, Flutter — anything
+that speaks HTTP. The auth flow is standard OAuth2, so any OAuth2 client
+library works.
+
+You get a production-ready backend without the pain of wiring it up yourself.
+
 ## Related services
 
 - [api-server-toolkit](https://github.com/fwmakc/api-server-toolkit) — CRUD engine, guards, columns
