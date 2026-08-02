@@ -7,9 +7,9 @@ import { DataSource } from 'typeorm';
 import { addTransactionalDataSource } from 'typeorm-transactional';
 import { getDbConfig } from '@config/db.config';
 import { RemovePrivateFieldsInterceptor } from 'api-server-toolkit';
+import { HealthModule } from 'api-server-toolkit/health';
 import { AppController } from '@src/app.controller';
 import { AppService } from '@src/app.service';
-import { HealthModule } from '@src/health/health.module';
 import AppImports from './app.imports';
 
 @Module({
@@ -27,7 +27,7 @@ import AppImports from './app.imports';
       },
     }),
     ...AppImports,
-    HealthModule,
+    HealthModule.forRoot('api-server'),
   ],
   providers: [
     {
