@@ -4,9 +4,9 @@
 [![Version](https://img.shields.io/badge/version-v0.5.0-blue)](https://github.com/fwmakc/api-server/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/fwmakc/api-server/blob/master/LICENSE)
 
-> Domain CRUD server — reference implementation for building your own application.
+> Reference implementation: domain CRUD pattern — EntityController, access levels, relation whitelisting, batch-loader.
 
-## What is this?
+## What This Is
 
 A working scaffold for domain-specific CRUD APIs. Part of a
 [microservices stack](https://github.com/fwmakc/gateway-server) — this is the service you
@@ -27,6 +27,18 @@ api-server → nginx → client (REST API)
 
 **Dependencies:** auth-server (JWT), PostgreSQL
 **Dependents:** nginx (routes default traffic here)
+
+## Pattern
+
+This service demonstrates the **domain CRUD pattern** in the toolkit stack:
+
+- **EntityController** — 10 routes auto-generated from entity + service
+- **Access levels** — `operations: { read: 'public', create: 'owner' }`, declarative
+- **Relation whitelisting** — `relations: ['tags', 'category']` in controller, enforced
+- **Batch-loader** — separate queries per relation, N+1 → 2 queries
+- **Field-level security** — `@FieldAccess({ read: 'owner' })` on entity fields
+
+Clone this when you need: your application's domain API (persons, posts, orders, courses).
 
 ## Quick start
 
