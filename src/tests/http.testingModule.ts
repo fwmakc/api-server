@@ -80,7 +80,7 @@ class HttpAdminController extends EntityController({
   name: 'http_admin',
   dto: TestArticleDto,
   entity: TestArticleEntity,
-  operations: { read: 'public', create: 'admin', update: 'admin', delete: 'admin' },
+  operations: { read: 'public', create: 'superuser', update: 'superuser', delete: 'superuser' },
   relations: ['account', 'comments', 'comments.account', 'tags'],
 })<TestArticleDto, TestArticleEntity, TestArticleService> {
   constructor(readonly service: TestArticleService) {
@@ -93,7 +93,7 @@ class HttpAdminStrictController extends EntityController({
   name: 'http_admin_strict',
   dto: TestArticleDto,
   entity: TestArticleEntity,
-  operations: { read: 'admin', create: 'admin', update: 'admin', delete: 'admin' },
+  operations: { read: 'superuser', create: 'superuser', update: 'superuser', delete: 'superuser' },
   relations: ['account', 'comments', 'comments.account', 'tags'],
 })<TestArticleDto, TestArticleEntity, TestArticleService> {
   constructor(readonly service: TestArticleService) {
@@ -119,7 +119,7 @@ class HttpMixedController extends EntityController({
   name: 'http_mixed',
   dto: TestArticleDto,
   entity: TestArticleEntity,
-  operations: { read: 'public', create: 'owner', update: 'admin', delete: 'closed' },
+  operations: { read: 'public', create: 'owner', update: 'superuser', delete: 'closed' },
   relations: ['account', 'comments', 'comments.account', 'tags'],
 })<TestArticleDto, TestArticleEntity, TestArticleService> {
   constructor(readonly service: TestArticleService) {
@@ -133,7 +133,7 @@ class HttpCourseController extends EntityController({
   dto: TestCourseDto,
   entity: TestCourseEntity,
   accountTable: 'enrolls.student.account',
-  operations: { read: 'owner', create: 'admin', update: 'admin', delete: 'admin' },
+  operations: { read: 'owner', create: 'superuser', update: 'superuser', delete: 'superuser' },
   relations: ['enrolls', 'enrolls.student', 'enrolls.course', 'enrolls.student.account'],
 })<TestCourseDto, TestCourseEntity, TestCourseService> {
   constructor(readonly service: TestCourseService) {

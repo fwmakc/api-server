@@ -78,7 +78,7 @@ describe('sanitizeForSave — cascade protection', () => {
 
     it('C4: new entity in registry, create: admin → stripped for non-admin', async () => {
       PermissionRegistry.set(TestTagEntity, {
-        create: 'admin',
+        create: 'superuser',
         read: 'public',
         update: 'public',
         delete: 'public',
@@ -98,7 +98,7 @@ describe('sanitizeForSave — cascade protection', () => {
 
     it('C5: new entity in registry, create: admin → kept for admin', async () => {
       PermissionRegistry.set(TestTagEntity, {
-        create: 'admin',
+        create: 'superuser',
         read: 'public',
         update: 'public',
         delete: 'public',

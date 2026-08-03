@@ -23,9 +23,9 @@ const ProfileBase = EntityController({
   entity: TestProfileEntity,
   operations: {
     read: 'public',
-    create: 'admin',
-    update: 'admin',
-    delete: 'admin',
+    create: 'superuser',
+    update: 'superuser',
+    delete: 'superuser',
   },
 });
 

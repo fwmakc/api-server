@@ -62,7 +62,7 @@ export class TestArticleEntity extends BaseEntity {
   @TextColumn('secret_notes')
   secretNotes: string;
 
-  @FieldAccess({ write: 'admin' })
+  @FieldAccess({ write: 'superuser' })
   @VarcharColumn('admin_notes')
   adminNotes: string;
 
@@ -208,7 +208,7 @@ export class TestSecretEntity extends BaseEntity {
   @VarcharColumn('name')
   name: string;
 
-  @FieldAccess({ read: 'admin' })
+  @FieldAccess({ read: 'superuser' })
   @VarcharColumn('admin_code')
   adminCode: string;
 
@@ -216,7 +216,7 @@ export class TestSecretEntity extends BaseEntity {
   @VarcharColumn('hidden_field')
   hiddenField: string;
 
-  @FieldAccess({ write: 'admin' })
+  @FieldAccess({ write: 'superuser' })
   @IntColumn('admin_price')
   adminPrice: number;
 

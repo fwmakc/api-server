@@ -70,6 +70,7 @@ describe('Controllers — EntityController access levels', () => {
         undefined,
         undefined,
         undefined,
+        undefined,
         { id: 2, isSuperuser: false } as any,
       );
       expect(result.length).toBe(1);
@@ -82,6 +83,7 @@ describe('Controllers — EntityController access levels', () => {
         undefined,
         undefined,
         { id: 'ASC' },
+        undefined,
         undefined,
         undefined,
         undefined,
@@ -159,9 +161,9 @@ describe('Controllers — EntityController access levels', () => {
         entity: TestArticleEntity,
         operations: {
           read: 'public',
-          create: 'admin',
-          update: 'admin',
-          delete: 'admin',
+          create: 'superuser',
+          update: 'superuser',
+          delete: 'superuser',
         },
       });
       controller = new CtrlClass();
@@ -313,6 +315,7 @@ describe('Controllers — EntityController access levels', () => {
         undefined,
         undefined,
         undefined,
+        undefined,
         { id: 1, isSuperuser: false } as any,
       );
       expect(result.length).toBeGreaterThanOrEqual(3);
@@ -365,7 +368,7 @@ describe('Controllers — EntityController access levels', () => {
         operations: {
           read: 'public',
           create: 'owner',
-          update: 'admin',
+          update: 'superuser',
           delete: 'closed',
         },
       });
