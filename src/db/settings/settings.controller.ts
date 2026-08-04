@@ -11,9 +11,9 @@ export class SettingsController extends EntityController({
   entity: SettingsEntity,
   operations: {
     read: 'public',
-    create: 'admin',
-    update: 'admin',
-    delete: 'admin',
+    create: 'superuser',
+    update: 'superuser',
+    delete: 'superuser',
   },
 })<SettingsDto, SettingsEntity, SettingsService> {
   constructor(readonly service: SettingsService) {

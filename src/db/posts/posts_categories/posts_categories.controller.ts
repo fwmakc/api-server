@@ -11,9 +11,9 @@ export class PostsCategoriesController extends EntityController({
   entity: PostsCategoriesEntity,
   operations: {
     read: 'public',
-    create: 'admin',
-    update: 'admin',
-    delete: 'admin',
+    create: 'superuser',
+    update: 'superuser',
+    delete: 'superuser',
   },
 })<PostsCategoriesDto, PostsCategoriesEntity, PostsCategoriesService> {
   constructor(readonly service: PostsCategoriesService) {

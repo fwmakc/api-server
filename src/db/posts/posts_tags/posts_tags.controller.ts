@@ -11,9 +11,9 @@ export class PostsTagsController extends EntityController({
   entity: PostsTagsEntity,
   operations: {
     read: 'public',
-    create: 'admin',
-    update: 'admin',
-    delete: 'admin',
+    create: 'superuser',
+    update: 'superuser',
+    delete: 'superuser',
   },
 })<PostsTagsDto, PostsTagsEntity, PostsTagsService> {
   constructor(readonly service: PostsTagsService) {

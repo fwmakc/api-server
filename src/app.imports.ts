@@ -1,10 +1,8 @@
 import { PassportModule } from '@nestjs/passport';
 import { AuthClientModule } from './auth-client/auth-client.module';
 import { AccountModule } from './account/account.module';
-import { ClientsModule } from './clients/clients.module';
 import { RandomModule } from './random/random.module';
 
-import { PersonsModule } from './db/persons/persons.module';
 import { PostsModule } from './db/posts/posts.module';
 import { PostsCategoriesModule } from './db/posts/posts_categories/posts_categories.module';
 import { PostsTagsModule } from './db/posts/posts_tags/posts_tags.module';
@@ -16,10 +14,8 @@ export default [
   PassportModule,
   AuthClientModule,
   AccountModule,
-  ClientsModule,
   RandomModule,
 
-  PersonsModule,
   PostsModule,
   PostsCategoriesModule,
   PostsTagsModule,

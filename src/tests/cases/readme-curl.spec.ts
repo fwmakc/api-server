@@ -32,7 +32,7 @@ describe('README curl examples — verification', () => {
       expect(res.body.length).toBeGreaterThan(0);
     });
 
-    it('[-] read: owner — GET /persons/find без токена → 401', async () => {
+    it('[-] read: owner — GET /http-owner/find без токена → 401', async () => {
       await request(app.getHttpServer())
         .get('/http-owner/find')
         .expect(401);
