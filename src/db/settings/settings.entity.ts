@@ -1,4 +1,4 @@
-import { BaseEntity, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { BaseEntity, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
 import { TypeValues } from 'api-server-toolkit';
 import { SettingsGroupsEntity } from './settings_groups/settings_groups.entity';
 import {
@@ -11,6 +11,7 @@ import {
 } from 'api-server-toolkit';
 
 @Entity({ name: 'settings' })
+@Index(['group'])
 export class SettingsEntity extends BaseEntity {
   @IdColumn()
   id: number;

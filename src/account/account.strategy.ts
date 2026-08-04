@@ -17,7 +17,6 @@ export class AccountStrategy extends PassportStrategy(Strategy) {
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: !configService.get('JWT_EXPIRES'),
       secretOrKeyProvider: passportJwtSecret({
         jwksUri: `${configService.get(
           'AUTH_SERVER_URL',

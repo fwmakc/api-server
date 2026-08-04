@@ -1,6 +1,7 @@
 import {
   BaseEntity,
   Entity,
+  Index,
   JoinColumn,
   JoinTable,
   ManyToMany,
@@ -22,6 +23,8 @@ import {
 } from 'api-server-toolkit';
 
 @Entity({ name: 'posts' })
+@Index(['account'])
+@Index(['category'])
 export class PostsEntity extends BaseEntity {
   @IdColumn()
   id: number;
