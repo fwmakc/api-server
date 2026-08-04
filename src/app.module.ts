@@ -8,12 +8,9 @@ import { addTransactionalDataSource } from 'typeorm-transactional';
 import { getDbConfig } from '@config/db.config';
 import { RemovePrivateFieldsInterceptor } from 'api-server-toolkit';
 import { HealthModule } from 'api-server-toolkit/health';
-import { AppController } from '@src/app.controller';
-import { AppService } from '@src/app.service';
 import AppImports from './app.imports';
 
 @Module({
-  controllers: [AppController],
   imports: [
     SentryModule.forRoot(),
     ConfigModule.forRoot({ isGlobal: true }),
@@ -38,7 +35,6 @@ import AppImports from './app.imports';
       provide: APP_INTERCEPTOR,
       useClass: RemovePrivateFieldsInterceptor,
     },
-    AppService,
   ],
 })
 export class AppModule {}

@@ -2,7 +2,6 @@
 /dist
 /node_modules
 /sessions
-/src/typeorm
 .env
 yarn.lock
 schema.gql
