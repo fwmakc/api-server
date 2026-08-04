@@ -28,9 +28,6 @@ export class PostsDto extends CommonDto {
   @DtoColumn('Приватные заметки автора (доступ: read — owner, write — owner)')
   secretNotes: string;
 
-  @DtoColumn('Счётчик просмотров (доступ: write — closed, обновляется только системой)')
-  viewCount: number;
-
   @ApiProperty({
     required: false,
     description: 'Данные категории, связанной с данной записью',

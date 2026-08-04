@@ -55,10 +55,6 @@ export class PostsEntity extends BaseEntity {
   @TextColumn('secret_notes')
   secretNotes: string;
 
-  @FieldAccess({ write: 'closed' })
-  @IntColumn('view_count')
-  viewCount: number;
-
   @ManyToOne(() => PostsCategoriesEntity, (category) => category.posts, {
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
