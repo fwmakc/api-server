@@ -67,7 +67,7 @@ describe('Negative / security tests', () => {
 
   it('N7: PostgreSQL rejects string injection in bigint column', async () => {
     await expect(service.find({ where: { id: '1 OR 1=1' } })).rejects.toThrow(
-      'invalid input syntax',
+      'Invalid request data',
     );
   });
 
