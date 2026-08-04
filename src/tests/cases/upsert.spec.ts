@@ -16,7 +16,7 @@ describe('upsert — find by unique or create', () => {
 
   it('U37: getUniqueColumns returns email', () => {
     const uniques = service.getUniqueColumns();
-    expect(uniques).toContain('email');
+    expect(uniques.some((group) => group.includes('email'))).toBe(true);
   });
 
   it('U38: findUniqueEntrie finds existing by email', async () => {
