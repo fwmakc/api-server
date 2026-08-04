@@ -1,18 +1,11 @@
 # AI Context — api-server
 
 > Auto-generated. Run `npm run ai-context` to regenerate.
-> Generated: 2026-08-01T21:10:11.049Z
+> Generated: 2026-08-04T17:57:50.598Z
 
 ---
 
 ## Controllers
-
-### PersonsController
-
-Base path: `/persons`
-
-| Method | Path |
-|--------|------|
 
 ### PostsController
 
@@ -61,24 +54,6 @@ Base path: `/settings/groups`
 
 - `getAccountInfo(id: number): Promise<AccountInfo | null>`
 
-### ClientsService extends `CommonService`
-
-- `clientsVerify(client_id: string, client_secret: string): Promise<any>`
-- `clientsGetWhere(where: object,
-    relations: Array<RelationsDto> = undefined,): Promise<ClientsEntity>`
-
-### PersonsService extends `CommonService`
-
-- `login(persons: PersonsDto): Promise<PersonsEntity>`
-- `create(persons: PersonsDto,
-    relations: Array<RelationsDto> = undefined,
-    bind: BindDto,): Promise<PersonsEntity>`
-
-### RandomService
-
-- `keys(sets): name.replace(/\W+/giu, ' ').split(' ')`
-- `randomOption(endings): ''`
-
 ---
 
 ## Entities
@@ -94,51 +69,6 @@ Base path: `/settings/groups`
 | `password` | `string` |
 | `isActivated` | `boolean` |
 | `isSuperuser` | `boolean` |
-
-
-### ClientsEntity
-
-| Column | Type |
-|--------|------|
-| `id` | `number` |
-| `createdAt` | `Date` |
-| `updatedAt` | `Date` |
-| `client_id` | `string` |
-| `client_secret` | `string` |
-| `client_password` | `string` |
-| `client_type` | `TypeClients` |
-| `title` | `string` |
-| `description` | `string` |
-| `client_uri` | `string` |
-| `code` | `string` |
-| `publishedAt` | `Date` |
-| `isPublished` | `boolean` |
-
-Relations: `AccountEntity`
-
-
-### PersonsEntity
-
-| Column | Type |
-|--------|------|
-| `id` | `number` |
-| `createdAt` | `Date` |
-| `updatedAt` | `Date` |
-| `username` | `string` |
-| `password` | `string` |
-| `email` | `string` |
-| `phone` | `string` |
-| `name` | `string` |
-| `lastName` | `string` |
-| `parentName` | `string` |
-| `avatar` | `string` |
-| `birthday` | `Date` |
-| `locale` | `string` |
-| `address` | `string` |
-| `timezone` | `string` |
-| `gender` | `TypeGenders` |
-
-Relations: `AccountEntity`
 
 
 ### PostsEntity
@@ -225,44 +155,6 @@ Relations: `SettingsEntity`
 | `password` | `string` | yes |
 | `isActivated` | `boolean` | yes |
 | `isSuperuser` | `boolean` | yes |
-
-### ClientsDto
-
-| Field | Type | Optional |
-|-------|------|----------|
-| `createdAt` | `Date` | yes |
-| `updatedAt` | `Date` | yes |
-| `client_id` | `string` | yes |
-| `client_secret` | `string` | yes |
-| `client_password` | `string` | yes |
-| `client_type` | `TypeClients` | yes |
-| `title` | `string` | yes |
-| `description` | `string` | yes |
-| `client_uri` | `string` | yes |
-| `code` | `string` | yes |
-| `publishedAt` | `Date` | yes |
-| `isPublished` | `boolean` | yes |
-| `redirect_uri` | `string` | yes |
-
-### PersonsDto
-
-| Field | Type | Optional |
-|-------|------|----------|
-| `createdAt` | `Date` | yes |
-| `updatedAt` | `Date` | yes |
-| `username` | `string` | yes |
-| `password` | `string` | yes |
-| `email` | `string` | yes |
-| `phone` | `string` | yes |
-| `name` | `string` | yes |
-| `lastName` | `string` | yes |
-| `parentName` | `string` | yes |
-| `avatar` | `string` | yes |
-| `birthday` | `Date` | yes |
-| `locale` | `string` | yes |
-| `address` | `string` | yes |
-| `timezone` | `string` | yes |
-| `gender` | `TypeGenders` | yes |
 
 ### PostsDto
 

@@ -138,32 +138,32 @@ export class PostsController extends EntityController<Posts, PostsDto>(PostsDto)
 ### 5. Wire up the module
 
 ```typescript
-// src/posts/posts.module.ts
+// src/db/posts/posts.module.ts
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { Posts } from "./posts.entity";
+import { PostsEntity } from "./posts.entity";
 import { PostsService } from "./posts.service";
 import { PostsController } from "./posts.controller";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Posts])],
+  imports: [TypeOrmModule.forFeature([PostsEntity])],
   providers: [PostsService],
   controllers: [PostsController],
 })
 export class PostsModule {}
 ```
 
-Add `PostsModule` to `app.module.ts` imports. You now have full CRUD:
+Add `PostsModule` to `app.imports.ts`. You now have full CRUD:
 
 | Method | Route | Access |
 |--------|-------|--------|
-| GET | `/posts` | Public — list with pagination, filtering, relations |
-| GET | `/posts/:id` | Public — single record |
-| POST | `/posts` | Auth required — create |
-| PATCH | `/posts/:id` | Auth + owner — update |
-| DELETE | `/posts/:id` | Auth + owner — delete |
+| GET | `/posts/find` | Public — list with pagination, filtering, relations |
+| GET | `/posts/find/:id` | Public — single record |
 | GET | `/posts/count` | Public — count with filters |
-| PATCH | `/posts/:id/:field/:position` | Auth + owner — sort position |
+| POST | `/posts/create` | Auth required — create |
+| PATCH | `/posts/update/:id` | Auth + owner — update |
+| DELETE | `/posts/remove/:id` | Auth + owner — delete |
+| GET | `/posts/self` | Auth — own records only (owner level) |
 
 See [api-server-toolkit](https://github.com/fwmakc/api-server-toolkit) for access control
 levels, relation whitelisting, field-level security, and the full `EntityController` API.
@@ -171,9 +171,9 @@ levels, relation whitelisting, field-level security, and the full `EntityControl
 ## Cloning api-server for a new project
 
 1. Clone the repo
-2. Delete example entities (`src/persons/`, `src/settings/`, etc.)
+2. Delete example entities (`src/db/settings/`, etc.)
 3. Add your own entities (see above)
-4. Update `src/app.module.ts` — remove old modules, add yours
+4. Update `src/app.imports.ts` — remove old modules, add yours
 5. Update `.env` — set `DB_NAME` to your project's database
 6. Run with `DB_SYNCHRONIZE=true` to auto-create tables (dev only)
 
@@ -184,8 +184,10 @@ levels, relation whitelisting, field-level security, and the full `EntityControl
 | `PORT` | 5000 | HTTP port |
 | `DB_HOST` | localhost | PostgreSQL host |
 | `DB_NAME` | api_server | Database name |
-| `DB_SYNCHRONIZE` | true | Auto-create tables (dev only — use migrations in production) |
+| `DB_SYNCHRONIZE` | false | Auto-create tables (dev only — use migrations in production) |
 | `AUTH_SERVER_URL` | http://localhost:3001 | Auth server for JWT/JWKS verification |
+| `AUTH_CACHE_TTL` | 30000 | Auth cache TTL in ms (account info from auth-server) |
+| `CORS_ORIGIN` | * | Comma-separated allowed origins |
 | `INTERNAL_API_KEY` | — | Shared secret for service-to-service calls |
 | `SWAGGER_PREFIX` | swagger | Swagger UI path |
 
