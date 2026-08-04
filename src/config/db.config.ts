@@ -2,18 +2,13 @@ import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { join } from 'path';
 
-type DatabaseTypes =
-  | 'mysql'
-  | 'postgres'
-  | 'sqlite'
-  | 'mssql'
-  | 'oracle'
-  | 'mongodb';
+const ENTITIES = [join(__dirname, '../**/*.entity{.ts,.js}')];
+const MIGRATIONS = [join(__dirname, '../typeorm/migrations/*{.ts,.js}')];
 
 export const getDbConfig = async (
   config: ConfigService,
 ): Promise<TypeOrmModuleOptions> => ({
-  type: config.get<DatabaseTypes>('DB_TYPE'),
+  type: config.get<'mysql' | 'postgres' | 'sqlite' | 'mssql' | 'oracle' | 'mongodb'>('DB_TYPE'),
   host: config.get<string>('DB_HOST'),
   database: config.get<string>('DB_NAME'),
   schema: config.get<string>('DB_SCHEMA'),
@@ -25,8 +20,8 @@ export const getDbConfig = async (
   autoLoadEntities: true,
   logging: config.get<string>('DB_LOG') === 'true',
 
-  entities: [join(__dirname, '../**/*.entity{.ts,.js}')],
-  migrations: [join(__dirname, '../typeorm/migrations/*{.ts,.js}')],
+  entities: ENTITIES,
+  migrations: MIGRATIONS,
   migrationsTableName: 'migrations_typeorm',
   migrationsRun: config.get<string>('DB_MIGRATIONS_RUN', 'false') === 'true',
 });
