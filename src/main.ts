@@ -5,10 +5,14 @@ import { startMetrics } from "@src/app.metrics";
 
 const logger = new Logger("Bootstrap");
 
+const corsOrigin = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(",").map((o) => o.trim())
+  : true;
+
 bootstrap({
   module: AppModule,
   serviceName: "api-server",
-  cors: true,
+  cors: { origin: corsOrigin, credentials: true },
   morgan: true,
   cookieParser: true,
   passport: true,

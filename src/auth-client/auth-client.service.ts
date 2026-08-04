@@ -15,7 +15,7 @@ export class AuthClientService {
   private readonly baseUrl: string;
   private readonly internalKey: string;
   private cache = new Map<number, { data: AccountInfo; expires: number }>();
-  private readonly CACHE_TTL = 30_000;
+  private readonly CACHE_TTL = Number(process.env.AUTH_CACHE_TTL) || 30_000;
 
   constructor(private readonly configService: ConfigService) {
     this.baseUrl =

@@ -7,7 +7,6 @@ import { PostsCategoriesModule } from './db/posts/posts_categories/posts_categor
 import { PostsTagsModule } from './db/posts/posts_tags/posts_tags.module';
 import { SettingsModule } from './db/settings/settings.module';
 import { SettingsGroupsModule } from './db/settings/settings_groups/settings_groups.module';
-import { TestModule } from './db/test/test.module';
 
 export default [
   PassportModule,
@@ -19,5 +18,4 @@ export default [
   PostsTagsModule,
   SettingsModule,
   SettingsGroupsModule,
-  TestModule,
 ];

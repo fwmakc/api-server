@@ -7,10 +7,10 @@ RUN npm install --legacy-peer-deps --ignore-scripts
 
 COPY api-server-toolkit/package.json ./node_modules/api-server-toolkit/package.json
 COPY api-server-toolkit/dist ./node_modules/api-server-toolkit/dist
-COPY api-server-toolkit/src ./node_modules/api-server-toolkit/src
 
 COPY api-server/ .
 RUN npm run build
+RUN npm prune --production --legacy-peer-deps
 
 # --- Runner ---
 
