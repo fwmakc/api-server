@@ -1,5 +1,4 @@
 import { PassportModule } from '@nestjs/passport';
-import { AuthClientModule } from './auth-client/auth-client.module';
 import { AccountModule } from './account/account.module';
 
 import { PostsModule } from './db/posts/posts.module';
@@ -10,7 +9,6 @@ import { SettingsGroupsModule } from './db/settings/settings_groups/settings_gro
 
 export default [
   PassportModule,
-  AuthClientModule,
   AccountModule,
 
   PostsModule,

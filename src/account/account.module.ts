@@ -1,19 +1,16 @@
-import { ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthClientModule } from 'api-server-toolkit/auth-client';
 
 import { AccountEntity } from './account.entity';
 import { AccountService } from './account.service';
-import { AccountStrategy } from './account.strategy';
-import { AuthClientModule } from '@src/auth-client/auth-client.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([AccountEntity]),
-    ConfigModule,
-    AuthClientModule,
+    AuthClientModule.forRoot(),
   ],
-  providers: [AccountService, AccountStrategy],
+  providers: [AccountService],
   exports: [AccountService],
 })
 export class AccountModule {}
