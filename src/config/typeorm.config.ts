@@ -26,14 +26,6 @@ const config = {
   migrationsTableName: 'migrations_typeorm',
 } as DataSourceOptions;
 
-const AppDataSource = new DataSource(config);
-
-AppDataSource.initialize()
-  .then(() => {
-    console.log('Data Source has been initialized!');
-  })
-  .catch((e) => {
-    console.error('Error during Data Source initialization', e);
-  });
+export const AppDataSource = new DataSource(config);
 
 export default AppDataSource;

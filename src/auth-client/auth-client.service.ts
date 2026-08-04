@@ -21,6 +21,9 @@ export class AuthClientService {
     this.baseUrl =
       this.configService.get('AUTH_SERVER_URL') || 'http://localhost:3001';
     this.internalKey = this.configService.get('INTERNAL_API_KEY') || '';
+    if (!this.internalKey) {
+      this.logger.warn('INTERNAL_API_KEY is not set — auth-server requests will fail');
+    }
   }
 
   async getAccountInfo(id: number): Promise<AccountInfo | null> {

@@ -4,7 +4,6 @@
 /sessions
 /src/typeorm
 .env
-package-lock.json
 yarn.lock
 schema.gql
 
