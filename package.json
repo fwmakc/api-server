@@ -1,6 +1,6 @@
 {
   "name": "api-server",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "API backend service with REST based on Nest.js and TypeORM",
   "private": true,
   "license": "MIT",

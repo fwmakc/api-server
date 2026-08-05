@@ -1,7 +1,7 @@
 # API Server
 
 [![Tests](https://github.com/fwmakc/api-server/actions/workflows/test.yml/badge.svg)](https://github.com/fwmakc/api-server/actions/workflows/test.yml)
-[![Version](https://img.shields.io/badge/version-v0.5.0-blue)](https://github.com/fwmakc/api-server/releases)
+[![Version](https://img.shields.io/badge/version-v0.6.0-blue)](https://github.com/fwmakc/api-server/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/fwmakc/api-server/blob/master/LICENSE)
 
 > Reference implementation: domain CRUD pattern — EntityController, access levels, relation whitelisting, batch-loader.
@@ -300,11 +300,11 @@ When a service makes a breaking change (e.g., toolkit 2.x → 3.0.0):
 | Service | Version |
 |---------|---------|
 | [api-server-toolkit](https://github.com/fwmakc/api-server-toolkit) | v0.13.0 |
-| [event-server](https://github.com/fwmakc/event-server) | v0.5.0 |
-| [auth-server](https://github.com/fwmakc/auth-server) | v0.5.0 |
+| [event-server](https://github.com/fwmakc/event-server) | v0.6.0 |
+| [auth-server](https://github.com/fwmakc/auth-server) | v0.6.0 |
 | [message-server](https://github.com/fwmakc/message-server) | v0.4.0 |
 | [file-server](https://github.com/fwmakc/file-server) | v0.4.0 |
 | [chat-server](https://github.com/fwmakc/chat-server) | v0.1.0 |
-| [api-server](https://github.com/fwmakc/api-server) | v0.5.0 |
+| [api-server](https://github.com/fwmakc/api-server) | v0.6.0 |
 | [gateway-server](https://github.com/fwmakc/gateway-server) | v0.3.0 |
 | [scaffold](https://github.com/fwmakc/scaffold) | v0.1.0 |
