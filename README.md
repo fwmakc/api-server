@@ -299,7 +299,7 @@ When a service makes a breaking change (e.g., toolkit 2.x → 3.0.0):
 
 | Service | Version |
 |---------|---------|
-| [api-server-toolkit](https://github.com/fwmakc/api-server-toolkit) | v0.12.0 |
+| [api-server-toolkit](https://github.com/fwmakc/api-server-toolkit) | v0.13.0 |
 | [event-server](https://github.com/fwmakc/event-server) | v0.5.0 |
 | [auth-server](https://github.com/fwmakc/auth-server) | v0.5.0 |
 | [message-server](https://github.com/fwmakc/message-server) | v0.4.0 |
