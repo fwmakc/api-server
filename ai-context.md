@@ -1,7 +1,7 @@
 # AI Context — api-server
 
 > Auto-generated. Run `npm run ai-context` to regenerate.
-> Generated: 2026-08-04T17:57:50.598Z
+> Generated: 2026-08-11T20:05:19.766Z
 
 ---
 
@@ -44,18 +44,6 @@ Base path: `/settings/groups`
 
 ---
 
-## Services
-
-### AppService
-
-- `hello(): string`
-
-### AuthClientService
-
-- `getAccountInfo(id: number): Promise<AccountInfo | null>`
-
----
-
 ## Entities
 
 ### AccountEntity
@@ -83,7 +71,6 @@ Base path: `/settings/groups`
 | `publishedAt` | `Date` |
 | `isPublished` | `boolean` |
 | `secretNotes` | `string` |
-| `viewCount` | `number` |
 
 Relations: `AccountEntity`, `PostsCategoriesEntity`, `PostsTagsEntity`
 
@@ -167,7 +154,6 @@ Relations: `SettingsEntity`
 | `publishedAt` | `Date` | no |
 | `isPublished` | `boolean` | no |
 | `secretNotes` | `string` | no |
-| `viewCount` | `number` | no |
 | `category` | `PostsCategoriesDto` | yes |
 | `tags` | `PostsTagsDto[]` | yes |
 
