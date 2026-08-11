@@ -20,6 +20,7 @@ import {
   UpdatedColumn,
   VarcharColumn,
   FieldAccess,
+  FieldRoles,
 } from 'api-server-toolkit';
 
 @Entity({ name: 'posts' })
@@ -52,6 +53,7 @@ export class PostsEntity extends BaseEntity {
   isPublished: boolean;
 
   @FieldAccess({ read: 'owner', write: 'owner' })
+  @FieldRoles({ read: ['editor', 'admin'], write: ['editor', 'admin'] })
   @TextColumn('secret_notes')
   secretNotes: string;
 

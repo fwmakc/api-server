@@ -15,6 +15,10 @@ export class PostsController extends EntityController({
     update: 'owner',
     delete: 'owner',
   },
+  roles: {
+    update: ['editor'],
+    delete: ['admin'],
+  },
   relations: ['tags', 'category', 'account'],
 })<PostsDto, PostsEntity, PostsService> {
   constructor(readonly service: PostsService) {
