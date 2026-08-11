@@ -1,6 +1,6 @@
 import { createTestModule } from '../app.testingModule';
 import { TestCourseService, TestEnrollService } from '../services';
-import { PermissionRegistry } from 'api-server-toolkit';
+import { AccessLevel, PermissionRegistry } from 'api-server-toolkit';
 import { TestEnrollEntity } from '../entities';
 
 // ═══════════════════════════════════════════════════════════════
@@ -17,10 +17,10 @@ describe('Security features — service-level', () => {
     enrollService = moduleRef.get(TestEnrollService);
 
     PermissionRegistry.set(TestEnrollEntity, {
-      create: 'owner',
-      read: 'owner',
-      update: 'owner',
-      delete: 'owner',
+      create: AccessLevel.OWNER,
+      read: AccessLevel.OWNER,
+      update: AccessLevel.OWNER,
+      delete: AccessLevel.OWNER,
       accountTable: 'student.account',
     });
   });

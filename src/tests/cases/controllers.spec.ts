@@ -2,7 +2,7 @@ import { createTestModule } from '../app.testingModule';
 import { TestArticleService } from '../services';
 import { TestArticleDto } from '../dtos';
 import { TestArticleEntity } from '../entities';
-import { EntityController } from 'api-server-toolkit';
+import { AccessLevel, EntityController } from 'api-server-toolkit';
 
 describe('Controllers — EntityController access levels', () => {
   let moduleRef: Awaited<ReturnType<typeof createTestModule>>;
@@ -27,10 +27,10 @@ describe('Controllers — EntityController access levels', () => {
         entity: TestArticleEntity,
         accountTable: 'account',
         operations: {
-          read: 'owner',
-          create: 'owner',
-          update: 'owner',
-          delete: 'owner',
+          read: AccessLevel.OWNER,
+          create: AccessLevel.OWNER,
+          update: AccessLevel.OWNER,
+          delete: AccessLevel.OWNER,
         },
       });
       controller = new CtrlClass();
@@ -160,10 +160,10 @@ describe('Controllers — EntityController access levels', () => {
         dto: TestArticleDto,
         entity: TestArticleEntity,
         operations: {
-          read: 'public',
-          create: 'superuser',
-          update: 'superuser',
-          delete: 'superuser',
+          read: AccessLevel.PUBLIC,
+          create: AccessLevel.SUPERUSER,
+          update: AccessLevel.SUPERUSER,
+          delete: AccessLevel.SUPERUSER,
         },
       });
       controller = new CtrlClass();
@@ -296,10 +296,10 @@ describe('Controllers — EntityController access levels', () => {
         dto: TestArticleDto,
         entity: TestArticleEntity,
         operations: {
-          read: 'account',
-          create: 'account',
-          update: 'account',
-          delete: 'account',
+          read: AccessLevel.ACCOUNT,
+          create: AccessLevel.ACCOUNT,
+          update: AccessLevel.ACCOUNT,
+          delete: AccessLevel.ACCOUNT,
         },
       });
       controller = new CtrlClass();
@@ -366,10 +366,10 @@ describe('Controllers — EntityController access levels', () => {
         dto: TestArticleDto,
         entity: TestArticleEntity,
         operations: {
-          read: 'public',
-          create: 'owner',
-          update: 'superuser',
-          delete: 'closed',
+          read: AccessLevel.PUBLIC,
+          create: AccessLevel.OWNER,
+          update: AccessLevel.SUPERUSER,
+          delete: AccessLevel.CLOSED,
         },
       });
       controller = new CtrlClass();

@@ -3,7 +3,7 @@ import { createTestModule } from '../app.testingModule';
 import { TestArticleService, TestProfileService } from '../services';
 import { TestArticleDto, TestProfileDto } from '../dtos';
 import { TestArticleEntity, TestProfileEntity } from '../entities';
-import { EntityController } from 'api-server-toolkit';
+import { AccessLevel, EntityController } from 'api-server-toolkit';
 
 const ArticleBase = EntityController({
   name: 'Articles',
@@ -11,10 +11,10 @@ const ArticleBase = EntityController({
   entity: TestArticleEntity,
   accountTable: 'account',
   operations: {
-    read: 'public',
-    create: 'owner',
-    update: 'owner',
-    delete: 'owner',
+    read: AccessLevel.PUBLIC,
+    create: AccessLevel.OWNER,
+    update: AccessLevel.OWNER,
+    delete: AccessLevel.OWNER,
   },
 });
 const ProfileBase = EntityController({
@@ -22,10 +22,10 @@ const ProfileBase = EntityController({
   dto: TestProfileDto,
   entity: TestProfileEntity,
   operations: {
-    read: 'public',
-    create: 'superuser',
-    update: 'superuser',
-    delete: 'superuser',
+    read: AccessLevel.PUBLIC,
+    create: AccessLevel.SUPERUSER,
+    update: AccessLevel.SUPERUSER,
+    delete: AccessLevel.SUPERUSER,
   },
 });
 

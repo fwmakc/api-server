@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { EntityController } from 'api-server-toolkit';
+import { AccessLevel, EntityController } from 'api-server-toolkit';
 import { PostsCategoriesDto } from './posts_categories.dto';
 import { PostsCategoriesEntity } from './posts_categories.entity';
 import { PostsCategoriesService } from './posts_categories.service';
@@ -10,10 +10,10 @@ export class PostsCategoriesController extends EntityController({
   dto: PostsCategoriesDto,
   entity: PostsCategoriesEntity,
   operations: {
-    read: 'public',
-    create: 'superuser',
-    update: 'superuser',
-    delete: 'superuser',
+    read: AccessLevel.PUBLIC,
+    create: AccessLevel.SUPERUSER,
+    update: AccessLevel.SUPERUSER,
+    delete: AccessLevel.SUPERUSER,
   },
 })<PostsCategoriesDto, PostsCategoriesEntity, PostsCategoriesService> {
   constructor(readonly service: PostsCategoriesService) {

@@ -1,5 +1,6 @@
 import { BaseEntity, Entity } from 'typeorm';
 import {
+  AccessLevel,
   BooleanColumn,
   CreatedColumn,
   FieldAccess,
@@ -22,7 +23,7 @@ export class AccountEntity extends BaseEntity {
   @VarcharColumn('username', 'normal', { index: 'unique' })
   username: string;
 
-  @FieldAccess({ read: 'closed' })
+  @FieldAccess({ read: AccessLevel.CLOSED })
   @VarcharColumn('password')
   password: string;
 

@@ -1,8 +1,8 @@
 import { createTestModule } from '../app.testingModule';
 import { TestArticleService } from '../services';
-import { removePrivateFields } from 'api-server-toolkit';
+import { AccessLevel, removePrivateFields } from 'api-server-toolkit';
 
-describe('@FieldAccess({ read: "owner" }) — field-level access control', () => {
+describe('@FieldAccess({ read: AccessLevel.OWNER }) — field-level access control', () => {
   let moduleRef: Awaited<ReturnType<typeof createTestModule>>;
   let service: TestArticleService;
 

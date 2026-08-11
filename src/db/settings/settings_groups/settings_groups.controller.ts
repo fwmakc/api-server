@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { EntityController } from 'api-server-toolkit';
+import { AccessLevel, EntityController } from 'api-server-toolkit';
 import { SettingsGroupsDto } from './settings_groups.dto';
 import { SettingsGroupsEntity } from './settings_groups.entity';
 import { SettingsGroupsService } from './settings_groups.service';
@@ -10,10 +10,10 @@ export class SettingsGroupsController extends EntityController({
   dto: SettingsGroupsDto,
   entity: SettingsGroupsEntity,
   operations: {
-    read: 'public',
-    create: 'superuser',
-    update: 'superuser',
-    delete: 'superuser',
+    read: AccessLevel.PUBLIC,
+    create: AccessLevel.SUPERUSER,
+    update: AccessLevel.SUPERUSER,
+    delete: AccessLevel.SUPERUSER,
   },
 })<SettingsGroupsDto, SettingsGroupsEntity, SettingsGroupsService> {
   constructor(readonly service: SettingsGroupsService) {

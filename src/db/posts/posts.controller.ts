@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { EntityController } from 'api-server-toolkit';
+import { AccessLevel, EntityController } from 'api-server-toolkit';
 import { PostsDto } from './posts.dto';
 import { PostsEntity } from './posts.entity';
 import { PostsService } from './posts.service';
@@ -10,10 +10,10 @@ export class PostsController extends EntityController({
   dto: PostsDto,
   entity: PostsEntity,
   operations: {
-    read: 'public',
-    create: 'owner',
-    update: 'owner',
-    delete: 'owner',
+    read: AccessLevel.PUBLIC,
+    create: AccessLevel.OWNER,
+    update: AccessLevel.OWNER,
+    delete: AccessLevel.OWNER,
   },
   roles: {
     update: ['editor'],

@@ -11,8 +11,7 @@ import {
   TestCycleAEntity,
   TestCycleBEntity,
 } from '../entities';
-import { sanitizeForSave } from 'api-server-toolkit';
-import { PermissionRegistry } from 'api-server-toolkit';
+import { AccessLevel, PermissionRegistry, sanitizeForSave } from 'api-server-toolkit';
 import { EntityManager } from 'typeorm';
 
 describe('sanitizeForSave — cascade protection', () => {
@@ -61,10 +60,10 @@ describe('sanitizeForSave — cascade protection', () => {
 
     it('C3: new entity in registry, create: public → kept', async () => {
       PermissionRegistry.set(TestTagEntity, {
-        create: 'public',
-        read: 'public',
-        update: 'public',
-        delete: 'public',
+        create: AccessLevel.PUBLIC,
+        read: AccessLevel.PUBLIC,
+        update: AccessLevel.PUBLIC,
+        delete: AccessLevel.PUBLIC,
       });
       const entity = {
         title: 'Test',
@@ -78,10 +77,10 @@ describe('sanitizeForSave — cascade protection', () => {
 
     it('C4: new entity in registry, create: admin → stripped for non-admin', async () => {
       PermissionRegistry.set(TestTagEntity, {
-        create: 'superuser',
-        read: 'public',
-        update: 'public',
-        delete: 'public',
+        create: AccessLevel.SUPERUSER,
+        read: AccessLevel.PUBLIC,
+        update: AccessLevel.PUBLIC,
+        delete: AccessLevel.PUBLIC,
       });
       const entity = {
         title: 'Test',
@@ -98,10 +97,10 @@ describe('sanitizeForSave — cascade protection', () => {
 
     it('C5: new entity in registry, create: admin → kept for admin', async () => {
       PermissionRegistry.set(TestTagEntity, {
-        create: 'superuser',
-        read: 'public',
-        update: 'public',
-        delete: 'public',
+        create: AccessLevel.SUPERUSER,
+        read: AccessLevel.PUBLIC,
+        update: AccessLevel.PUBLIC,
+        delete: AccessLevel.PUBLIC,
       });
       const entity = {
         title: 'Test',
@@ -114,10 +113,10 @@ describe('sanitizeForSave — cascade protection', () => {
 
     it('C6: new entity in registry, create: closed → always stripped', async () => {
       PermissionRegistry.set(TestTagEntity, {
-        create: 'closed',
-        read: 'public',
-        update: 'public',
-        delete: 'public',
+        create: AccessLevel.CLOSED,
+        read: AccessLevel.PUBLIC,
+        update: AccessLevel.PUBLIC,
+        delete: AccessLevel.PUBLIC,
       });
       const entity = {
         title: 'Test',
@@ -130,10 +129,10 @@ describe('sanitizeForSave — cascade protection', () => {
 
     it('C7: array of mixed items filtered correctly', async () => {
       PermissionRegistry.set(TestTagEntity, {
-        create: 'public',
-        read: 'public',
-        update: 'public',
-        delete: 'public',
+        create: AccessLevel.PUBLIC,
+        read: AccessLevel.PUBLIC,
+        update: AccessLevel.PUBLIC,
+        delete: AccessLevel.PUBLIC,
       });
       const entity = {
         title: 'Test',
@@ -183,10 +182,10 @@ describe('sanitizeForSave — cascade protection', () => {
 
     it('C10: create with existing tag id → tag linked', async () => {
       PermissionRegistry.set(TestTagEntity, {
-        create: 'public',
-        read: 'public',
-        update: 'public',
-        delete: 'public',
+        create: AccessLevel.PUBLIC,
+        read: AccessLevel.PUBLIC,
+        update: AccessLevel.PUBLIC,
+        delete: AccessLevel.PUBLIC,
       });
 
       const result = await articleService.create(

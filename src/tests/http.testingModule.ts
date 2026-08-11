@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PassportModule, PassportStrategy } from '@nestjs/passport';
 import { Strategy as JwtStrategy } from 'passport-jwt';
 import * as jwt from 'jsonwebtoken';
-import { EntityController, RemovePrivateFieldsInterceptor } from 'api-server-toolkit';
+import { AccessLevel, EntityController, RemovePrivateFieldsInterceptor } from 'api-server-toolkit';
 import { TestEntities } from './entities';
 import { TestArticleEntity, TestCourseEntity, TestEnrollEntity } from './entities';
 import { TestArticleDto, TestCourseDto, TestEnrollDto } from './dtos';
@@ -41,7 +41,7 @@ class HttpPublicController extends EntityController({
   name: 'http_public',
   dto: TestArticleDto,
   entity: TestArticleEntity,
-  operations: { read: 'public', create: 'public', update: 'public', delete: 'public' },
+  operations: { read: AccessLevel.PUBLIC, create: AccessLevel.PUBLIC, update: AccessLevel.PUBLIC, delete: AccessLevel.PUBLIC },
   relations: ['account', 'comments', 'comments.account', 'tags'],
 })<TestArticleDto, TestArticleEntity, TestArticleService> {
   constructor(readonly service: TestArticleService) {
@@ -54,7 +54,7 @@ class HttpAccountController extends EntityController({
   name: 'http_account',
   dto: TestArticleDto,
   entity: TestArticleEntity,
-  operations: { read: 'account', create: 'account', update: 'account', delete: 'account' },
+  operations: { read: AccessLevel.ACCOUNT, create: AccessLevel.ACCOUNT, update: AccessLevel.ACCOUNT, delete: AccessLevel.ACCOUNT },
   relations: ['account', 'comments', 'comments.account', 'tags'],
 })<TestArticleDto, TestArticleEntity, TestArticleService> {
   constructor(readonly service: TestArticleService) {
@@ -67,7 +67,7 @@ class HttpOwnerController extends EntityController({
   name: 'http_owner',
   dto: TestArticleDto,
   entity: TestArticleEntity,
-  operations: { read: 'owner', create: 'owner', update: 'owner', delete: 'owner' },
+  operations: { read: AccessLevel.OWNER, create: AccessLevel.OWNER, update: AccessLevel.OWNER, delete: AccessLevel.OWNER },
   relations: ['account', 'comments', 'comments.account', 'tags'],
 })<TestArticleDto, TestArticleEntity, TestArticleService> {
   constructor(readonly service: TestArticleService) {
@@ -80,7 +80,7 @@ class HttpAdminController extends EntityController({
   name: 'http_admin',
   dto: TestArticleDto,
   entity: TestArticleEntity,
-  operations: { read: 'public', create: 'superuser', update: 'superuser', delete: 'superuser' },
+  operations: { read: AccessLevel.PUBLIC, create: AccessLevel.SUPERUSER, update: AccessLevel.SUPERUSER, delete: AccessLevel.SUPERUSER },
   relations: ['account', 'comments', 'comments.account', 'tags'],
 })<TestArticleDto, TestArticleEntity, TestArticleService> {
   constructor(readonly service: TestArticleService) {
@@ -93,7 +93,7 @@ class HttpAdminStrictController extends EntityController({
   name: 'http_admin_strict',
   dto: TestArticleDto,
   entity: TestArticleEntity,
-  operations: { read: 'superuser', create: 'superuser', update: 'superuser', delete: 'superuser' },
+  operations: { read: AccessLevel.SUPERUSER, create: AccessLevel.SUPERUSER, update: AccessLevel.SUPERUSER, delete: AccessLevel.SUPERUSER },
   relations: ['account', 'comments', 'comments.account', 'tags'],
 })<TestArticleDto, TestArticleEntity, TestArticleService> {
   constructor(readonly service: TestArticleService) {
@@ -106,7 +106,7 @@ class HttpClosedController extends EntityController({
   name: 'http_closed',
   dto: TestArticleDto,
   entity: TestArticleEntity,
-  operations: { read: 'closed', create: 'closed', update: 'closed', delete: 'closed' },
+  operations: { read: AccessLevel.CLOSED, create: AccessLevel.CLOSED, update: AccessLevel.CLOSED, delete: AccessLevel.CLOSED },
   relations: ['account', 'comments', 'comments.account', 'tags'],
 })<TestArticleDto, TestArticleEntity, TestArticleService> {
   constructor(readonly service: TestArticleService) {
@@ -119,7 +119,7 @@ class HttpMixedController extends EntityController({
   name: 'http_mixed',
   dto: TestArticleDto,
   entity: TestArticleEntity,
-  operations: { read: 'public', create: 'owner', update: 'superuser', delete: 'closed' },
+  operations: { read: AccessLevel.PUBLIC, create: AccessLevel.OWNER, update: AccessLevel.SUPERUSER, delete: AccessLevel.CLOSED },
   relations: ['account', 'comments', 'comments.account', 'tags'],
 })<TestArticleDto, TestArticleEntity, TestArticleService> {
   constructor(readonly service: TestArticleService) {
@@ -133,7 +133,7 @@ class HttpCourseController extends EntityController({
   dto: TestCourseDto,
   entity: TestCourseEntity,
   accountTable: 'enrolls.student.account',
-  operations: { read: 'owner', create: 'superuser', update: 'superuser', delete: 'superuser' },
+  operations: { read: AccessLevel.OWNER, create: AccessLevel.SUPERUSER, update: AccessLevel.SUPERUSER, delete: AccessLevel.SUPERUSER },
   relations: ['enrolls', 'enrolls.student', 'enrolls.course', 'enrolls.student.account'],
 })<TestCourseDto, TestCourseEntity, TestCourseService> {
   constructor(readonly service: TestCourseService) {
@@ -147,7 +147,7 @@ class HttpEnrollController extends EntityController({
   dto: TestEnrollDto,
   entity: TestEnrollEntity,
   accountTable: 'student.account',
-  operations: { read: 'owner', create: 'owner', update: 'owner', delete: 'owner' },
+  operations: { read: AccessLevel.OWNER, create: AccessLevel.OWNER, update: AccessLevel.OWNER, delete: AccessLevel.OWNER },
   relations: ['course', 'student', 'student.account', 'course.enrolls'],
 })<TestEnrollDto, TestEnrollEntity, TestEnrollService> {
   constructor(readonly service: TestEnrollService) {
@@ -160,7 +160,7 @@ class HttpPartialRelationsController extends EntityController({
   name: 'http_partial',
   dto: TestArticleDto,
   entity: TestArticleEntity,
-  operations: { read: 'public' },
+  operations: { read: AccessLevel.PUBLIC },
   relations: ['account'],
 })<TestArticleDto, TestArticleEntity, TestArticleService> {
   constructor(readonly service: TestArticleService) {
@@ -173,7 +173,7 @@ class HttpNoRelationsController extends EntityController({
   name: 'http_no_relations',
   dto: TestArticleDto,
   entity: TestArticleEntity,
-  operations: { read: 'public' },
+  operations: { read: AccessLevel.PUBLIC },
 })<TestArticleDto, TestArticleEntity, TestArticleService> {
   constructor(readonly service: TestArticleService) {
     super();

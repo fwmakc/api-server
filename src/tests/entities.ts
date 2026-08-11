@@ -9,15 +9,16 @@ import {
   JoinTable,
 } from 'typeorm';
 import {
+  AccessLevel,
   BooleanColumn,
   CreatedColumn,
+  FieldAccess,
   IdColumn,
   IntColumn,
   TextColumn,
   UpdatedColumn,
   VarcharColumn,
 } from 'api-server-toolkit';
-import { FieldAccess } from 'api-server-toolkit';
 
 @Entity({ name: 'test_accounts' })
 export class TestAccountEntity extends BaseEntity {
@@ -27,7 +28,7 @@ export class TestAccountEntity extends BaseEntity {
   @VarcharColumn('username', 'normal', { index: 'unique' })
   username: string;
 
-  @FieldAccess({ read: 'owner' })
+  @FieldAccess({ read: AccessLevel.OWNER })
   @VarcharColumn('email')
   email: string;
 
@@ -58,15 +59,15 @@ export class TestArticleEntity extends BaseEntity {
   @TextColumn('content')
   content: string;
 
-  @FieldAccess({ read: 'owner', write: 'owner' })
+  @FieldAccess({ read: AccessLevel.OWNER, write: AccessLevel.OWNER })
   @TextColumn('secret_notes')
   secretNotes: string;
 
-  @FieldAccess({ write: 'superuser' })
+  @FieldAccess({ write: AccessLevel.SUPERUSER })
   @VarcharColumn('admin_notes')
   adminNotes: string;
 
-  @FieldAccess({ write: 'closed' })
+  @FieldAccess({ write: AccessLevel.CLOSED })
   @VarcharColumn('locked_notes')
   lockedNotes: string;
 
@@ -93,7 +94,7 @@ export class TestCommentEntity extends BaseEntity {
   @VarcharColumn('text')
   text: string;
 
-  @FieldAccess({ read: 'owner', write: 'owner' })
+  @FieldAccess({ read: AccessLevel.OWNER, write: AccessLevel.OWNER })
   @VarcharColumn('author_ip')
   authorIp: string;
 
@@ -128,7 +129,7 @@ export class TestProfileEntity extends BaseEntity {
   @TextColumn('bio')
   bio: string;
 
-  @FieldAccess({ read: 'owner', write: 'owner' })
+  @FieldAccess({ read: AccessLevel.OWNER, write: AccessLevel.OWNER })
   @TextColumn('internal_notes')
   internalNotes: string;
 
@@ -145,7 +146,7 @@ export class TestCycleAEntity extends BaseEntity {
   @VarcharColumn('name')
   name: string;
 
-  @FieldAccess({ read: 'owner', write: 'owner' })
+  @FieldAccess({ read: AccessLevel.OWNER, write: AccessLevel.OWNER })
   @VarcharColumn('secret_a')
   secretA: string;
 
@@ -162,7 +163,7 @@ export class TestCycleBEntity extends BaseEntity {
   @VarcharColumn('name')
   name: string;
 
-  @FieldAccess({ read: 'owner', write: 'owner' })
+  @FieldAccess({ read: AccessLevel.OWNER, write: AccessLevel.OWNER })
   @VarcharColumn('secret_b')
   secretB: string;
 
@@ -191,7 +192,7 @@ export class TestNoteEntity extends BaseEntity {
   @VarcharColumn('title')
   title: string;
 
-  @FieldAccess({ read: 'owner', write: 'owner' })
+  @FieldAccess({ read: AccessLevel.OWNER, write: AccessLevel.OWNER })
   @TextColumn('secret')
   secret: string;
 
@@ -208,27 +209,27 @@ export class TestSecretEntity extends BaseEntity {
   @VarcharColumn('name')
   name: string;
 
-  @FieldAccess({ read: 'superuser' })
+  @FieldAccess({ read: AccessLevel.SUPERUSER })
   @VarcharColumn('admin_code')
   adminCode: string;
 
-  @FieldAccess({ read: 'closed' })
+  @FieldAccess({ read: AccessLevel.CLOSED })
   @VarcharColumn('hidden_field')
   hiddenField: string;
 
-  @FieldAccess({ write: 'superuser' })
+  @FieldAccess({ write: AccessLevel.SUPERUSER })
   @IntColumn('admin_price')
   adminPrice: number;
 
-  @FieldAccess({ write: 'closed' })
+  @FieldAccess({ write: AccessLevel.CLOSED })
   @VarcharColumn('locked_field')
   lockedField: string;
 
-  @FieldAccess({ read: 'account' })
+  @FieldAccess({ read: AccessLevel.ACCOUNT })
   @VarcharColumn('account_note')
   accountNote: string;
 
-  @FieldAccess({ write: 'account' })
+  @FieldAccess({ write: AccessLevel.ACCOUNT })
   @VarcharColumn('account_write')
   accountWrite: string;
 
