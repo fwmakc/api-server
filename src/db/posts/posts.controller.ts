@@ -17,7 +17,7 @@ export class PostsController extends EntityController({
   },
   roles: {
     update: ['editor'],
-    delete: ['admin'],
+    delete: [{ role: 'admin', tenant: 'all' }],
   },
   relations: ['tags', 'category', 'account'],
 })<PostsDto, PostsEntity, PostsService> {
