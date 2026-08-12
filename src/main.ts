@@ -1,26 +1,41 @@
 import { Logger } from "@nestjs/common";
+import { NestFactory } from "@nestjs/core";
+import { NestExpressApplication } from "@nestjs/platform-express";
 import { bootstrap } from "api-server-toolkit/bootstrap";
+import { Sentry, Helmet, Morgan, Cors, CookieParser, Passport, ValidationPipe, Log, Prefix, Swagger } from "api-server-toolkit/bootstrap/setup";
 import { AppModule } from "@src/app.module";
 import { startMetrics } from "@src/app.metrics";
-
-const logger = new Logger("Bootstrap");
 
 const corsOrigin = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(",").map((o) => o.trim())
   : true;
 
-bootstrap({
-  module: AppModule,
-  serviceName: "api-server",
-  cors: { origin: corsOrigin, credentials: true },
-  morgan: true,
-  cookieParser: true,
-  passport: true,
-  transactional: true,
-  beforeListen: () => {
-    if (process.env.METRICS_ENABLE === "true") {
-      logger.log("Starting performance monitoring...");
-      startMetrics();
-    }
-  },
-});
+async function main() {
+  if (process.env.TRANSACTIONAL === "true") {
+    const { initializeTransactionalContext } = require("typeorm-transactional");
+    initializeTransactionalContext();
+  }
+
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  Sentry.setup(app);
+  Helmet.setup(app);
+  Cors.setup(app, { origin: corsOrigin, credentials: true });
+  Morgan.setup(app);
+  CookieParser.setup(app);
+  Passport.setup(app);
+  ValidationPipe.setup(app);
+  Log.setup(app);
+  Prefix.setup(app);
+  Swagger.setup(app);
+
+  if (process.env.METRICS_ENABLE === "true") {
+    const logger = new Logger("Bootstrap");
+    logger.log("Starting performance monitoring...");
+    startMetrics();
+  }
+
+  await bootstrap(app, { port: 5000 });
+}
+
+main();
