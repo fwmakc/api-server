@@ -90,23 +90,23 @@ describe('README curl examples — verification', () => {
   });
 
   // ═══════════════════════════════════════════════════════════
-  // Защита полей (@FieldAccess)
-  // secretNotes: read:owner, write:owner
-  // lockedNotes: write:closed (эквивалент viewCount из README)
+  // Защита полей (FieldRule)
+  // secretNotes: read/write — editor, superuser
+  // lockedNotes: write — закрыто для всех, кроме суперюзера
   // ═══════════════════════════════════════════════════════════
 
-  describe('read: owner — стрипинг при чтении', () => {
-    it('[-] GET /posts/find без relations → secretNotes стрипается', async () => {
+  describe('read: editor — стрипинг при чтении по ролям', () => {
+    it('[-] GET /posts/find с plain user → secretNotes стрипается у всех', async () => {
       const res = await request(app.getHttpServer())
         .get('/http-public/find')
-        .set('Authorization', `Bearer ${ALICE_TOKEN}`)
+        .set('Authorization', `Bearer ${BOB_TOKEN}`)
         .expect(200);
       res.body.forEach((article: any) => {
         expect(article.secretNotes).toBeUndefined();
       });
     });
 
-    it('[+] GET /posts/find + relation account → secretNotes виден на своих', async () => {
+    it('[+] GET /posts/find с editor + relation account → secretNotes виден везде', async () => {
       const res = await request(app.getHttpServer())
         .get('/http-public/find')
         .query({ relations: JSON.stringify([{ name: 'account' }]) })
@@ -117,7 +117,7 @@ describe('README curl examples — verification', () => {
       const others = res.body.find((a: any) => +a.id === 3);
 
       expect(own.secretNotes).toBeDefined();
-      expect(others.secretNotes).toBeUndefined();
+      expect(others.secretNotes).toBeDefined();
     });
 
     it('[-] GET /posts/find без токена → secretNotes стрипается', async () => {
@@ -157,7 +157,7 @@ describe('README curl examples — verification', () => {
     });
   });
 
-  describe('write: owner — запись владельцем', () => {
+  describe('write: editor — запись редактором', () => {
     it('[+] PATCH /posts/update/1 с secretNotes → сохраняется', async () => {
       const res = await request(app.getHttpServer())
         .patch('/http-owner/update/1')

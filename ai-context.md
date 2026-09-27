@@ -1,7 +1,7 @@
 # AI Context — api-server
 
 > Auto-generated. Run `npm run ai-context` to regenerate.
-> Generated: 2026-08-12T00:13:23.761Z
+> Generated: 2026-09-27T15:26:54.711Z
 
 ---
 
@@ -13,6 +13,17 @@ Base path: `/posts`
 
 | Method | Path |
 |--------|------|
+| `GET` | `/posts/find` |
+| `GET` | `/posts/find/first` |
+| `GET` | `/posts/find/many/:ids` |
+| `GET` | `/posts/find/:id` |
+| `GET` | `/posts/count` |
+| `GET` | `/posts/self` |
+| `POST` | `/posts/create` |
+| `PATCH` | `/posts/update/:id` |
+| `POST` | `/posts/position/sort` |
+| `POST` | `/posts/position/move/:id` |
+| `DELETE` | `/posts/remove/:id` |
 
 ### PostsCategoriesController
 
@@ -20,6 +31,17 @@ Base path: `/posts/categories`
 
 | Method | Path |
 |--------|------|
+| `GET` | `/posts/categories/find` |
+| `GET` | `/posts/categories/find/first` |
+| `GET` | `/posts/categories/find/many/:ids` |
+| `GET` | `/posts/categories/find/:id` |
+| `GET` | `/posts/categories/count` |
+| `GET` | `/posts/categories/self` |
+| `POST` | `/posts/categories/create` |
+| `PATCH` | `/posts/categories/update/:id` |
+| `POST` | `/posts/categories/position/sort` |
+| `POST` | `/posts/categories/position/move/:id` |
+| `DELETE` | `/posts/categories/remove/:id` |
 
 ### PostsTagsController
 
@@ -27,6 +49,17 @@ Base path: `/posts/tags`
 
 | Method | Path |
 |--------|------|
+| `GET` | `/posts/tags/find` |
+| `GET` | `/posts/tags/find/first` |
+| `GET` | `/posts/tags/find/many/:ids` |
+| `GET` | `/posts/tags/find/:id` |
+| `GET` | `/posts/tags/count` |
+| `GET` | `/posts/tags/self` |
+| `POST` | `/posts/tags/create` |
+| `PATCH` | `/posts/tags/update/:id` |
+| `POST` | `/posts/tags/position/sort` |
+| `POST` | `/posts/tags/position/move/:id` |
+| `DELETE` | `/posts/tags/remove/:id` |
 
 ### SettingsController
 
@@ -34,6 +67,17 @@ Base path: `/settings`
 
 | Method | Path |
 |--------|------|
+| `GET` | `/settings/find` |
+| `GET` | `/settings/find/first` |
+| `GET` | `/settings/find/many/:ids` |
+| `GET` | `/settings/find/:id` |
+| `GET` | `/settings/count` |
+| `GET` | `/settings/self` |
+| `POST` | `/settings/create` |
+| `PATCH` | `/settings/update/:id` |
+| `POST` | `/settings/position/sort` |
+| `POST` | `/settings/position/move/:id` |
+| `DELETE` | `/settings/remove/:id` |
 
 ### SettingsGroupsController
 
@@ -41,6 +85,17 @@ Base path: `/settings/groups`
 
 | Method | Path |
 |--------|------|
+| `GET` | `/settings/groups/find` |
+| `GET` | `/settings/groups/find/first` |
+| `GET` | `/settings/groups/find/many/:ids` |
+| `GET` | `/settings/groups/find/:id` |
+| `GET` | `/settings/groups/count` |
+| `GET` | `/settings/groups/self` |
+| `POST` | `/settings/groups/create` |
+| `PATCH` | `/settings/groups/update/:id` |
+| `POST` | `/settings/groups/position/sort` |
+| `POST` | `/settings/groups/position/move/:id` |
+| `DELETE` | `/settings/groups/remove/:id` |
 
 ---
 

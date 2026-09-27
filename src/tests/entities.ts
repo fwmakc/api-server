@@ -9,16 +9,20 @@ import {
   JoinTable,
 } from 'typeorm';
 import {
-  AccessLevel,
   BooleanColumn,
   CreatedColumn,
-  FieldAccess,
   IdColumn,
   IntColumn,
+  PermissionRegistry,
   TextColumn,
   UpdatedColumn,
   VarcharColumn,
 } from 'api-server-toolkit';
+
+// Правила видимости полей (who-only). Роль-заглушка '__never__' никому не
+// выдаётся — правило с ней означает «поле закрыто для всех, кроме суперюзера».
+const NEVER: string[] = ['__never__'];
+const EDITOR: string[] = ['editor'];
 
 @Entity({ name: 'test_accounts' })
 export class TestAccountEntity extends BaseEntity {
@@ -28,7 +32,6 @@ export class TestAccountEntity extends BaseEntity {
   @VarcharColumn('username', 'normal', { index: 'unique' })
   username: string;
 
-  @FieldAccess({ read: AccessLevel.OWNER })
   @VarcharColumn('email')
   email: string;
 
@@ -59,15 +62,12 @@ export class TestArticleEntity extends BaseEntity {
   @TextColumn('content')
   content: string;
 
-  @FieldAccess({ read: AccessLevel.OWNER, write: AccessLevel.OWNER })
   @TextColumn('secret_notes')
   secretNotes: string;
 
-  @FieldAccess({ write: AccessLevel.SUPERUSER })
   @VarcharColumn('admin_notes')
   adminNotes: string;
 
-  @FieldAccess({ write: AccessLevel.CLOSED })
   @VarcharColumn('locked_notes')
   lockedNotes: string;
 
@@ -94,7 +94,6 @@ export class TestCommentEntity extends BaseEntity {
   @VarcharColumn('text')
   text: string;
 
-  @FieldAccess({ read: AccessLevel.OWNER, write: AccessLevel.OWNER })
   @VarcharColumn('author_ip')
   authorIp: string;
 
@@ -129,7 +128,6 @@ export class TestProfileEntity extends BaseEntity {
   @TextColumn('bio')
   bio: string;
 
-  @FieldAccess({ read: AccessLevel.OWNER, write: AccessLevel.OWNER })
   @TextColumn('internal_notes')
   internalNotes: string;
 
@@ -146,7 +144,6 @@ export class TestCycleAEntity extends BaseEntity {
   @VarcharColumn('name')
   name: string;
 
-  @FieldAccess({ read: AccessLevel.OWNER, write: AccessLevel.OWNER })
   @VarcharColumn('secret_a')
   secretA: string;
 
@@ -163,7 +160,6 @@ export class TestCycleBEntity extends BaseEntity {
   @VarcharColumn('name')
   name: string;
 
-  @FieldAccess({ read: AccessLevel.OWNER, write: AccessLevel.OWNER })
   @VarcharColumn('secret_b')
   secretB: string;
 
@@ -192,7 +188,6 @@ export class TestNoteEntity extends BaseEntity {
   @VarcharColumn('title')
   title: string;
 
-  @FieldAccess({ read: AccessLevel.OWNER, write: AccessLevel.OWNER })
   @TextColumn('secret')
   secret: string;
 
@@ -209,27 +204,21 @@ export class TestSecretEntity extends BaseEntity {
   @VarcharColumn('name')
   name: string;
 
-  @FieldAccess({ read: AccessLevel.SUPERUSER })
   @VarcharColumn('admin_code')
   adminCode: string;
 
-  @FieldAccess({ read: AccessLevel.CLOSED })
   @VarcharColumn('hidden_field')
   hiddenField: string;
 
-  @FieldAccess({ write: AccessLevel.SUPERUSER })
   @IntColumn('admin_price')
   adminPrice: number;
 
-  @FieldAccess({ write: AccessLevel.CLOSED })
   @VarcharColumn('locked_field')
   lockedField: string;
 
-  @FieldAccess({ read: AccessLevel.ACCOUNT })
   @VarcharColumn('account_note')
   accountNote: string;
 
-  @FieldAccess({ write: AccessLevel.ACCOUNT })
   @VarcharColumn('account_write')
   accountWrite: string;
 
@@ -291,6 +280,83 @@ export class TestEnrollEntity extends BaseEntity {
   @JoinColumn({ name: 'student_id', referencedColumnName: 'id' })
   student: TestStudentEntity;
 }
+
+// ── Правила полей (видимость/запись по ролям) ──────────────────────────
+// Ранее задавались декораторами @FieldAccess на entity, теперь — fields-
+// конфиг сущности. Роли: editor — редактор, superuser — байпас/явное правило.
+
+PermissionRegistry.set(TestAccountEntity, {
+  fields: {
+    email: { response: [{ who: ['authenticated'] }] },
+  },
+});
+
+PermissionRegistry.set(TestArticleEntity, {
+  fields: {
+    secretNotes: {
+      response: [{ who: EDITOR }, { who: ['superuser'] }],
+      request: [{ who: EDITOR }, { who: ['superuser'] }],
+    },
+    adminNotes: { request: [{ who: ['superuser'] }] },
+    lockedNotes: { request: [{ who: NEVER }] },
+  },
+});
+
+PermissionRegistry.set(TestCommentEntity, {
+  fields: {
+    authorIp: {
+      response: [{ who: EDITOR }, { who: ['superuser'] }],
+      request: [{ who: EDITOR }, { who: ['superuser'] }],
+    },
+  },
+});
+
+PermissionRegistry.set(TestProfileEntity, {
+  fields: {
+    internalNotes: {
+      response: [{ who: EDITOR }, { who: ['superuser'] }],
+      request: [{ who: EDITOR }, { who: ['superuser'] }],
+    },
+  },
+});
+
+PermissionRegistry.set(TestCycleAEntity, {
+  fields: {
+    secretA: {
+      response: [{ who: EDITOR }, { who: ['superuser'] }],
+      request: [{ who: EDITOR }, { who: ['superuser'] }],
+    },
+  },
+});
+
+PermissionRegistry.set(TestCycleBEntity, {
+  fields: {
+    secretB: {
+      response: [{ who: EDITOR }, { who: ['superuser'] }],
+      request: [{ who: EDITOR }, { who: ['superuser'] }],
+    },
+  },
+});
+
+PermissionRegistry.set(TestNoteEntity, {
+  fields: {
+    secret: {
+      response: [{ who: EDITOR }, { who: ['superuser'] }],
+      request: [{ who: EDITOR }, { who: ['superuser'] }],
+    },
+  },
+});
+
+PermissionRegistry.set(TestSecretEntity, {
+  fields: {
+    adminCode: { response: [{ who: ['superuser'] }] },
+    hiddenField: { response: [{ who: NEVER }] },
+    adminPrice: { request: [{ who: ['superuser'] }] },
+    lockedField: { request: [{ who: NEVER }] },
+    accountNote: { response: [{ who: ['authenticated'] }] },
+    accountWrite: { request: [{ who: ['authenticated'] }] },
+  },
+});
 
 export const TestEntities = [
   TestAccountEntity,

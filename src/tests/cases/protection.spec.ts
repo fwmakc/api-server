@@ -3,18 +3,17 @@ import { createTestModule } from '../app.testingModule';
 import { TestArticleService, TestProfileService } from '../services';
 import { TestArticleDto, TestProfileDto } from '../dtos';
 import { TestArticleEntity, TestProfileEntity } from '../entities';
-import { AccessLevel, EntityController } from 'api-server-toolkit';
+import { EntityController } from 'api-server-toolkit';
 
 const ArticleBase = EntityController({
   name: 'Articles',
   dto: TestArticleDto,
   entity: TestArticleEntity,
-  accountTable: 'account',
   operations: {
-    read: AccessLevel.PUBLIC,
-    create: AccessLevel.OWNER,
-    update: AccessLevel.OWNER,
-    delete: AccessLevel.OWNER,
+    read: [{ who: ['public'] }, { who: ['authenticated'] }],
+    create: [{ who: ['authenticated'], scope: { owner: 'account.id' } }],
+    update: [{ who: ['authenticated'], scope: { owner: 'account.id' } }],
+    delete: [{ who: ['authenticated'], scope: { owner: 'account.id' } }],
   },
 });
 const ProfileBase = EntityController({
@@ -22,10 +21,10 @@ const ProfileBase = EntityController({
   dto: TestProfileDto,
   entity: TestProfileEntity,
   operations: {
-    read: AccessLevel.PUBLIC,
-    create: AccessLevel.SUPERUSER,
-    update: AccessLevel.SUPERUSER,
-    delete: AccessLevel.SUPERUSER,
+    read: [{ who: ['public'] }, { who: ['authenticated'] }],
+    create: [{ who: ['superuser'] }],
+    update: [{ who: ['superuser'] }],
+    delete: [{ who: ['superuser'] }],
   },
 });
 

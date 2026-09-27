@@ -1,10 +1,9 @@
 import { BaseEntity, Entity } from 'typeorm';
 import {
-  AccessLevel,
   BooleanColumn,
   CreatedColumn,
-  FieldAccess,
   IdColumn,
+  PermissionRegistry,
   UpdatedColumn,
   VarcharColumn,
 } from 'api-server-toolkit';
@@ -23,7 +22,6 @@ export class AccountEntity extends BaseEntity {
   @VarcharColumn('username', 'normal', { index: 'unique' })
   username: string;
 
-  @FieldAccess({ read: AccessLevel.CLOSED })
   @VarcharColumn('password')
   password: string;
 
@@ -33,3 +31,14 @@ export class AccountEntity extends BaseEntity {
   @BooleanColumn('is_superuser')
   isSuperuser: boolean;
 }
+
+// Аккаунт в api-server — только цель связей (контроллера нет), но пароль
+// нельзя отдавать даже во вложенных ответах. Правила видимости — в реестре.
+PermissionRegistry.set(AccountEntity, {
+  fields: {
+    password: {
+      response: [{ who: ['superuser'] }],
+      request: [{ who: ['superuser'] }],
+    },
+  },
+});

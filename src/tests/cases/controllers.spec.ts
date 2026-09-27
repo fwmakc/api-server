@@ -2,7 +2,12 @@ import { createTestModule } from '../app.testingModule';
 import { TestArticleService } from '../services';
 import { TestArticleDto } from '../dtos';
 import { TestArticleEntity } from '../entities';
-import { AccessLevel, EntityController } from 'api-server-toolkit';
+import { EntityController } from 'api-server-toolkit';
+
+const OWNER: any = [{ who: ['authenticated'], scope: { owner: 'account.id' } }];
+const AUTHENTICATED: any = [{ who: ['authenticated'] }];
+const PUBLIC: any = [{ who: ['public'] }, { who: ['authenticated'] }];
+const SUPERUSER: any = [{ who: ['superuser'] }];
 
 describe('Controllers — EntityController access levels', () => {
   let moduleRef: Awaited<ReturnType<typeof createTestModule>>;
@@ -25,12 +30,11 @@ describe('Controllers — EntityController access levels', () => {
         name: 'test_articles',
         dto: TestArticleDto,
         entity: TestArticleEntity,
-        accountTable: 'account',
         operations: {
-          read: AccessLevel.OWNER,
-          create: AccessLevel.OWNER,
-          update: AccessLevel.OWNER,
-          delete: AccessLevel.OWNER,
+          read: OWNER,
+          create: OWNER,
+          update: OWNER,
+          delete: OWNER,
         },
       });
       controller = new CtrlClass();
@@ -124,27 +128,31 @@ describe('Controllers — EntityController access levels', () => {
       expect(result).toBe(2);
     });
 
-    it('CC8: self shows private fields for owner', async () => {
+    it('CC8: self returns own articles; role-gated fields stripped without roles', async () => {
       const result = await controller.self(
         undefined,
         {},
         undefined,
         [{ name: 'account' }],
-        { id: 2, isSuperuser: false } as any,
+        { id: 2, isSuperuser: false, roles: [] } as any,
       );
+      expect(result.length).toBeGreaterThan(0);
       for (const article of result) {
-        expect(article.secretNotes).toBeDefined();
+        expect(+article.account.id).toBe(2);
+        // who-only поля: без роли editor secretNotes не виден.
+        expect(article.secretNotes).toBeUndefined();
       }
     });
 
-    it('CC9: private fields visible for owner in self', async () => {
+    it('CC9: self — editor sees secretNotes on own articles', async () => {
       const result = await controller.self(
         undefined,
         {},
         undefined,
         [{ name: 'account' }],
-        { id: 1, isSuperuser: false } as any,
+        { id: 1, isSuperuser: false, roles: ['editor'] } as any,
       );
+      expect(result.length).toBeGreaterThan(0);
       for (const article of result) {
         expect(article.secretNotes).toBeDefined();
       }
@@ -160,10 +168,10 @@ describe('Controllers — EntityController access levels', () => {
         dto: TestArticleDto,
         entity: TestArticleEntity,
         operations: {
-          read: AccessLevel.PUBLIC,
-          create: AccessLevel.SUPERUSER,
-          update: AccessLevel.SUPERUSER,
-          delete: AccessLevel.SUPERUSER,
+          read: PUBLIC,
+          create: SUPERUSER,
+          update: SUPERUSER,
+          delete: SUPERUSER,
         },
       });
       controller = new CtrlClass();
@@ -296,10 +304,10 @@ describe('Controllers — EntityController access levels', () => {
         dto: TestArticleDto,
         entity: TestArticleEntity,
         operations: {
-          read: AccessLevel.ACCOUNT,
-          create: AccessLevel.ACCOUNT,
-          update: AccessLevel.ACCOUNT,
-          delete: AccessLevel.ACCOUNT,
+          read: AUTHENTICATED,
+          create: AUTHENTICATED,
+          update: AUTHENTICATED,
+          delete: AUTHENTICATED,
         },
       });
       controller = new CtrlClass();
@@ -366,10 +374,9 @@ describe('Controllers — EntityController access levels', () => {
         dto: TestArticleDto,
         entity: TestArticleEntity,
         operations: {
-          read: AccessLevel.PUBLIC,
-          create: AccessLevel.OWNER,
-          update: AccessLevel.SUPERUSER,
-          delete: AccessLevel.CLOSED,
+          read: PUBLIC,
+          create: OWNER,
+          update: SUPERUSER,
         },
       });
       controller = new CtrlClass();

@@ -15,13 +15,9 @@ import {
   CreatedColumn,
   DateColumn,
   IdColumn,
-  IntColumn,
   TextColumn,
   UpdatedColumn,
   VarcharColumn,
-  AccessLevel,
-  FieldAccess,
-  FieldRoles,
 } from 'api-server-toolkit';
 
 @Entity({ name: 'posts' })
@@ -53,8 +49,6 @@ export class PostsEntity extends BaseEntity {
   @BooleanColumn('is_published')
   isPublished: boolean;
 
-  @FieldAccess({ read: AccessLevel.OWNER, write: AccessLevel.OWNER })
-  @FieldRoles({ read: ['editor', 'admin'], write: ['editor', 'admin'] })
   @TextColumn('secret_notes')
   secretNotes: string;
 

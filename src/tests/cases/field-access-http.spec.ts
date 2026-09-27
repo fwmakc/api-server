@@ -3,10 +3,11 @@ import { INestApplication } from '@nestjs/common';
 import {
   createHttpTestApp,
   ALICE_TOKEN,
+  BOB_TOKEN,
   ADMIN_TOKEN,
 } from '../http.testingModule';
 
-describe('HTTP Field Access — @FieldAccess via interceptor', () => {
+describe('HTTP Field Rules — stripping via interceptor', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
@@ -29,10 +30,21 @@ describe('HTTP Field Access — @FieldAccess via interceptor', () => {
     });
   });
 
-  it('HFA2: public find with alice but no relations → secretNotes stripped (cannot verify ownership)', async () => {
+  it('HFA2: public find with editor → secretNotes visible (who-only rules)', async () => {
     const res = await request(app.getHttpServer())
       .get('/http-public/find')
       .set('Authorization', `Bearer ${ALICE_TOKEN}`)
+      .expect(200);
+
+    res.body.forEach((article: any) => {
+      expect(article.secretNotes).toBeDefined();
+    });
+  });
+
+  it('HFA2a: public find with plain user → secretNotes stripped', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/http-public/find')
+      .set('Authorization', `Bearer ${BOB_TOKEN}`)
       .expect(200);
 
     res.body.forEach((article: any) => {
@@ -40,20 +52,16 @@ describe('HTTP Field Access — @FieldAccess via interceptor', () => {
     });
   });
 
-  it('HFA3: public find with alice + account relation → secretNotes only on own articles', async () => {
+  it('HFA3: public find with editor + relations → secretNotes on all articles', async () => {
     const res = await request(app.getHttpServer())
       .get('/http-public/find')
       .query({ relations: JSON.stringify([{ name: 'account' }]) })
       .set('Authorization', `Bearer ${ALICE_TOKEN}`)
       .expect(200);
 
-    const aliceArticles = res.body.filter((a: any) => +a.id === 1 || +a.id === 2);
-    const bobArticle = res.body.find((a: any) => +a.id === 3);
-
-    aliceArticles.forEach((article: any) => {
+    res.body.forEach((article: any) => {
       expect(article.secretNotes).toBeDefined();
     });
-    expect(bobArticle.secretNotes).toBeUndefined();
   });
 
   it('HFA4: owner findOne own article → secretNotes visible', async () => {
@@ -116,7 +124,8 @@ describe('HTTP Field Access — @FieldAccess via interceptor', () => {
 
     expect(res.body.title).toBe('Admin Create');
     expect(res.body.adminNotes).toBe('admin sets this');
-    expect(res.body.lockedNotes).toBeFalsy();
+    // Суперюзер — глобальный байпас: closed-поля для него не стрипаются.
+    expect(res.body.lockedNotes).toBe('always stripped');
   });
 
   it('HFA8: owner update strips write:admin and write:closed fields', async () => {
@@ -140,7 +149,7 @@ describe('HTTP Field Access — @FieldAccess via interceptor', () => {
     expect(res.body.lockedNotes).not.toBe('locked via update');
   });
 
-  it('HFA9: nested relation fields stripped by interceptor (comments.authorIp)', async () => {
+  it('HFA9: nested relation fields stripped by roles (comments.authorIp)', async () => {
     const res = await request(app.getHttpServer())
       .get('/http-public/find')
       .query({
@@ -157,11 +166,25 @@ describe('HTTP Field Access — @FieldAccess via interceptor', () => {
     expect(art1.comments).toBeDefined();
     expect(art1.comments.length).toBe(2);
 
-    const ownComment = art1.comments.find((c: any) => +c.id === 1);
-    expect(ownComment.authorIp).toBeDefined();
+    art1.comments.forEach((comment: any) => {
+      expect(comment.authorIp).toBeDefined();
+    });
 
-    const otherComment = art1.comments.find((c: any) => +c.id === 2);
-    expect(otherComment.authorIp).toBeUndefined();
+    const resBob = await request(app.getHttpServer())
+      .get('/http-public/find')
+      .query({
+        relations: JSON.stringify([
+          { name: 'account' },
+          { name: 'comments' },
+        ]),
+      })
+      .set('Authorization', `Bearer ${BOB_TOKEN}`)
+      .expect(200);
+
+    const bobArt1 = resBob.body.find((a: any) => +a.id === 1);
+    bobArt1.comments.forEach((comment: any) => {
+      expect(comment.authorIp).toBeUndefined();
+    });
   });
 
   it('HFA10: admin update allows write:admin, strips write:closed', async () => {
@@ -179,6 +202,7 @@ describe('HTTP Field Access — @FieldAccess via interceptor', () => {
 
     expect(res.body.title).toBe('Admin Updated');
     expect(res.body.adminNotes).toBe('admin sets via update');
-    expect(res.body.lockedNotes).toBeFalsy();
+    // Суперюзер — глобальный байпас: closed-поля для него не стрипаются.
+    expect(res.body.lockedNotes).toBe('always stripped');
   });
 });

@@ -1,6 +1,6 @@
 import { createTestModule } from '../app.testingModule';
 import { TestCourseService, TestEnrollService } from '../services';
-import { AccessLevel, PermissionRegistry } from 'api-server-toolkit';
+import { PermissionRegistry } from 'api-server-toolkit';
 import { TestEnrollEntity } from '../entities';
 
 // ═══════════════════════════════════════════════════════════════
@@ -16,12 +16,16 @@ describe('Security features — service-level', () => {
     courseService = moduleRef.get(TestCourseService);
     enrollService = moduleRef.get(TestEnrollService);
 
+    const STUDENT_OWNER: any = [
+      { who: ['authenticated'], scope: { owner: 'student.account.id' } },
+    ];
     PermissionRegistry.set(TestEnrollEntity, {
-      create: AccessLevel.OWNER,
-      read: AccessLevel.OWNER,
-      update: AccessLevel.OWNER,
-      delete: AccessLevel.OWNER,
-      accountTable: 'student.account',
+      operations: {
+        read: STUDENT_OWNER,
+        create: STUDENT_OWNER,
+        update: STUDENT_OWNER,
+        delete: STUDENT_OWNER,
+      },
     });
   });
 

@@ -8,7 +8,7 @@ import {
   TestAccountEntity,
 } from '../entities';
 
-describe('@FieldAccess — field-level access control', () => {
+describe('Field rules — field-level access control', () => {
   let moduleRef: Awaited<ReturnType<typeof createTestModule>>;
   let service: TestSecretService;
 
@@ -60,7 +60,7 @@ describe('@FieldAccess — field-level access control', () => {
         { relations: [{ name: 'account' }] },
         { allow: true },
       );
-      removePrivateFields(result, { allow: true });
+      removePrivateFields(result, { roles: ['superuser'] });
       const alice = result.find((s) => +s.id === 1);
       expect(alice.adminCode).toBeDefined();
       expect(alice.adminCode).toBe('AC-001');
@@ -103,12 +103,12 @@ describe('@FieldAccess — field-level access control', () => {
       expect(result.name).toBe('Updated by owner');
     });
 
-    it('FA6: lockedField never writable (write: closed)', async () => {
+    it('FA6: lockedField never writable (write: closed, even for admin role)', async () => {
       const result = await service.update(
         1,
         { lockedField: 'hacked', name: 'Attempt lock' } as any,
         undefined,
-        { allow: true },
+        { id: 1, name: 'account', key: 'id', allow: false, roles: ['admin'] },
       );
       expect(result).toBeDefined();
       expect(result.lockedField).not.toBe('hacked');
@@ -130,7 +130,7 @@ describe('@FieldAccess — field-level access control', () => {
       expect(result.lockedField).not.toBe('injected');
     });
 
-    it('FA10: admin create strips lockedField (write: closed)', async () => {
+    it('FA10: superuser-role create keeps adminPrice, strips lockedField', async () => {
       const result = await service.create(
         {
           name: 'Admin Secret',
@@ -138,7 +138,7 @@ describe('@FieldAccess — field-level access control', () => {
           lockedField: 'admin-injected',
         } as any,
         undefined,
-        { allow: true },
+        { id: 3, name: 'account', key: 'id', allow: false, roles: ['superuser'] },
       );
       expect(result).toBeDefined();
       expect(result.name).toBe('Admin Secret');
@@ -153,7 +153,7 @@ describe('@FieldAccess — field-level access control', () => {
         { relations: [{ name: 'account' }] },
         { allow: true },
       );
-      removePrivateFields(result, { id: 1, name: 'account', key: 'id', allow: false });
+      removePrivateFields(result, { id: 1, roles: ['authenticated'] });
       const alice = result.find((s) => +s.id === 1);
       expect(alice.accountNote).toBe('visible to logged-in users');
     });
@@ -163,7 +163,7 @@ describe('@FieldAccess — field-level access control', () => {
         { relations: [{ name: 'account' }] },
         { allow: true },
       );
-      removePrivateFields(result, { id: undefined, name: 'account', key: 'id', allow: false });
+      removePrivateFields(result, { roles: ['public'] });
       result.forEach((s) => {
         expect(s.accountNote).toBeUndefined();
       });
@@ -174,7 +174,7 @@ describe('@FieldAccess — field-level access control', () => {
         1,
         { accountWrite: 'updated by logged-in' } as any,
         undefined,
-        { id: 1, name: 'account', key: 'id', allow: false },
+        { id: 1, name: 'account', key: 'id', allow: false, roles: ['authenticated'] },
       );
       expect(result.accountWrite).toBe('updated by logged-in');
     });
@@ -213,14 +213,14 @@ describe('@FieldAccess — field-level access control', () => {
       expect(dto.lockedNotes).toBeUndefined();
     });
 
-    it('FA17: owner bind allows write: owner field but strips admin/closed', () => {
+    it('FA17: editor bind allows secretNotes but strips admin/closed', () => {
       const dto: any = {
         title: 'Hello',
         secretNotes: 'my notes',
         adminNotes: 'try admin',
         lockedNotes: 'try locked',
       };
-      stripWriteFields(dto, TestArticleEntity, { id: 1, name: 'account', key: 'id', allow: false });
+      stripWriteFields(dto, TestArticleEntity, { id: 1, name: 'account', key: 'id', allow: false, roles: ['editor'] });
       expect(dto.title).toBe('Hello');
       expect(dto.secretNotes).toBe('my notes');
       expect(dto.adminNotes).toBeUndefined();
@@ -228,75 +228,4 @@ describe('@FieldAccess — field-level access control', () => {
     });
   });
 
-  describe('accountId fallback — ownership via FK when relation not loaded', () => {
-    it('FA18: canRead uses accountId fallback when account relation is absent', () => {
-      const own = new TestArticleEntity();
-      own.id = 10;
-      own.title = 'Own';
-      own.secretNotes = 'visible via FK';
-      (own as any).accountId = 1;
-
-      removePrivateFields(own, { id: 1, name: 'account', key: 'id', allow: false });
-      expect(own.secretNotes).toBe('visible via FK');
-
-      const other = new TestArticleEntity();
-      other.id = 11;
-      other.title = 'Other';
-      other.secretNotes = 'should be stripped';
-      (other as any).accountId = 2;
-
-      removePrivateFields(other, { id: 1, name: 'account', key: 'id', allow: false });
-      expect(other.secretNotes).toBeUndefined();
-    });
-  });
-
-  describe('computeNestedBind with dot-path — multi-hop ownership', () => {
-    it('FA19: nested fields visible through article.account chain (owner)', () => {
-      const alice = new TestAccountEntity();
-      alice.id = 1;
-      alice.email = 'alice@test.com';
-
-      const article = new TestArticleEntity();
-      article.id = 1;
-      article.title = 'Article';
-      article.secretNotes = 'article secret';
-      article.account = alice;
-
-      const comment = new TestCommentEntity();
-      comment.id = 1;
-      comment.text = 'Alice comment';
-      comment.authorIp = '127.0.0.1';
-      comment.article = article;
-
-      removePrivateFields(comment, { id: 1, name: 'article.account', key: 'id', allow: false });
-
-      expect(comment.authorIp).toBe('127.0.0.1');
-      expect(comment.article.secretNotes).toBe('article secret');
-      expect(comment.article.account.email).toBe('alice@test.com');
-    });
-
-    it('FA20: nested fields stripped through article.account chain (non-owner)', () => {
-      const bob = new TestAccountEntity();
-      bob.id = 2;
-      bob.email = 'bob@test.com';
-
-      const article = new TestArticleEntity();
-      article.id = 3;
-      article.title = 'Bob Article';
-      article.secretNotes = 'bob secret';
-      article.account = bob;
-
-      const comment = new TestCommentEntity();
-      comment.id = 2;
-      comment.text = 'Bob comment';
-      comment.authorIp = '192.168.1.1';
-      comment.article = article;
-
-      removePrivateFields(comment, { id: 1, name: 'article.account', key: 'id', allow: false });
-
-      expect(comment.authorIp).toBeUndefined();
-      expect(comment.article.secretNotes).toBeUndefined();
-      expect(comment.article.account.email).toBeUndefined();
-    });
-  });
 });
