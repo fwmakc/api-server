@@ -1,4 +1,4 @@
-FROM node:22-alpine AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
@@ -9,12 +9,12 @@ COPY api-server-toolkit/package.json ./node_modules/api-server-toolkit/package.j
 COPY api-server-toolkit/dist ./node_modules/api-server-toolkit/dist
 
 COPY api-server/ .
-RUN npm run build
+RUN npx tsc -p tsconfig.build.json
 RUN npm prune --production --legacy-peer-deps
 
 # --- Runner ---
 
-FROM node:22-alpine AS runner
+FROM node:24-alpine AS runner
 
 WORKDIR /app
 
