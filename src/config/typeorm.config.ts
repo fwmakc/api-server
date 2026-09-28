@@ -7,7 +7,9 @@ dotenv.config();
 const ENTITIES = [join(__dirname, '../**/*.entity{.ts,.js}')];
 const MIGRATIONS = [join(__dirname, '../typeorm/migrations/*{.ts,.js}')];
 
-export const AppDataSource = new DataSource({
+// The typeorm CLI requires the data-source file to export exactly ONE
+// DataSource instance (named + default both count), so keep default only.
+const AppDataSource = new DataSource({
   type: process.env.DB_TYPE as any,
   host: process.env.DB_HOST,
   database: process.env.DB_NAME,
