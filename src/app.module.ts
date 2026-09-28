@@ -8,6 +8,7 @@ import { addTransactionalDataSource } from 'typeorm-transactional';
 import { getDbConfig } from '@config/db.config';
 import { RemovePrivateFieldsInterceptor } from 'api-server-toolkit';
 import { HealthModule } from 'api-server-toolkit/health';
+import { MetricsModule } from 'api-server-toolkit/metrics';
 import AppImports from './app.imports';
 
 @Module({
@@ -25,6 +26,7 @@ import AppImports from './app.imports';
     }),
     ...AppImports,
     HealthModule.forRoot('api-server'),
+    MetricsModule.forRoot({ service: 'api-server' }),
   ],
   providers: [
     {
