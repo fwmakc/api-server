@@ -6,10 +6,6 @@ import { Sentry, Helmet, Morgan, Cors, CookieParser, Passport, ValidationPipe, L
 import { AppModule } from "@src/app.module";
 import { startMetrics } from "@src/app.metrics";
 
-const corsOrigin = process.env.CORS_ORIGIN
-  ? process.env.CORS_ORIGIN.split(",").map((o) => o.trim())
-  : true;
-
 async function main() {
   if (process.env.TRANSACTIONAL === "true") {
     const { initializeTransactionalContext } = require("typeorm-transactional");
@@ -20,7 +16,7 @@ async function main() {
 
   Sentry.setup(app);
   Helmet.setup(app);
-  Cors.setup(app, { origin: corsOrigin, credentials: true });
+  Cors.setup(app);
   Morgan.setup(app);
   CookieParser.setup(app);
   Passport.setup(app);
