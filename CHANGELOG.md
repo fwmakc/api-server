@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2026-09-29
+### Changed
+- Database schema is now owned exclusively by TypeORM migrations. DB_SYNCHRONIZE is removed: pending migrations are applied on every boot (hardcoded migrationsRun: true), so the first boot on an empty database initializes the schema.
+### Fixed
+- Entity index names aligned with the InitialSchema migration (`IDX_settings_group`, `IDX_posts_account`, `IDX_posts_category`): unnamed `@Index` declarations produced hash names and drifted from the migration schema. `migration:generate` against a migrated database is now a no-op.
+
 ## [0.6.1] - 2026-09-28
 ### Changed
 - Node.js runtime bumped 22 → 24 LTS: Docker images `node:24-alpine`, CI `node-version: 24`.

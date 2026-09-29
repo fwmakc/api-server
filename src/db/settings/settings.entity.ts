@@ -11,7 +11,7 @@ import {
 } from 'api-server-toolkit';
 
 @Entity({ name: 'settings' })
-@Index(['group'])
+@Index('IDX_settings_group', ['group'])
 export class SettingsEntity extends BaseEntity {
   @IdColumn()
   id: number;

@@ -175,7 +175,7 @@ levels, relation whitelisting, field-level security, and the full `EntityControl
 3. Add your own entities (see above)
 4. Update `src/app.imports.ts` — remove old modules, add yours
 5. Update `.env` — set `DB_NAME` to your project's database
-6. Run with `DB_SYNCHRONIZE=true` to auto-create tables (dev only)
+6. Generate the first migration for your entities: `npm run migration:auto` (schema is owned by migrations — the app applies pending migrations on every boot, including the first one on an empty database)
 
 ## Configuration (.env)
 
@@ -184,7 +184,6 @@ levels, relation whitelisting, field-level security, and the full `EntityControl
 | `PORT` | 5000 | HTTP port |
 | `DB_HOST` | localhost | PostgreSQL host |
 | `DB_NAME` | api_server | Database name |
-| `DB_SYNCHRONIZE` | false | Auto-create tables (dev only — use migrations in production) |
 | `AUTH_SERVER_URL` | http://localhost:3001 | Auth server for JWT/JWKS verification |
 | `AUTH_CACHE_TTL` | 30000 | Auth cache TTL in ms (account info from auth-server) |
 | `CORS_ORIGIN` | * | Comma-separated allowed origins |
@@ -192,6 +191,20 @@ levels, relation whitelisting, field-level security, and the full `EntityControl
 | `SWAGGER_PREFIX` | swagger | Swagger UI path |
 
 See `.env.example` for the full list.
+
+## Migrations
+
+The database schema is owned exclusively by TypeORM migrations (`src/typeorm/migrations`) — `synchronize` is not used anywhere. The app applies pending migrations on every boot, so the first boot on an empty database initializes the schema.
+
+```bash
+npm run migration:auto    # generate a migration from entity changes
+npm run migration:run     # apply pending migrations (usually unnecessary — boot does it)
+npm run migration:revert  # revert the last migration
+```
+
+CI verifies on every push that the migration chain builds the schema from scratch and that entities have no drift against it (a generated diff must be empty).
+
+Writing migrations for zero-downtime deploys (expand-contract): ship additive changes first (add nullable column, write to both), remove old columns in a later release — never rename or drop in one step. With multiple replicas of this service, move migration out of boot: disable `migrationsRun` in `src/config/db.config.ts` and run `migration:run` once per deploy (from CI or a one-shot container) before rolling new code.
 
 ## API reference
 

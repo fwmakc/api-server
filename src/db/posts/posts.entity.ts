@@ -21,8 +21,8 @@ import {
 } from 'api-server-toolkit';
 
 @Entity({ name: 'posts' })
-@Index(['account'])
-@Index(['category'])
+@Index('IDX_posts_account', ['account'])
+@Index('IDX_posts_category', ['category'])
 export class PostsEntity extends BaseEntity {
   @IdColumn()
   id: number;
