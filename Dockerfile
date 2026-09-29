@@ -20,6 +20,7 @@ WORKDIR /app
 
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/tsconfig.json ./tsconfig.json
 
 ENV NODE_ENV=production
 ENV ROOT_PATH=.
@@ -28,4 +29,4 @@ EXPOSE 5000
 HEALTHCHECK --interval=10s --timeout=3s --retries=5 --start-period=15s \
   CMD wget -qO- http://localhost:5000/health || exit 1
 
-CMD ["node", "dist/main"]
+CMD ["node", "-r", "tsconfig-paths/register", "dist/main"]
