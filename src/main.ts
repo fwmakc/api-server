@@ -19,9 +19,8 @@ import { startMetrics } from '@src/app.metrics';
 
 async function main() {
   if (process.env.TRANSACTIONAL === 'true') {
-    const { initializeTransactionalContext } = await import(
-      'typeorm-transactional'
-    );
+    const { initializeTransactionalContext } =
+      await import('typeorm-transactional');
     initializeTransactionalContext();
   }
 
