@@ -5,7 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.7.3] - 2026-09-29
+### Changed
+- Toolkit pinned to v0.20.2 (bootstrap binds 0.0.0.0 by default).
+
+## [0.7.4] - 2026-09-29
+0.7.3] - 2026-09-29
 ### Fixed
 - `tsconfig-paths` moved to dependencies: the runner registers it at boot, but the builder's `npm prune --production` removed it as a devDependency, so the image still failed with MODULE_NOT_FOUND.
 
