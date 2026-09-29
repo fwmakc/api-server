@@ -18,11 +18,12 @@ import { AppModule } from '@src/app.module';
 import { startMetrics } from '@src/app.metrics';
 
 async function main() {
-  if (process.env.TRANSACTIONAL === 'true') {
-    const { initializeTransactionalContext } =
-      await import('typeorm-transactional');
-    initializeTransactionalContext();
-  }
+  // Must run before TypeORM initializes: app.module always wraps the
+  // DataSource with addTransactionalDataSource, and boot migrations
+  // (migrationsRun) touch the patched EntityManager during initialize().
+  const { initializeTransactionalContext } =
+    await import('typeorm-transactional');
+  initializeTransactionalContext();
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
