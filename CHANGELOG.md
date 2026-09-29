@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.3] - 2026-09-29
+### Fixed
+- `tsconfig-paths` moved to dependencies: the runner registers it at boot, but the builder's `npm prune --production` removed it as a devDependency, so the image still failed with MODULE_NOT_FOUND.
+
 ## [0.7.2] - 2026-09-29
 ### Fixed
 - The image could not boot: `dist/main` requires `@src/*` path aliases that only `tsconfig-paths/register` can resolve at runtime, but the runner stage neither copied `tsconfig.json` nor registered the loader. Runner now matches the other services.
