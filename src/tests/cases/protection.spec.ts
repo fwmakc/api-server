@@ -92,5 +92,4 @@ describe('Protection — controller-level access control', () => {
     expect(result).toBeDefined();
     expect(result.bio).toBe('admin created');
   });
-
 });

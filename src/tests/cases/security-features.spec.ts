@@ -33,9 +33,24 @@ describe('Security features — service-level', () => {
     await moduleRef.close();
   });
 
-  const aliceBind = { id: 1, name: 'enrolls.student.account', key: 'id', allow: false };
-  const bobBind = { id: 2, name: 'enrolls.student.account', key: 'id', allow: false };
-  const adminBind = { id: 3, name: 'enrolls.student.account', key: 'id', allow: true };
+  const aliceBind = {
+    id: 1,
+    name: 'enrolls.student.account',
+    key: 'id',
+    allow: false,
+  };
+  const bobBind = {
+    id: 2,
+    name: 'enrolls.student.account',
+    key: 'id',
+    allow: false,
+  };
+  const adminBind = {
+    id: 3,
+    name: 'enrolls.student.account',
+    key: 'id',
+    allow: true,
+  };
 
   // ── Task 7: Nested relation auto-filtering ──
   describe('Nested relation auto-filtering', () => {
@@ -129,10 +144,7 @@ describe('Security features — service-level', () => {
   // ── Task 5: Pagination with multi-hop ──
   describe('Pagination with multi-hop bind', () => {
     it('limit=1 returns 1 course (not affected by JOIN duplicates)', async () => {
-      const result = await courseService.find(
-        { limit: 1 },
-        aliceBind,
-      );
+      const result = await courseService.find({ limit: 1 }, aliceBind);
       expect(result.length).toBe(1);
     });
 
@@ -151,10 +163,7 @@ describe('Security features — service-level', () => {
     });
 
     it('admin limit=2 returns exactly 2 courses', async () => {
-      const result = await courseService.find(
-        { limit: 2 },
-        adminBind,
-      );
+      const result = await courseService.find({ limit: 2 }, adminBind);
       expect(result.length).toBe(2);
     });
   });
@@ -162,7 +171,12 @@ describe('Security features — service-level', () => {
   // ── Task 3: Multi-hop auto-assign ──
   describe('Multi-hop auto-assign on create', () => {
     it('create enroll with student.account bind → auto-assigns student', async () => {
-      const enrollBind = { id: 1, name: 'student.account', key: 'id', allow: false };
+      const enrollBind = {
+        id: 1,
+        name: 'student.account',
+        key: 'id',
+        allow: false,
+      };
       const result = await enrollService.create(
         { status: 'active' } as any,
         [{ name: 'student' }],
@@ -171,22 +185,28 @@ describe('Security features — service-level', () => {
       expect(result).toBeDefined();
       expect(+result.id).toBeGreaterThan(0);
       expect((result as any).student).toBeDefined();
-      expect(+((result as any).student).id).toBe(1);
+      expect(+(result as any).student.id).toBe(1);
     });
 
     it('create enroll with non-existent account → throws NotFoundException', async () => {
-      const fakeBind = { id: 999, name: 'student.account', key: 'id', allow: false };
+      const fakeBind = {
+        id: 999,
+        name: 'student.account',
+        key: 'id',
+        allow: false,
+      };
       await expect(
-        enrollService.create(
-          { status: 'active' } as any,
-          undefined,
-          fakeBind,
-        ),
+        enrollService.create({ status: 'active' } as any, undefined, fakeBind),
       ).rejects.toThrow();
     });
 
     it('create course with ToMany-first-segment bind → no auto-assign, no crash', async () => {
-      const courseBind = { id: 1, name: 'enrolls.student.account', key: 'id', allow: false };
+      const courseBind = {
+        id: 1,
+        name: 'enrolls.student.account',
+        key: 'id',
+        allow: false,
+      };
       await expect(
         courseService.create(
           { title: 'ToManySkipUnique' } as any,

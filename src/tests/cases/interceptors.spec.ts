@@ -10,19 +10,19 @@ describe('interceptors — unit', () => {
       socket: { remoteAddress: '127.0.0.1' },
       connection: { remoteAddress: '127.0.0.1' },
       ...extras,
-    } as any);
+    }) as any;
 
   const mockContext = (request: any) =>
     ({
       switchToHttp: () => ({ getRequest: () => request }),
-    } as any);
+    }) as any;
 
   const mockHandler = () =>
     ({
       handle: () => ({
         pipe: (fn: any) => fn,
       }),
-    } as any);
+    }) as any;
 
   describe('AddClientIpInterceptor', () => {
     it('IP1: sets ip in body', () => {

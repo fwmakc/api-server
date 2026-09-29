@@ -165,9 +165,7 @@ describe('Relations whitelist & deny-by-default', () => {
   // ═══════════════════════════════════════════════════════════
   describe('Deny-by-default operations (no operations field)', () => {
     it('RW12: find → 404 (read defaults to closed)', async () => {
-      await request(app.getHttpServer())
-        .get('/http-default/find')
-        .expect(404);
+      await request(app.getHttpServer()).get('/http-default/find').expect(404);
     });
 
     it('RW13: findOne → 404', async () => {

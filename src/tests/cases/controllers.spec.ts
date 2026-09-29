@@ -330,12 +330,10 @@ describe('Controllers — EntityController access levels', () => {
     });
 
     it('CC23: findOne finds other user record (no scoping)', async () => {
-      const result = await controller.findOne(
-        3,
-        undefined,
-        undefined,
-        { id: 1, isSuperuser: false } as any,
-      );
+      const result = await controller.findOne(3, undefined, undefined, {
+        id: 1,
+        isSuperuser: false,
+      } as any);
       expect(result).toBeDefined();
       expect(+result.id).toBe(3);
     });

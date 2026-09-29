@@ -113,9 +113,7 @@ describe('Unit — utility services', () => {
     });
 
     it('U11: decrypt reverses encrypt', async () => {
-      const { encrypt, decrypt } = await import(
-        'api-server-toolkit'
-      );
+      const { encrypt, decrypt } = await import('api-server-toolkit');
       const original = 'secret data 123';
       const { encrypted, iv } = await encrypt(original);
       const decrypted = await decrypt(encrypted, iv);
@@ -123,9 +121,7 @@ describe('Unit — utility services', () => {
     });
 
     it('U12: decrypt with wrong iv throws', async () => {
-      const { encrypt, decrypt } = await import(
-        'api-server-toolkit'
-      );
+      const { encrypt, decrypt } = await import('api-server-toolkit');
       const { encrypted } = await encrypt('test data');
       const badIv = '000000000000000000000000';
       await expect(decrypt(encrypted, badIv)).rejects.toThrow();
@@ -151,9 +147,7 @@ describe('Unit — utility services', () => {
     });
 
     it('U16: encrypt handles unicode', async () => {
-      const { encrypt, decrypt } = await import(
-        'api-server-toolkit'
-      );
+      const { encrypt, decrypt } = await import('api-server-toolkit');
       const original = 'Привет мир 🌍';
       const { encrypted, iv } = await encrypt(original);
       const decrypted = await decrypt(encrypted, iv);

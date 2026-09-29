@@ -80,22 +80,33 @@ describe('sanitizeForSave — cascade protection', () => {
     });
 
     it('C4: new entity in registry, create: admin → stripped for non-admin', async () => {
-      PermissionRegistry.set(TestTagEntity, tagConfig([{ who: ['superuser'] }]));
+      PermissionRegistry.set(
+        TestTagEntity,
+        tagConfig([{ who: ['superuser'] }]),
+      );
       const entity = {
         title: 'Test',
         tags: [{ name: 'new-tag' }, { id: 1 }],
       };
-      await sanitizeForSave(entity, articleMetadata, {
-        id: 1,
-        name: 'account',
-        allow: false,
-      }, manager);
+      await sanitizeForSave(
+        entity,
+        articleMetadata,
+        {
+          id: 1,
+          name: 'account',
+          allow: false,
+        },
+        manager,
+      );
       expect(entity.tags).toHaveLength(1);
       expect(entity.tags[0]).toEqual({ id: 1 });
     });
 
     it('C5: new entity in registry, create: admin → kept for admin', async () => {
-      PermissionRegistry.set(TestTagEntity, tagConfig([{ who: ['superuser'] }]));
+      PermissionRegistry.set(
+        TestTagEntity,
+        tagConfig([{ who: ['superuser'] }]),
+      );
       const entity = {
         title: 'Test',
         tags: [{ name: 'admin-tag' }],

@@ -29,11 +29,18 @@ describe('LMS Performance', () => {
   let activityRepo: Repository<LmsActivityEntity>;
   let resultRepo: Repository<LmsActivityResultEntity>;
 
-  const results: { query: string; approach: string; ms: number; rows: number }[] = [];
+  const results: {
+    query: string;
+    approach: string;
+    ms: number;
+    rows: number;
+  }[] = [];
 
   function record(query: string, approach: string, ms: number, rows: number) {
     results.push({ query, approach, ms, rows });
-    console.log(`  ${approach.padEnd(8)} ${ms.toFixed(0).padStart(6)}ms  ${rows} rows`);
+    console.log(
+      `  ${approach.padEnd(8)} ${ms.toFixed(0).padStart(6)}ms  ${rows} rows`,
+    );
   }
 
   beforeAll(async () => {
@@ -64,11 +71,18 @@ describe('LMS Performance', () => {
     activityRepo = ds.getRepository(LmsActivityEntity);
     resultRepo = ds.getRepository(LmsActivityResultEntity);
 
-    const count = await ds.query('SELECT count(*)::int as n FROM lms_activities_results');
+    const count = await ds.query(
+      'SELECT count(*)::int as n FROM lms_activities_results',
+    );
     if (count[0].n === 0) {
       console.log('  Seeding LMS data...');
-      await ds.query('TRUNCATE TABLE lms_activities_results, lms_activities, lms_tasks, lms_modules, lms_enrolls, lms_flows, lms_courses, lms_students RESTART IDENTITY CASCADE');
-      const seedSql = fs.readFileSync(path.join(__dirname, 'seed.sql'), 'utf-8');
+      await ds.query(
+        'TRUNCATE TABLE lms_activities_results, lms_activities, lms_tasks, lms_modules, lms_enrolls, lms_flows, lms_courses, lms_students RESTART IDENTITY CASCADE',
+      );
+      const seedSql = fs.readFileSync(
+        path.join(__dirname, 'seed.sql'),
+        'utf-8',
+      );
       const cleanSql = seedSql
         .split('\n')
         .filter((line) => !line.trim().startsWith('--'))
@@ -101,7 +115,9 @@ describe('LMS Performance', () => {
   });
 
   afterAll(async () => {
-    console.log('\n┌─────────────────────────────────────────────────────────┐');
+    console.log(
+      '\n┌─────────────────────────────────────────────────────────┐',
+    );
     console.log('│                  PERFORMANCE RESULTS                     │');
     console.log('├──────────────────────────────────────┬──────────┬────────┤');
     console.log('│ Query                                │ Time(ms) │  Rows  │');
@@ -183,7 +199,12 @@ describe('LMS Performance', () => {
         skip: 0,
         order: { id: 'ASC' },
       });
-      record('Q6: Students+enrolls', 'OLD', performance.now() - t0, rows.length);
+      record(
+        'Q6: Students+enrolls',
+        'OLD',
+        performance.now() - t0,
+        rows.length,
+      );
     });
 
     it('Q7: Full deep load (course→modules→tasks→activities→results)', async () => {
@@ -205,7 +226,12 @@ describe('LMS Performance', () => {
         .where('m.course_id = 1')
         .take(100)
         .getMany();
-      record('Q8: Activities+results', 'OLD', performance.now() - t0, rows.length);
+      record(
+        'Q8: Activities+results',
+        'OLD',
+        performance.now() - t0,
+        rows.length,
+      );
     });
   });
 
@@ -290,7 +316,12 @@ describe('LMS Performance', () => {
         studentRepo.metadata,
         ds.manager,
       );
-      record('Q6: Students+enrolls', 'NEW', performance.now() - t0, rows.length);
+      record(
+        'Q6: Students+enrolls',
+        'NEW',
+        performance.now() - t0,
+        rows.length,
+      );
     });
 
     it('Q7: Full deep load (course→modules→tasks→activities→results)', async () => {
@@ -324,7 +355,12 @@ describe('LMS Performance', () => {
         activityRepo.metadata,
         ds.manager,
       );
-      record('Q8: Activities+results', 'NEW', performance.now() - t0, fullRows.length);
+      record(
+        'Q8: Activities+results',
+        'NEW',
+        performance.now() - t0,
+        fullRows.length,
+      );
     });
   });
 });

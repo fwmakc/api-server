@@ -71,7 +71,12 @@ describe('Field rules — field-level access control', () => {
         { relations: [{ name: 'account' }] },
         { allow: true },
       );
-      removePrivateFields(result, { id: undefined, name: 'account', key: 'id', allow: false });
+      removePrivateFields(result, {
+        id: undefined,
+        name: 'account',
+        key: 'id',
+        allow: false,
+      });
       result.forEach((s) => {
         expect(s.adminCode).toBeUndefined();
         expect(s.hiddenField).toBeUndefined();
@@ -138,7 +143,13 @@ describe('Field rules — field-level access control', () => {
           lockedField: 'admin-injected',
         } as any,
         undefined,
-        { id: 3, name: 'account', key: 'id', allow: false, roles: ['superuser'] },
+        {
+          id: 3,
+          name: 'account',
+          key: 'id',
+          allow: false,
+          roles: ['superuser'],
+        },
       );
       expect(result).toBeDefined();
       expect(result.name).toBe('Admin Secret');
@@ -174,7 +185,13 @@ describe('Field rules — field-level access control', () => {
         1,
         { accountWrite: 'updated by logged-in' } as any,
         undefined,
-        { id: 1, name: 'account', key: 'id', allow: false, roles: ['authenticated'] },
+        {
+          id: 1,
+          name: 'account',
+          key: 'id',
+          allow: false,
+          roles: ['authenticated'],
+        },
       );
       expect(result.accountWrite).toBe('updated by logged-in');
     });
@@ -220,12 +237,17 @@ describe('Field rules — field-level access control', () => {
         adminNotes: 'try admin',
         lockedNotes: 'try locked',
       };
-      stripWriteFields(dto, TestArticleEntity, { id: 1, name: 'account', key: 'id', allow: false, roles: ['editor'] });
+      stripWriteFields(dto, TestArticleEntity, {
+        id: 1,
+        name: 'account',
+        key: 'id',
+        allow: false,
+        roles: ['editor'],
+      });
       expect(dto.title).toBe('Hello');
       expect(dto.secretNotes).toBe('my notes');
       expect(dto.adminNotes).toBeUndefined();
       expect(dto.lockedNotes).toBeUndefined();
     });
   });
-
 });

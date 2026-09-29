@@ -1,14 +1,27 @@
-import { Logger } from "@nestjs/common";
-import { NestFactory } from "@nestjs/core";
-import { NestExpressApplication } from "@nestjs/platform-express";
-import { bootstrap } from "api-server-toolkit/bootstrap";
-import { Sentry, Helmet, Morgan, Cors, CookieParser, Passport, ValidationPipe, Log, Prefix, Swagger } from "api-server-toolkit/bootstrap/setup";
-import { AppModule } from "@src/app.module";
-import { startMetrics } from "@src/app.metrics";
+import { Logger } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { bootstrap } from 'api-server-toolkit/bootstrap';
+import {
+  Sentry,
+  Helmet,
+  Morgan,
+  Cors,
+  CookieParser,
+  Passport,
+  ValidationPipe,
+  Log,
+  Prefix,
+  Swagger,
+} from 'api-server-toolkit/bootstrap/setup';
+import { AppModule } from '@src/app.module';
+import { startMetrics } from '@src/app.metrics';
 
 async function main() {
-  if (process.env.TRANSACTIONAL === "true") {
-    const { initializeTransactionalContext } = require("typeorm-transactional");
+  if (process.env.TRANSACTIONAL === 'true') {
+    const { initializeTransactionalContext } = await import(
+      'typeorm-transactional'
+    );
     initializeTransactionalContext();
   }
 
@@ -25,9 +38,9 @@ async function main() {
   Prefix.setup(app);
   Swagger.setup(app);
 
-  if (process.env.METRICS_ENABLE === "true") {
-    const logger = new Logger("Bootstrap");
-    logger.log("Starting performance monitoring...");
+  if (process.env.METRICS_ENABLE === 'true') {
+    const logger = new Logger('Bootstrap');
+    logger.log('Starting performance monitoring...');
     startMetrics();
   }
 

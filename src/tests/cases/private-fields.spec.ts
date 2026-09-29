@@ -21,10 +21,7 @@ describe('Field rules — read stripping by roles', () => {
   });
 
   it('P17: editor sees secretNotes', async () => {
-    const result = await service.find(
-      { where: { id: 1 } },
-      { allow: true },
-    );
+    const result = await service.find({ where: { id: 1 } }, { allow: true });
     expect(result.length).toBe(1);
     removePrivateFields(result, editor);
     expect(result[0].secretNotes).toBeDefined();

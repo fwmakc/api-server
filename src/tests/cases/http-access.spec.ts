@@ -130,9 +130,7 @@ describe('HTTP Access Control — full guard pipeline', () => {
   // ═══════════════════════════════════════════════════════════
   describe('account level', () => {
     it('find without token → 401', async () => {
-      await request(app.getHttpServer())
-        .get('/http-account/find')
-        .expect(401);
+      await request(app.getHttpServer()).get('/http-account/find').expect(401);
     });
 
     it('findOne without token → 401', async () => {
@@ -214,15 +212,11 @@ describe('HTTP Access Control — full guard pipeline', () => {
   // ═══════════════════════════════════════════════════════════
   describe('owner level', () => {
     it('find without token → 401', async () => {
-      await request(app.getHttpServer())
-        .get('/http-owner/find')
-        .expect(401);
+      await request(app.getHttpServer()).get('/http-owner/find').expect(401);
     });
 
     it('findOne without token → 401', async () => {
-      await request(app.getHttpServer())
-        .get('/http-owner/find/1')
-        .expect(401);
+      await request(app.getHttpServer()).get('/http-owner/find/1').expect(401);
     });
 
     it('find with alice → 200 (only own records)', async () => {
@@ -271,9 +265,7 @@ describe('HTTP Access Control — full guard pipeline', () => {
     });
 
     it('self without token → 401', async () => {
-      await request(app.getHttpServer())
-        .get('/http-owner/self')
-        .expect(401);
+      await request(app.getHttpServer()).get('/http-owner/self').expect(401);
     });
 
     it('self with admin → 200 (admin owns no records)', async () => {
@@ -393,9 +385,7 @@ describe('HTTP Access Control — full guard pipeline', () => {
   // ═══════════════════════════════════════════════════════════
   describe('admin level', () => {
     it('find without token → 200 (read is public)', async () => {
-      await request(app.getHttpServer())
-        .get('/http-admin/find')
-        .expect(200);
+      await request(app.getHttpServer()).get('/http-admin/find').expect(200);
     });
 
     it('find with non-superuser → 200 (read is public)', async () => {
@@ -607,9 +597,7 @@ describe('HTTP Access Control — full guard pipeline', () => {
   // ═══════════════════════════════════════════════════════════
   describe('closed level', () => {
     it('find without token → 404', async () => {
-      await request(app.getHttpServer())
-        .get('/http-closed/find')
-        .expect(404);
+      await request(app.getHttpServer()).get('/http-closed/find').expect(404);
     });
 
     it('find with regular user → 404', async () => {
@@ -620,9 +608,7 @@ describe('HTTP Access Control — full guard pipeline', () => {
     });
 
     it('findOne without token → 404', async () => {
-      await request(app.getHttpServer())
-        .get('/http-closed/find/1')
-        .expect(404);
+      await request(app.getHttpServer()).get('/http-closed/find/1').expect(404);
     });
 
     it('find with admin → 404', async () => {
@@ -675,9 +661,7 @@ describe('HTTP Access Control — full guard pipeline', () => {
   // ═══════════════════════════════════════════════════════════
   describe('mixed level', () => {
     it('find without token → 200 (public read)', async () => {
-      await request(app.getHttpServer())
-        .get('/http-mixed/find')
-        .expect(200);
+      await request(app.getHttpServer()).get('/http-mixed/find').expect(200);
     });
 
     it('find with token → 200 (public read)', async () => {

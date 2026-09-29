@@ -1,10 +1,10 @@
-import { Logger } from "@nestjs/common";
+import { Logger } from '@nestjs/common';
 
 const INTERVAL = 10000;
 const LAG_THRESHOLD = 100;
 
 export function startMetrics(): void {
-  const logger = new Logger("Metrics");
+  const logger = new Logger('Metrics');
 
   let lastCheck = process.hrtime.bigint();
   let maxLag = 0;
@@ -27,7 +27,7 @@ export function startMetrics(): void {
     const heapPercent = ((memory.heapUsed / memory.heapTotal) * 100).toFixed(1);
 
     logger.log(
-      `eventLoop lag=${lag.toFixed(2)}ms max=${maxLag.toFixed(2)}ms events=${lagCount} ${lag > LAG_THRESHOLD ? "SLOW" : "OK"} | heap=${heapUsedMB}/${heapTotalMB}MB (${heapPercent}%) rss=${rssMB}MB ${Number(heapPercent) > 90 ? "HIGH" : "OK"} | uptime=${new Date(process.uptime() * 1000).toISOString().substr(11, 8)}`,
+      `eventLoop lag=${lag.toFixed(2)}ms max=${maxLag.toFixed(2)}ms events=${lagCount} ${lag > LAG_THRESHOLD ? 'SLOW' : 'OK'} | heap=${heapUsedMB}/${heapTotalMB}MB (${heapPercent}%) rss=${rssMB}MB ${Number(heapPercent) > 90 ? 'HIGH' : 'OK'} | uptime=${new Date(process.uptime() * 1000).toISOString().substr(11, 8)}`,
     );
 
     if (process.uptime() % 60 < 10) {

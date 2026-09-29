@@ -1,5 +1,9 @@
 import { IsEmail, IsString, MinLength } from 'class-validator';
-import { DtoColumn, DtoCreatedColumn, DtoUpdatedColumn } from 'api-server-toolkit';
+import {
+  DtoColumn,
+  DtoCreatedColumn,
+  DtoUpdatedColumn,
+} from 'api-server-toolkit';
 import { CommonDto } from 'api-server-toolkit';
 
 export class AccountDto extends CommonDto {

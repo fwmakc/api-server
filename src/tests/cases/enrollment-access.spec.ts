@@ -25,9 +25,24 @@ describe('Enrollment access — service-level (4-hop bindPath)', () => {
     await moduleRef.close();
   });
 
-  const aliceBind = { id: 1, name: 'enrolls.student.account', key: 'id', allow: false };
-  const bobBind = { id: 2, name: 'enrolls.student.account', key: 'id', allow: false };
-  const adminBind = { id: 3, name: 'enrolls.student.account', key: 'id', allow: true };
+  const aliceBind = {
+    id: 1,
+    name: 'enrolls.student.account',
+    key: 'id',
+    allow: false,
+  };
+  const bobBind = {
+    id: 2,
+    name: 'enrolls.student.account',
+    key: 'id',
+    allow: false,
+  };
+  const adminBind = {
+    id: 3,
+    name: 'enrolls.student.account',
+    key: 'id',
+    allow: true,
+  };
 
   it('find — alice sees 2 enrolled courses (1, 3)', async () => {
     const result = await service.find({}, aliceBind);
@@ -99,9 +114,7 @@ describe('Enrollment access — HTTP-level (EntityController)', () => {
 
   describe('GET /http-courses/find', () => {
     it('without token → 401', async () => {
-      await request(app.getHttpServer())
-        .get('/http-courses/find')
-        .expect(401);
+      await request(app.getHttpServer()).get('/http-courses/find').expect(401);
     });
 
     it('with alice → 200, 2 courses', async () => {

@@ -13,9 +13,21 @@ describe('Pagination + Search + Count — bug verification', () => {
   const adminBind = { allow: true };
   const aliceBind = { id: 1, name: 'account', key: 'id', allow: false };
 
-  const searchAlpha: SearchType = { fields: ['title'], terms: ['alpha'], method: undefined };
-  const searchBeta: SearchType = { fields: ['title'], terms: ['beta'], method: undefined };
-  const searchGamma: SearchType = { fields: ['title'], terms: ['gamma'], method: undefined };
+  const searchAlpha: SearchType = {
+    fields: ['title'],
+    terms: ['alpha'],
+    method: undefined,
+  };
+  const searchBeta: SearchType = {
+    fields: ['title'],
+    terms: ['beta'],
+    method: undefined,
+  };
+  const searchGamma: SearchType = {
+    fields: ['title'],
+    terms: ['gamma'],
+    method: undefined,
+  };
   const searchAlphaAndBeta: SearchType = {
     fields: ['title'],
     terms: ['alpha', 'beta'],
@@ -72,7 +84,14 @@ describe('Pagination + Search + Count — bug verification', () => {
           content,
           account: i <= 60 ? alice : bob,
           position: i,
-          createdAt: new Date(2024, 0, 1, Math.floor((i - 1) / 60), (i - 1) % 60, 0),
+          createdAt: new Date(
+            2024,
+            0,
+            1,
+            Math.floor((i - 1) / 60),
+            (i - 1) % 60,
+            0,
+          ),
         }),
       );
     }
@@ -129,10 +148,7 @@ describe('Pagination + Search + Count — bug verification', () => {
     });
 
     it('P5: pagination based on count misses half the results', async () => {
-      const total = await service.count(
-        { search: searchAlpha },
-        adminBind,
-      );
+      const total = await service.count({ search: searchAlpha }, adminBind);
       // count() calls find() without limit → loads all 120 → filters to 60
       // So count is "correct" (60), but pages based on it are wrong:
       const pages = Math.ceil(total / 10); // 6 pages
@@ -210,10 +226,7 @@ describe('Pagination + Search + Count — bug verification', () => {
   // ─────────────────────────────────────────────
   describe('Group 3: BUG — count issues', () => {
     it('P7: count with search returns 0 — select:{id:true} strips searchable fields', async () => {
-      const result = await service.count(
-        { search: searchAlpha },
-        adminBind,
-      );
+      const result = await service.count({ search: searchAlpha }, adminBind);
       // count() does: find.select = { id: true }, then calls find().
       // find() loads rows with only { id } — no title field!
       // searchService tries extractValues(result, ['title']) → null → no match.
@@ -222,10 +235,7 @@ describe('Pagination + Search + Count — bug verification', () => {
     });
 
     it('P8: count with limit returns page count instead of total', async () => {
-      const result = await service.count(
-        { limit: 10, offset: 0 },
-        adminBind,
-      );
+      const result = await service.count({ limit: 10, offset: 0 }, adminBind);
       // BUG: count passes limit to find(), DB returns 10 rows, count returns 10.
       expect(result).toBe(120); // FAILS: actual 10
     });
@@ -241,10 +251,7 @@ describe('Pagination + Search + Count — bug verification', () => {
     });
 
     it('P19: count with bind + search — alice "alpha" (select bug)', async () => {
-      const result = await service.count(
-        { search: searchAlpha },
-        aliceBind,
-      );
+      const result = await service.count({ search: searchAlpha }, aliceBind);
       // Same select bug as P7: title stripped, search finds nothing.
       // BUG: returns 0 instead of 30.
       expect(result).toBe(30); // FAILS: actual 0
@@ -343,10 +350,7 @@ describe('Pagination + Search + Count — bug verification', () => {
     });
 
     it('P12b: alice + search "alpha" — all results correct without pagination', async () => {
-      const result = await service.find(
-        { search: searchAlpha },
-        aliceBind,
-      );
+      const result = await service.find({ search: searchAlpha }, aliceBind);
       // Without limit: all alice's 60 loaded, filtered to 30. Correct.
       expect(result.length).toBe(30);
       // All should belong to alice

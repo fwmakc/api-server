@@ -4,11 +4,22 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PassportModule, PassportStrategy } from '@nestjs/passport';
 import { Strategy as JwtStrategy } from 'passport-jwt';
 import * as jwt from 'jsonwebtoken';
-import { EntityController, RemovePrivateFieldsInterceptor } from 'api-server-toolkit';
+import {
+  EntityController,
+  RemovePrivateFieldsInterceptor,
+} from 'api-server-toolkit';
 import { TestEntities } from './entities';
-import { TestArticleEntity, TestCourseEntity, TestEnrollEntity } from './entities';
+import {
+  TestArticleEntity,
+  TestCourseEntity,
+  TestEnrollEntity,
+} from './entities';
 import { TestArticleDto, TestCourseDto, TestEnrollDto } from './dtos';
-import { TestArticleService, TestCourseService, TestEnrollService } from './services';
+import {
+  TestArticleService,
+  TestCourseService,
+  TestEnrollService,
+} from './services';
 import { seedDatabase } from './app.testingModule';
 
 const TEST_SECRET = 'test-jwt-secret';
@@ -66,7 +77,12 @@ class HttpAccountController extends EntityController({
   name: 'http_account',
   dto: TestArticleDto,
   entity: TestArticleEntity,
-  operations: { read: AUTHENTICATED, create: AUTHENTICATED, update: AUTHENTICATED, delete: AUTHENTICATED },
+  operations: {
+    read: AUTHENTICATED,
+    create: AUTHENTICATED,
+    update: AUTHENTICATED,
+    delete: AUTHENTICATED,
+  },
   relations: ['account', 'comments', 'comments.account', 'tags'],
 })<TestArticleDto, TestArticleEntity, TestArticleService> {
   constructor(readonly service: TestArticleService) {
@@ -92,7 +108,12 @@ class HttpAdminController extends EntityController({
   name: 'http_admin',
   dto: TestArticleDto,
   entity: TestArticleEntity,
-  operations: { read: PUBLIC, create: SUPERUSER, update: SUPERUSER, delete: SUPERUSER },
+  operations: {
+    read: PUBLIC,
+    create: SUPERUSER,
+    update: SUPERUSER,
+    delete: SUPERUSER,
+  },
   relations: ['account', 'comments', 'comments.account', 'tags'],
 })<TestArticleDto, TestArticleEntity, TestArticleService> {
   constructor(readonly service: TestArticleService) {
@@ -105,7 +126,12 @@ class HttpAdminStrictController extends EntityController({
   name: 'http_admin_strict',
   dto: TestArticleDto,
   entity: TestArticleEntity,
-  operations: { read: SUPERUSER, create: SUPERUSER, update: SUPERUSER, delete: SUPERUSER },
+  operations: {
+    read: SUPERUSER,
+    create: SUPERUSER,
+    update: SUPERUSER,
+    delete: SUPERUSER,
+  },
   relations: ['account', 'comments', 'comments.account', 'tags'],
 })<TestArticleDto, TestArticleEntity, TestArticleService> {
   constructor(readonly service: TestArticleService) {
@@ -145,12 +171,22 @@ class HttpCourseController extends EntityController({
   dto: TestCourseDto,
   entity: TestCourseEntity,
   operations: {
-    read: [{ who: ['authenticated'], scope: { owner: 'enrolls.student.account.id' } }],
+    read: [
+      {
+        who: ['authenticated'],
+        scope: { owner: 'enrolls.student.account.id' },
+      },
+    ],
     create: SUPERUSER,
     update: SUPERUSER,
     delete: SUPERUSER,
   },
-  relations: ['enrolls', 'enrolls.student', 'enrolls.course', 'enrolls.student.account'],
+  relations: [
+    'enrolls',
+    'enrolls.student',
+    'enrolls.course',
+    'enrolls.student.account',
+  ],
 })<TestCourseDto, TestCourseEntity, TestCourseService> {
   constructor(readonly service: TestCourseService) {
     super();
@@ -164,9 +200,15 @@ class HttpEnrollController extends EntityController({
   entity: TestEnrollEntity,
   operations: {
     read: [{ who: ['authenticated'], scope: { owner: 'student.account.id' } }],
-    create: [{ who: ['authenticated'], scope: { owner: 'student.account.id' } }],
-    update: [{ who: ['authenticated'], scope: { owner: 'student.account.id' } }],
-    delete: [{ who: ['authenticated'], scope: { owner: 'student.account.id' } }],
+    create: [
+      { who: ['authenticated'], scope: { owner: 'student.account.id' } },
+    ],
+    update: [
+      { who: ['authenticated'], scope: { owner: 'student.account.id' } },
+    ],
+    delete: [
+      { who: ['authenticated'], scope: { owner: 'student.account.id' } },
+    ],
   },
   relations: ['course', 'student', 'student.account', 'course.enrolls'],
 })<TestEnrollDto, TestEnrollEntity, TestEnrollService> {
@@ -248,7 +290,12 @@ export const createHttpTestApp = async (): Promise<{
       HttpNoRelationsController,
       HttpDefaultController,
     ],
-    providers: [TestArticleService, TestCourseService, TestEnrollService, MockJwtStrategy],
+    providers: [
+      TestArticleService,
+      TestCourseService,
+      TestEnrollService,
+      MockJwtStrategy,
+    ],
   }).compile();
 
   await seedDatabase(moduleRef);

@@ -8,7 +8,9 @@ const MIGRATIONS = [join(__dirname, '../typeorm/migrations/*{.ts,.js}')];
 export const getDbConfig = async (
   config: ConfigService,
 ): Promise<TypeOrmModuleOptions> => ({
-  type: config.get<'mysql' | 'postgres' | 'sqlite' | 'mssql' | 'oracle' | 'mongodb'>('DB_TYPE'),
+  type: config.get<
+    'mysql' | 'postgres' | 'sqlite' | 'mssql' | 'oracle' | 'mongodb'
+  >('DB_TYPE'),
   host: config.get<string>('DB_HOST'),
   database: config.get<string>('DB_NAME'),
   schema: config.get<string>('DB_SCHEMA'),

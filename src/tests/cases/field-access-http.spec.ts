@@ -173,10 +173,7 @@ describe('HTTP Field Rules — stripping via interceptor', () => {
     const resBob = await request(app.getHttpServer())
       .get('/http-public/find')
       .query({
-        relations: JSON.stringify([
-          { name: 'account' },
-          { name: 'comments' },
-        ]),
+        relations: JSON.stringify([{ name: 'account' }, { name: 'comments' }]),
       })
       .set('Authorization', `Bearer ${BOB_TOKEN}`)
       .expect(200);

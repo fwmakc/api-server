@@ -5,9 +5,7 @@ describe('Unit — dynamic SQL services', () => {
     let parseDynamicWhereObject: any;
 
     beforeAll(async () => {
-      ({ parseDynamicWhereObject } = await import(
-        'api-server-toolkit'
-      ));
+      ({ parseDynamicWhereObject } = await import('api-server-toolkit'));
     });
 
     it('D1: null where returns empty array', () => {
@@ -172,9 +170,7 @@ describe('Unit — dynamic SQL services', () => {
     let parseDynamicSaveObject: any;
 
     beforeAll(async () => {
-      ({ parseDynamicSaveObject } = await import(
-        'api-server-toolkit'
-      ));
+      ({ parseDynamicSaveObject } = await import('api-server-toolkit'));
     });
 
     it('S1: string value — quoted and escaped', () => {
@@ -240,9 +236,7 @@ describe('Unit — dynamic SQL services', () => {
     it('P1: postgres uses $1, $2, ...', async () => {
       process.env.DB_TYPE = 'postgres';
       jest.resetModules();
-      const { prepareParams } = await import(
-        'api-server-toolkit'
-      );
+      const { prepareParams } = await import('api-server-toolkit');
       const result = prepareParams({ name: 'test', count: 1 }) as any;
       expect(result.name).toBe('$1');
       expect(result.count).toBe('$2');
@@ -251,9 +245,7 @@ describe('Unit — dynamic SQL services', () => {
     it('P2: mysql uses ?', async () => {
       process.env.DB_TYPE = 'mysql';
       jest.resetModules();
-      const { prepareParams } = await import(
-        'api-server-toolkit'
-      );
+      const { prepareParams } = await import('api-server-toolkit');
       const result = prepareParams({ name: 'test', count: 1 }) as any;
       expect(result.name).toBe('?');
       expect(result.count).toBe('?');
