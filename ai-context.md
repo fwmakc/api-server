@@ -1,7 +1,7 @@
 # AI Context — api-server
 
 > Auto-generated. Run `npm run ai-context` to regenerate.
-> Generated: 2026-09-27T15:26:54.711Z
+> Generated: 2026-09-30T15:47:37.745Z
 
 ---
 

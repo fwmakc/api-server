@@ -11,9 +11,11 @@ import {
 import {
   BooleanColumn,
   CreatedColumn,
+  DateColumn,
   IdColumn,
   IntColumn,
   PermissionRegistry,
+  SoftDelete,
   TextColumn,
   UpdatedColumn,
   VarcharColumn,
@@ -281,6 +283,23 @@ export class TestEnrollEntity extends BaseEntity {
   student: TestStudentEntity;
 }
 
+@Entity({ name: 'test_softs' })
+export class TestSoftEntity extends BaseEntity {
+  @IdColumn()
+  id: number;
+
+  @VarcharColumn('title')
+  title: string;
+
+  @SoftDelete()
+  @DateColumn('deleted_at')
+  deletedAt?: Date;
+
+  @ManyToOne(() => TestAccountEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'account_id', referencedColumnName: 'id' })
+  account: TestAccountEntity;
+}
+
 // ── Правила полей (видимость/запись по ролям) ──────────────────────────
 // Ранее задавались декораторами @FieldAccess на entity, теперь — fields-
 // конфиг сущности. Роли: editor — редактор, superuser — байпас/явное правило.
@@ -373,4 +392,5 @@ export const TestEntities = [
   TestStudentEntity,
   TestEnrollEntity,
   TestCourseEntity,
+  TestSoftEntity,
 ];

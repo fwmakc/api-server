@@ -6,7 +6,11 @@ import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
 import { DataSource } from 'typeorm';
 import { addTransactionalDataSource } from 'typeorm-transactional';
 import { getDbConfig } from '@config/db.config';
-import { RemovePrivateFieldsInterceptor, AuditModule } from 'api-server-toolkit';
+import {
+  RemovePrivateFieldsInterceptor,
+  AuditModule,
+  AccessModule,
+} from 'api-server-toolkit';
 import { HealthModule } from 'api-server-toolkit/health';
 import { MetricsModule } from 'api-server-toolkit/metrics';
 import AppImports from './app.imports';
@@ -28,6 +32,9 @@ import AppImports from './app.imports';
     HealthModule.forRoot('api-server'),
     MetricsModule.forRoot({ service: 'api-server' }),
     AuditModule.forRoot(),
+    // fail-fast: валидирует dot-path'и scope и имена полей Access-конфигов
+    // против entity-метаданных на старте
+    AccessModule.forRoot(),
   ],
   providers: [
     {

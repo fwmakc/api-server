@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.7] - 2026-09-30
+### Added
+- `AccessModule.forRoot()` (toolkit 0.22.0): Access-конфиги (dot-path'и scope, имена полей fields) валидируются против entity-метаданных на старте — опечатка в правиле роняет сервис при загрузке, а не превращается в молча неработающий скоуп.
+
+### Changed
+- Toolkit pinned `#v0.22.0` (self-pentest wave 4): `AccessRule.filter` теперь реально компилируется в bind (публичные правила с фильтром, например `isPublished`, работают), scope-all даёт явный bind без allow-байпаса, owner/tenant-бинды без id/tenantId падают с 403 вместо запроса по всей таблице, `remove`/`hardDelete`/`restore` проверяют скоуп для tenant-биндов, `movePosition` не двигает чужие строки, search по dotted-полям больше не расширяет загрузку связей, `getClientIp()`/`TRUST_PROXY` убирают спуфинг `X-Forwarded-For`.
+
 ## [0.7.6] - 2026-09-30
 ### Added
 - `AuditModule.forRoot()` (toolkit 0.21.1): successful mutations (non-GET 2xx) are audited as `data.created` / `data.updated` / `data.deleted` and 403s as `access.denied`, published to event-server 0.8.0's tamper-evident `audit_events` store.

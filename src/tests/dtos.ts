@@ -78,3 +78,7 @@ export class TestEnrollDto extends CommonDto {
   course?: any;
   student?: any;
 }
+
+export class TestSoftDto extends CommonDto {
+  title?: string;
+}

@@ -17,6 +17,7 @@ import {
   DynamicTestService,
   TestCourseService,
   TestEnrollService,
+  TestSoftService,
 } from './services';
 
 export const createTestModule = async (): Promise<TestingModule> => {
@@ -52,6 +53,7 @@ export const createTestModule = async (): Promise<TestingModule> => {
       DynamicTestService,
       TestCourseService,
       TestEnrollService,
+      TestSoftService,
     ],
   }).compile();
 
