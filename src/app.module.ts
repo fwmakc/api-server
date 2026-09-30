@@ -3,13 +3,14 @@ import { Module } from '@nestjs/common';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
-import { DataSource } from 'typeorm';
+import { DataSource, DataSourceOptions } from 'typeorm';
 import { addTransactionalDataSource } from 'typeorm-transactional';
 import { getDbConfig } from '@config/db.config';
 import {
   RemovePrivateFieldsInterceptor,
   AuditModule,
   AccessModule,
+  runMigrationsUnderLock,
 } from 'api-server-toolkit';
 import { HealthModule } from 'api-server-toolkit/health';
 import { MetricsModule } from 'api-server-toolkit/metrics';
@@ -25,7 +26,15 @@ import AppImports from './app.imports';
       useFactory: getDbConfig,
       async dataSourceFactory(option) {
         if (!option) throw new Error('Invalid options passed');
-        return addTransactionalDataSource(new DataSource(option));
+        // Serialize boot migrations across replicas (TypeORM has no
+        // built-in migration locking); the helper consumes `migrationsRun`.
+        const { migrationsRun, ...dsOption } = option;
+        if (migrationsRun) {
+          await runMigrationsUnderLock(dsOption as DataSourceOptions);
+        }
+        return addTransactionalDataSource(
+          new DataSource(dsOption as DataSourceOptions),
+        );
       },
     }),
     ...AppImports,
