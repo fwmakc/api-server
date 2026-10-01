@@ -51,7 +51,7 @@ describe('LMS Performance', () => {
           host: 'localhost',
           port: 5432,
           username: 'root',
-          password: '1234',
+          password: process.env.DB_PASSWORD || '1234',
           database: 'api_server_test',
           entities: LmsEntities,
           synchronize: true,
