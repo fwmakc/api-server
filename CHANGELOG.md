@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.9] - 2026-10-02
+### Security (Wave 6)
+- **Вложенный `account` у постов больше не сливает email и служебные флаги**: username (= email) теперь виден только аутентифицированным, `isActivated`/`isSuperuser` — только superuser (rules в PermissionRegistry для AccountEntity, применяются ко всем вложенным появлениям). Раньше аноним через `GET /posts?relations=account` получал email автора и его привилегии — перечисление адресов + раскрытие служебного статуса.
+- **`settings.value` скрыт от анонимов** (field-rule: response — authenticated): публичный read отдаёт `default`; живое значение может разойтись с дефолтом и содержать внутренние данные.
+- **Swagger-описание `posts.secretNotes` приведено к фактическим правилам** (editor/admin, а не «read/write — owner», как было написано).
+
+### Tests
+- `account-settings-field-rules.spec` — регрессии на реальных сущностях: аноним не видит username/password/флаги аккаунта, authenticated видит username, superuser — всё; settings.value стрипается анониму, default — публичный; secretNotes — только editor/admin.
+
+### Dependencies
+- `api-server-toolkit` синхронизирован до **0.26.2** (фикс dot-path criteria в remove — Multi-hop MH10).
+
 ## [0.7.8] - 2026-09-30
 ### Changed (dependency)
 - `api-server-toolkit` v0.23.0: boot migrations now run through

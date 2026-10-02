@@ -25,7 +25,7 @@ export class PostsDto extends CommonDto {
   @DtoColumn('Флаг публикации, отключение может сделать запись недоступной')
   isPublished: boolean;
 
-  @DtoColumn('Приватные заметки автора (доступ: read — owner, write — owner)')
+  @DtoColumn('Приватные заметки автора (видны и принимаются только от editor/admin)')
   secretNotes: string;
 
   @ApiProperty({

@@ -33,12 +33,24 @@ export class AccountEntity extends BaseEntity {
 }
 
 // Аккаунт в api-server — только цель связей (контроллера нет), но пароль
-// нельзя отдавать даже во вложенных ответах. Правила видимости — в реестре.
+// нельзя отдавать даже во вложенных ответах, а username — это email
+// (перечисление адресов через ?relations=account у постов), флаги
+// isActivated/isSuperuser — служебная информация. Правила — в реестре;
+// они применяются ко всем вложенным появлениям AccountEntity.
 PermissionRegistry.set(AccountEntity, {
   fields: {
     password: {
       response: [{ who: ['superuser'] }],
       request: [{ who: ['superuser'] }],
+    },
+    username: {
+      response: [{ who: ['authenticated'] }],
+    },
+    isActivated: {
+      response: [{ who: ['superuser'] }],
+    },
+    isSuperuser: {
+      response: [{ who: ['superuser'] }],
     },
   },
 });

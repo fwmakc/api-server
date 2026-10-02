@@ -15,6 +15,13 @@ export class SettingsController extends EntityController({
     update: [{ who: ['superuser'] }],
     delete: [{ who: ['superuser'] }],
   },
+  // анонимные читатели получают default; живое value может разойтись с ним
+  // и содержать внутренние данные — только для залогиненных
+  fields: {
+    value: {
+      response: [{ who: ['authenticated'] }],
+    },
+  },
 })<SettingsDto, SettingsEntity, SettingsService> {
   constructor(readonly service: SettingsService) {
     super();
