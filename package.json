@@ -39,7 +39,8 @@
     "migration:create": "npm run typeorm migration:create --",
     "migration:fake": "npm run migration:run -- --fake",
     "migration:revert": "npm run typeorm migration:revert",
-    "migration:run": "npm run typeorm migration:run -- -d ./src/config/typeorm.config.ts"
+    "migration:run": "npm run typeorm migration:run -- -d ./src/config/typeorm.config.ts",
+    "test:wiring": "ts-node -r tsconfig-paths/register scripts/wiring.ts"
   },
   "engines": {
     "node": ">=20"

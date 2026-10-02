@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Tests
+- **Wiring-проверка реального бута** (`scripts/wiring.ts`, `npm run test:wiring`): поднимает настоящий `AppModule` в контексте приложения на чистой БД `api_server_wiring_test` (drop/create + реальные boot-миграции через `runMigrationsUnderLock` — ловит дрейф entity↔migrations, который не видят существующие сьюты на тестовых сущностях с `synchronize: true`), затем живые пробы: валидация `AccessModule.forRoot`, settings create/read-back, posts create/read-back с bind. 5/5 проверок, exit code для CI. Запуск через ts-node (не jest — под jest-рантаймом бут полного AppModule портит кэш модуля `pg`, гонка jest-only, в проде не воспроизводится).
+- CI: новый job `wiring` с TZ-матрицей (UTC + Europe/Moscow).
+
 ## [0.7.9] - 2026-10-02
 ### Security (Wave 6)
 - **Вложенный `account` у постов больше не сливает email и служебные флаги**: username (= email) теперь виден только аутентифицированным, `isActivated`/`isSuperuser` — только superuser (rules в PermissionRegistry для AccountEntity, применяются ко всем вложенным появлениям). Раньше аноним через `GET /posts?relations=account` получал email автора и его привилегии — перечисление адресов + раскрытие служебного статуса.
