@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- **Docker-сборка с чистого кэша снова работает** (три независимых излома): (1) `npm prune` после `COPY api-server/ .` видел оригинальный package.json с git-пином тулкита и падал `spawn git ENOENT` (в alpine нет git) — stub-rewrite теперь применяется повторно после COPY, а `tsc` перенесён ДО prune (prune срезает typescript, и `npx tsc` без него ставит пакет-пустышку `tsc`). (2) `tsconfig.build.json` без `rootDir`: `allowJs` втягивал `scripts/wiring.ts` + `audit-gate.mjs`, rootDir поднимался до корня проекта, и образ собирался как `dist/src/main.js`, который `CMD dist/main` не находит — `rootDir: src` + exclude `scripts` возвращает `dist/main.js`. (3) `@types/babel__generator` (нужен tsconfig `types`) был только транзитивной dev-зависимостью и вырезался prune — теперь явная dependencies-запись.
+
+### Tests
+- `scripts/wiring.ts`: кредиты БД переопределяются через env (`DB_PASSWORD`), дефолт не изменился.
+
 ### Tests
 - **Wiring-проверка реального бута** (`scripts/wiring.ts`, `npm run test:wiring`): поднимает настоящий `AppModule` в контексте приложения на чистой БД `api_server_wiring_test` (drop/create + реальные boot-миграции через `runMigrationsUnderLock` — ловит дрейф entity↔migrations, который не видят существующие сьюты на тестовых сущностях с `synchronize: true`), затем живые пробы: валидация `AccessModule.forRoot`, settings create/read-back, posts create/read-back с bind. 5/5 проверок, exit code для CI. Запуск через ts-node (не jest — под jest-рантаймом бут полного AppModule портит кэш модуля `pg`, гонка jest-only, в проде не воспроизводится).
 - CI: новый job `wiring` с TZ-матрицей (UTC + Europe/Moscow).

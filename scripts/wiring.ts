@@ -12,7 +12,7 @@ process.env.DB_TYPE = "postgres";
 process.env.DB_HOST = "127.0.0.1";
 process.env.DB_PORT = "5432";
 process.env.DB_USER = "root";
-process.env.DB_PASSWORD = "1234";
+process.env.DB_PASSWORD = process.env.DB_PASSWORD || "1234";
 process.env.DB_NAME = "api_server_wiring_test";
 process.env.EVENT_SERVER_URL = "http://127.0.0.1:9";
 process.env.THROTTLE_STORAGE = "memory";
@@ -41,7 +41,7 @@ async function recreateDatabase(): Promise<void> {
     host: "127.0.0.1",
     port: 5432,
     user: "root",
-    password: "1234",
+    password: process.env.DB_PASSWORD || "1234",
     database: "postgres",
   });
   await client.connect();
