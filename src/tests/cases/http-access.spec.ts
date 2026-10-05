@@ -340,12 +340,14 @@ describe('HTTP Access Control — full guard pipeline', () => {
         .expect(401);
     });
 
-    it('remove not-owned with alice → 200 but false', async () => {
-      const res = await request(app.getHttpServer())
+    // toolkit: no-op delete answers 404 — an out-of-scope row is
+    // indistinguishable from a missing one (Access model, rows outside
+    // scope → 404)
+    it('remove not-owned with alice → 404', async () => {
+      await request(app.getHttpServer())
         .delete('/http-owner/remove/3')
         .set('Authorization', `Bearer ${ALICE_TOKEN}`)
-        .expect(200);
-      expect(res.text).toContain('false');
+        .expect(404);
     });
 
     it('remove own with alice → 200 true', async () => {
@@ -362,12 +364,11 @@ describe('HTTP Access Control — full guard pipeline', () => {
       expect(res.text).toContain('true');
     });
 
-    it('remove not-owned with bob → 200 but false', async () => {
-      const res = await request(app.getHttpServer())
+    it('remove not-owned with bob → 404', async () => {
+      await request(app.getHttpServer())
         .delete('/http-owner/remove/1')
         .set('Authorization', `Bearer ${BOB_TOKEN}`)
-        .expect(200);
-      expect(res.text).toContain('false');
+        .expect(404);
     });
 
     it('remove not-owned with admin → 200 true (bypass)', async () => {

@@ -60,9 +60,12 @@ describe('Protection — controller-level access control', () => {
     ).rejects.toThrow(NotFoundException);
   });
 
-  it('N13: non-owner remove → false', async () => {
-    const result = await articleController.remove('3', aliceAuth);
-    expect(result).toBe(false);
+  // toolkit: no-op delete answers 404 — an out-of-scope row is
+  // indistinguishable from a missing one (consistent with update)
+  it('N13: non-owner remove → NotFoundException', async () => {
+    await expect(
+      articleController.remove('3', aliceAuth),
+    ).rejects.toThrow(NotFoundException);
   });
 
   it('N14: admin update → success (own article)', async () => {

@@ -57,6 +57,13 @@ describe('LMS Performance', () => {
           synchronize: true,
           dropSchema: false,
           logging: false,
+          // The stack postgres runs statement_timeout=60000 (runaway-query
+          // guard, gateway compose). This benchmark deliberately seeds 1M
+          // rows and runs slow "old approach" JOINs — the 60s cap kills the
+          // seed mid-INSERT. CI's postgres has no guard; opt out for stack
+          // runs only (pg sends it per connection, server default untouched).
+          // STRING "0": pg checks truthiness and skips the numeric 0.
+          extra: { statement_timeout: "0" },
         }),
         TypeOrmModule.forFeature(LmsEntities),
       ],
