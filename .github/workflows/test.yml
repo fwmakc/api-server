@@ -26,10 +26,10 @@ jobs:
           --health-retries 5
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
@@ -64,10 +64,10 @@ jobs:
           --health-retries 5
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 24
 
@@ -112,7 +112,7 @@ jobs:
   docker-build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           path: api-server
 
@@ -125,7 +125,7 @@ jobs:
           echo "TOOLKIT_REF=$(node -p "require('./api-server/package.json').dependencies['api-server-toolkit'].split('#')[1]")" >> $GITHUB_ENV
 
       # Dockerfile copies the toolkit from a sibling directory
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           repository: fwmakc/api-server-toolkit
           ref: ${{ env.TOOLKIT_REF }}
@@ -133,7 +133,7 @@ jobs:
 
       # dist/ is gitignored in the toolkit — build it for the Docker COPY
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 24
 
@@ -141,7 +141,7 @@ jobs:
         run: cd api-server-toolkit && npm install --legacy-peer-deps --ignore-scripts && npx tsc
 
       - name: Build Docker image (no push)
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: api-server/Dockerfile
@@ -150,10 +150,10 @@ jobs:
   security:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 24
 
@@ -170,7 +170,7 @@ jobs:
         run: npm sbom --sbom-format cyclonedx > sbom.cdx.json
 
       - name: Upload SBOM artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: sbom
           path: sbom.cdx.json
@@ -194,10 +194,10 @@ jobs:
           --health-retries 5
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
