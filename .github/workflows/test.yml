@@ -123,6 +123,7 @@ jobs:
       - name: Resolve sibling pins from package.json
         run: |
           echo "TOOLKIT_REF=$(node -p "require('./api-server/package.json').dependencies['api-server-toolkit'].split('#')[1]")" >> $GITHUB_ENV
+          echo "EVENTSERVER_REF=$(node -p "require('./api-server/package.json').dependencies['event-server'].split('#')[1]")" >> $GITHUB_ENV
 
       # Dockerfile copies the toolkit from a sibling directory
       - uses: actions/checkout@v7
@@ -130,6 +131,13 @@ jobs:
           repository: fwmakc/api-server-toolkit
           ref: ${{ env.TOOLKIT_REF }}
           path: api-server-toolkit
+
+      # Dockerfile copies prebuilt event contracts (dist/contracts is committed in the event-server repo)
+      - uses: actions/checkout@v7
+        with:
+          repository: fwmakc/event-server
+          ref: ${{ env.EVENTSERVER_REF }}
+          path: event-server
 
       # dist/ is gitignored in the toolkit — build it for the Docker COPY
       - name: Setup Node.js
