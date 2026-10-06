@@ -25,7 +25,11 @@ async function main() {
     await import('typeorm-transactional');
   initializeTransactionalContext();
 
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  // rawBody keeps the exact request bytes for the EventDeliveryGuard
+  // (HMAC is verified over the signed string, not the re-serialized body).
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    rawBody: true,
+  });
 
   Sentry.setup(app);
   Helmet.setup(app);

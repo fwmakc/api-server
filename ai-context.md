@@ -1,7 +1,7 @@
 # AI Context — api-server
 
 > Auto-generated. Run `npm run ai-context` to regenerate.
-> Generated: 2026-09-30T15:47:37.745Z
+> Generated: 2026-10-06T08:43:17.769Z
 
 ---
 
@@ -97,6 +97,44 @@ Base path: `/settings/groups`
 | `POST` | `/settings/groups/position/move/:id` |
 | `DELETE` | `/settings/groups/remove/:id` |
 
+### WebhooksController
+
+Base path: `/webhooks`
+
+| Method | Path |
+|--------|------|
+| `POST` | `/webhooks/events` |
+
+---
+
+## Services
+
+### SubscriberService
+
+- `onApplicationBootstrap(): Promise<void>`
+- `register(retry = 0): Promise<void>`
+- `httpPost(`${this.eventServerUrl}/subscribe`,
+        {
+          service: "api-server",
+          url: this.webhookUrl,
+          patterns: this.patterns,
+          active: true,
+          // Регистрация идемпотентна (тот же service+url мержится): свежий
+          // секрет перепрописывает сохранённый, например после ротации.
+          ...(this.webhookSecret ?`
+
+### WebhooksService
+
+- `handleEvent(event: WebhookEnvelopeDto): Promise<void>`
+- `onRegistered(em: EntityManager,
+    payload: UserRegisteredDto,): Promise<void>`
+- `onConfirmed(em: EntityManager,
+    payload: UserConfirmedDto,): Promise<void>`
+- `onDeactivated(em: EntityManager,
+    payload: UserDeactivatedDto,): Promise<void>`
+- `onDeleted(em: EntityManager,
+    payload: UserDeletedDto,): Promise<void>`
+
 ---
 
 ## Entities
@@ -181,6 +219,9 @@ Relations: `SettingsGroupsEntity`
 | `isDisabled` | `boolean` |
 
 Relations: `SettingsEntity`
+
+
+### ProcessedEventEntity (table: `webhook_processed_events`)
 
 
 ---

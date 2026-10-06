@@ -1,5 +1,6 @@
 import { PassportModule } from '@nestjs/passport';
 import { AccountModule } from './account/account.module';
+import { WebhooksModule } from './webhooks/webhooks.module';
 
 import { PostsModule } from './db/posts/posts.module';
 import { PostsCategoriesModule } from './db/posts/posts_categories/posts_categories.module';
@@ -10,6 +11,7 @@ import { SettingsGroupsModule } from './db/settings/settings_groups/settings_gro
 export default [
   PassportModule,
   AccountModule,
+  WebhooksModule,
 
   PostsModule,
   PostsCategoriesModule,

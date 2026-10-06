@@ -1,6 +1,6 @@
 {
   "name": "api-server",
-  "version": "0.7.9",
+  "version": "0.8.0",
   "description": "API backend service with REST based on Nest.js and TypeORM",
   "private": true,
   "license": "MIT",
@@ -64,6 +64,7 @@
     "class-validator": "^0.15.1",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.3.1",
+    "event-server": "github:fwmakc/event-server#v1.4.0",
     "helmet": "^8.3.0",
     "js-yaml": "^4.1.0",
     "jwks-rsa": "^4.1.0",

@@ -188,6 +188,9 @@ levels, relation whitelisting, field-level security, and the full `EntityControl
 | `AUTH_CACHE_TTL` | 30000 | Auth cache TTL in ms (account info from auth-server) |
 | `CORS_ORIGIN` | * | Comma-separated allowed origins |
 | `INTERNAL_API_KEY` | — | Shared secret for service-to-service calls |
+| `EVENT_SERVER_URL` | http://event-server:3005 | Event bus (accounts-mirror subscription) |
+| `WEBHOOK_URL` | http://api-server:5000/webhooks/events | Receiver URL announced to event-server |
+| `WEBHOOK_SECRET` | — | HMAC secret for signed deliveries (same value as event-server's) |
 | `SWAGGER_PREFIX` | swagger | Swagger UI path |
 
 See `.env.example` for the full list.
@@ -205,6 +208,22 @@ npm run migration:revert  # revert the last migration
 CI verifies on every push that the migration chain builds the schema from scratch and that entities have no drift against it (a generated diff must be empty).
 
 Writing migrations for zero-downtime deploys (expand-contract): ship additive changes first (add nullable column, write to both), remove old columns in a later release — never rename or drop in one step. With multiple replicas of this service, move migration out of boot: disable `migrationsRun` in `src/config/db.config.ts` and run `migration:run` once per deploy (from CI or a one-shot container) before rolling new code.
+
+## Accounts mirror (event-driven projection)
+
+`posts.account_id` carries a real FK to the local `accounts` table, but accounts are owned by auth-server — api-server keeps a **read-only projection** so owner-scoped writes survive the FK. There is no CRUD route for accounts; rows are written only from the event bus.
+
+- **Receiver**: `POST /webhooks/events` behind the toolkit `EventDeliveryGuard` (HMAC `X-Event-Signature` when `WEBHOOK_SECRET` is set, legacy shared `X-Internal-Api-Key` otherwise). Raw-body parsing is on (`rawBody: true`) — signatures verify over the exact bytes.
+- **Patterns**: `user.registered` → insert (`is_activated = !confirmUrl`), `user.confirmed` → activate (also self-heals a lost `registered`), `user.deactivated` → deactivate, `user.deleted` → delete. A delete blocked by referencing posts (FK `NO ACTION`) keeps the row as an inert tombstone — posts stay joinable, login is impossible (the account is gone upstream).
+- **Ordering safety**: `registered` uses `ON CONFLICT (id) DO NOTHING`, so a redelivered registration can never re-deactivate a confirmed account; every delivery is marked in `webhook_processed_events` in the same transaction as the mutation (crash = retry, never double-apply).
+- **Credentials**: the mirror never stores passwords — the `password` column stays at its empty default and is response-stripped by the field rules in `PermissionRegistry`.
+- **Backfill** (one-off per live install — events cover only new registrations):
+  ```bash
+  # from gateway-server stack (or locally with AUTH_SERVER_URL pointing at auth)
+  node -r tsconfig-paths/register dist/scripts/backfill-accounts.js
+  # → {"status":"ok","mirrored":N,"existing":M}   idempotent, safe to re-run
+  ```
+- **Subscription**: on boot the service registers with event-server (`service: api-server`, the four patterns above). Env: `EVENT_SERVER_URL`, `WEBHOOK_URL` (default `http://api-server:5000[/PREFIX]/webhooks/events`), `WEBHOOK_SECRET` (same value as event-server's to enable signed delivery).
 
 ## API reference
 

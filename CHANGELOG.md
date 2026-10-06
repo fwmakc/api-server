@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2026-10-06
+### Added
+- **Accounts mirror — event-driven projection** (closes the wave-6 HIGH
+  finding «accounts-mirror seam»). `posts.account_id` держит реальный FK
+  на локальную таблицу `accounts`, но аккаунты принадлежат auth-server —
+  теперь api-server подписан на шину (`POST /webhooks/events`, guard
+  `EventDeliveryGuard`: HMAC `WEBHOOK_SECRET` / легаси internal-key) и
+  ведёт read-only проекцию: `user.registered` (insert, `is_activated =
+  !confirmUrl`), `user.confirmed` (activate + self-heal потерянного
+  register), `user.deactivated`, `user.deleted` (при FK-конфликте от
+  постов — инертный tombstone). Дедупликация через
+  `webhook_processed_events` в одной транзакции с мутацией (краш = ретрай,
+  никогда двойное применение); `registered` идёт через `ON CONFLICT DO
+  NOTHING` — повторная доставка не разактивирует подтверждённый аккаунт.
+  Пароли зеркалом не хранятся. CRUD-маршрута у зеркала нет.
+- **`scripts/backfill-accounts.ts`** — разовый бэкфилл существующих
+  аккаунтов через новый internal-листинг auth-server
+  (`GET /account/internal/list`, курсорный обход), идемпотентен
+  (ON CONFLICT DO NOTHING, `RETURNING`-счётчики mirrored/existing).
+- main.ts: `rawBody: true` (HMAC верифицируется над точными байтами);
+  подписка на event-server при бутстрапе (patterns: 4 lifecycle-события,
+  retry с backoff, `WEBHOOK_URL`/`WEBHOOK_SECRET`/`PREFIX`).
+
 ## [Unreleased]
 ### Fixed
 - **Docker-сборка с чистого кэша снова работает** (три независимых излома): (1) `npm prune` после `COPY api-server/ .` видел оригинальный package.json с git-пином тулкита и падал `spawn git ENOENT` (в alpine нет git) — stub-rewrite теперь применяется повторно после COPY, а `tsc` перенесён ДО prune (prune срезает typescript, и `npx tsc` без него ставит пакет-пустышку `tsc`). (2) `tsconfig.build.json` без `rootDir`: `allowJs` втягивал `scripts/wiring.ts` + `audit-gate.mjs`, rootDir поднимался до корня проекта, и образ собирался как `dist/src/main.js`, который `CMD dist/main` не находит — `rootDir: src` + exclude `scripts` возвращает `dist/main.js`. (3) `@types/babel__generator` (нужен tsconfig `types`) был только транзитивной dev-зависимостью и вырезался prune — теперь явная dependencies-запись.
