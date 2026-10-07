@@ -29,6 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   retry с backoff, `WEBHOOK_URL`/`WEBHOOK_SECRET`/`PREFIX`).
 
 ## [Unreleased]
+### Added
+- **Кросс-репличная инвалидация auth-client через шину событий**: каждая доставка `user.roles_changed` / `user.deactivated` / `user.deleted` сбрасывает кэш auth-client для этого пользователя — вне ledger (`webhook_processed_events` дедуплицирует только мутации зеркала, у каждой реплики свой кэш). Подписки: `user.roles_changed` добавлен в паттерны; webhook-url по умолчанию строится от hostname контейнера — N реплик = N подписчиков в event-server (per-replica fan-out), `WEBHOOK_URL` перекрывает для одиночного режима. Пин event-server#v1.6.0 (`UserRolesChangedDto`).
 ### Fixed
 - **Docker-сборка с чистого кэша снова работает** (три независимых излома): (1) `npm prune` после `COPY api-server/ .` видел оригинальный package.json с git-пином тулкита и падал `spawn git ENOENT` (в alpine нет git) — stub-rewrite теперь применяется повторно после COPY, а `tsc` перенесён ДО prune (prune срезает typescript, и `npx tsc` без него ставит пакет-пустышку `tsc`). (2) `tsconfig.build.json` без `rootDir`: `allowJs` втягивал `scripts/wiring.ts` + `audit-gate.mjs`, rootDir поднимался до корня проекта, и образ собирался как `dist/src/main.js`, который `CMD dist/main` не находит — `rootDir: src` + exclude `scripts` возвращает `dist/main.js`. (3) `@types/babel__generator` (нужен tsconfig `types`) был только транзитивной dev-зависимостью и вырезался prune — теперь явная dependencies-запись.
 

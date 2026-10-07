@@ -189,7 +189,7 @@ levels, relation whitelisting, field-level security, and the full `EntityControl
 | `CORS_ORIGIN` | * | Comma-separated allowed origins |
 | `INTERNAL_API_KEY` | — | Shared secret for service-to-service calls |
 | `EVENT_SERVER_URL` | http://event-server:3005 | Event bus (accounts-mirror subscription) |
-| `WEBHOOK_URL` | http://api-server:5000/webhooks/events | Receiver URL announced to event-server |
+| `WEBHOOK_URL` | — | Overrides the per-replica default webhook url (own container hostname) — use for single-instance mode |
 | `WEBHOOK_SECRET` | — | HMAC secret for signed deliveries (same value as event-server's) |
 | `SWAGGER_PREFIX` | swagger | Swagger UI path |
 
@@ -214,7 +214,8 @@ Writing migrations for zero-downtime deploys (expand-contract): ship additive ch
 `posts.account_id` carries a real FK to the local `accounts` table, but accounts are owned by auth-server — api-server keeps a **read-only projection** so owner-scoped writes survive the FK. There is no CRUD route for accounts; rows are written only from the event bus.
 
 - **Receiver**: `POST /webhooks/events` behind the toolkit `EventDeliveryGuard` (HMAC `X-Event-Signature` when `WEBHOOK_SECRET` is set, legacy shared `X-Internal-Api-Key` otherwise). Raw-body parsing is on (`rawBody: true`) — signatures verify over the exact bytes.
-- **Patterns**: `user.registered` → insert (`is_activated = !confirmUrl`), `user.confirmed` → activate (also self-heals a lost `registered`), `user.deactivated` → deactivate, `user.deleted` → delete. A delete blocked by referencing posts (FK `NO ACTION`) keeps the row as an inert tombstone — posts stay joinable, login is impossible (the account is gone upstream).
+- **Patterns**: `user.registered` → insert (`is_activated = !confirmUrl`), `user.confirmed` → activate (also self-heals a lost `registered`), `user.deactivated` → deactivate, `user.deleted` → delete, `user.roles_changed` → no mirror write (roles live in auth-server). A delete blocked by referencing posts (FK `NO ACTION`) keeps the row as an inert tombstone — posts stay joinable, login is impossible (the account is gone upstream).
+- **Cache invalidation**: every delivery of `user.deactivated` / `user.deleted` / `user.roles_changed` also drops the auth-client cache entry for that user — **on every delivery, outside the `webhook_processed_events` ledger**. The ledger dedupes mirror writes (they must apply once), but each replica owns its own auth cache, so invalidation must run per replica. This closes the multi-replica gap where a role revocation stayed visible for up to the cache TTL (30 s) on replicas other than the one that issued the token check. Remaining TTL-bound edge: renaming a role itself (`roles.controller` update) does not emit the event — holders' caches age out naturally.
 - **Ordering safety**: `registered` uses `ON CONFLICT (id) DO NOTHING`, so a redelivered registration can never re-deactivate a confirmed account; every delivery is marked in `webhook_processed_events` in the same transaction as the mutation (crash = retry, never double-apply).
 - **Credentials**: the mirror never stores passwords — the `password` column stays at its empty default and is response-stripped by the field rules in `PermissionRegistry`.
 - **Backfill** (one-off per live install — events cover only new registrations):
@@ -223,7 +224,7 @@ Writing migrations for zero-downtime deploys (expand-contract): ship additive ch
   node -r tsconfig-paths/register dist/scripts/backfill-accounts.js
   # → {"status":"ok","mirrored":N,"existing":M}   idempotent, safe to re-run
   ```
-- **Subscription**: on boot the service registers with event-server (`service: api-server`, the four patterns above). Env: `EVENT_SERVER_URL`, `WEBHOOK_URL` (default `http://api-server:5000[/PREFIX]/webhooks/events`), `WEBHOOK_SECRET` (same value as event-server's to enable signed delivery).
+- **Subscription**: on boot the service registers with event-server (`service: api-server`, the five patterns above). The default webhook url is `http://<container-hostname>:5000[/PREFIX]/webhooks/events` — subscriptions key on `(service, url)`, so each `--scale` replica registers as its own subscriber and every one receives the delivery (per-replica fan-out; a dead replica is dropped by event-server's circuit breaker — `subscriber.deactivated` noise is expected). Set `WEBHOOK_URL` to override for single-instance mode. Other env: `EVENT_SERVER_URL`, `WEBHOOK_SECRET` (same value as event-server's to enable signed delivery).
 
 ## API reference
 
