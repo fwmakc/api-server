@@ -1,12 +1,14 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectDataSource } from "@nestjs/typeorm";
 import { DataSource, EntityManager } from "typeorm";
+import { AuthClientService } from "api-server-toolkit/auth-client";
 import {
   WebhookEnvelopeDto,
   UserRegisteredDto,
   UserConfirmedDto,
   UserDeactivatedDto,
   UserDeletedDto,
+  UserRolesChangedDto,
 } from "event-server/contracts";
 import { ProcessedEventEntity } from "./processed-event.entity";
 
@@ -31,6 +33,7 @@ export class WebhooksService {
 
   constructor(
     @InjectDataSource() private readonly dataSource: DataSource,
+    private readonly authClient: AuthClientService,
   ) {}
 
   async handleEvent(event: WebhookEnvelopeDto): Promise<void> {
@@ -52,15 +55,33 @@ export class WebhooksService {
         );
         break;
       case "user.deactivated":
+        // Cache invalidation is per-delivery, OUTSIDE the ledger: the shared
+        // webhook_processed_events dedupes only mirror writes, while every
+        // replica must drop its own auth-client entry.
+        this.authClient.clearCache(
+          (event.payload as UserDeactivatedDto).userId,
+        );
         await this.processOnce(
           event,
           (em) => this.onDeactivated(em, event.payload as UserDeactivatedDto),
         );
         break;
       case "user.deleted":
+        this.authClient.clearCache((event.payload as UserDeletedDto).userId);
         await this.processOnce(
           event,
           (em) => this.onDeleted(em, event.payload as UserDeletedDto),
+        );
+        break;
+      case "user.roles_changed":
+        // No mirror mutation (roles live in auth-server) — invalidation only.
+        this.authClient.clearCache(
+          (event.payload as UserRolesChangedDto).userId,
+        );
+        this.logger.log(
+          `Invalidated auth cache: userId=${
+            (event.payload as UserRolesChangedDto).userId
+          } (roles_changed)`,
         );
         break;
       default:

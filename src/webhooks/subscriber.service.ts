@@ -1,5 +1,6 @@
 import { Injectable, Logger, OnApplicationBootstrap } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import * as os from "os";
 import { httpPost } from "api-server-toolkit/helper";
 
 @Injectable()
@@ -9,12 +10,14 @@ export class SubscriberService implements OnApplicationBootstrap {
   private readonly apiKey: string;
   private readonly webhookUrl: string;
   private readonly webhookSecret?: string;
-  // Всё, что меняет/accounts-зеркало: жизненный цикл аккаунта целиком.
+  // Всё, что меняет accounts-зеркало: жизненный цикл аккаунта целиком, плюс
+  // roles_changed — чистая инвалидация auth-client кэша (без мутаций).
   private readonly patterns = [
     "user.registered",
     "user.confirmed",
     "user.deactivated",
     "user.deleted",
+    "user.roles_changed",
   ];
 
   constructor(private readonly config: ConfigService) {
@@ -24,9 +27,18 @@ export class SubscriberService implements OnApplicationBootstrap {
     );
     this.apiKey = this.config.get<string>("INTERNAL_API_KEY", "changeme");
     const prefix = this.config.get<string>("PREFIX", "");
+    // По умолчанию каждая реплика подписывается СОБСТВЕННЫМ url (docker DNS
+    // резолвит hostname контейнера в конкретную реплику): подписки ключуются
+    // (service, url), поэтому N реплик = N подписчиков, и каждая получает
+    // доставку — без этого роль отзывается в кэше только одной реплики.
+    // WEBHOOK_URL по-прежнему перекрывает всё (одиночный режим за общим
+    // DNS-именем), WEBBOOK_HOST — точечный override хоста.
+    const host =
+      this.config.get<string>("WEBHOOK_HOST") || os.hostname();
+    const port = this.config.get<string>("PORT", "5000");
     this.webhookUrl = this.config.get<string>(
       "WEBHOOK_URL",
-      `http://api-server:5000${prefix ? `/${prefix}` : ""}/webhooks/events`,
+      `http://${host}:${port}${prefix ? `/${prefix}` : ""}/webhooks/events`,
     );
     // Общий HMAC-секрет подписанных доставок. Передаётся при регистрации,
     // event-server сохраняет его для подписчика; EventDeliveryGuard

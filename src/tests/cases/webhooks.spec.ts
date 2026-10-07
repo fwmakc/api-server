@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import * as os from 'os';
 import { AccountEntity } from '../../account/account.entity';
 import { PostsEntity } from '../../db/posts/posts.entity';
 import { PostsCategoriesEntity } from '../../db/posts/posts_categories/posts_categories.entity';
@@ -12,8 +13,15 @@ import { SubscriberService } from '../../webhooks/subscriber.service';
 jest.mock('api-server-toolkit/helper', () => ({
   httpPost: jest.fn(),
 }));
+// AuthClientService here is a DI token only — the real module's static
+// import chain pulls ESM-only deps jest (CJS) can't parse. The service
+// under test just calls clearCache on it.
+jest.mock('api-server-toolkit/auth-client', () => ({
+  AuthClientService: class AuthClientService {},
+}));
 
 import { httpPost } from 'api-server-toolkit/helper';
+import { AuthClientService } from 'api-server-toolkit/auth-client';
 
 // Синтетический диапазон id зеркала — не пересекается с сиддами alice/bob.
 const ID = 990001;
@@ -32,6 +40,7 @@ function event(pattern: string, payload: any, eventId = 1) {
 describe('Webhooks — accounts mirror projection', () => {
   let moduleRef: TestingModule;
   let service: WebhooksService;
+  let authMock: { clearCache: jest.Mock };
   let dataSource: DataSource;
 
   beforeAll(async () => {
@@ -66,9 +75,13 @@ describe('Webhooks — accounts mirror projection', () => {
           ProcessedEventEntity,
         ]),
       ],
-      providers: [WebhooksService],
+      providers: [
+        WebhooksService,
+        { provide: AuthClientService, useValue: { clearCache: jest.fn() } },
+      ],
     }).compile();
     service = moduleRef.get(WebhooksService);
+    authMock = moduleRef.get(AuthClientService) as any;
     dataSource = moduleRef.get(DataSource);
   });
 
@@ -215,6 +228,43 @@ describe('Webhooks — accounts mirror projection', () => {
     );
     expect(ledger).toHaveLength(0);
   });
+
+  it('M10: invalidation is per-delivery (outside the ledger), roles_changed has no mirror write', async () => {
+    authMock.clearCache.mockClear();
+    await service.handleEvent(
+      event('user.roles_changed', {
+        userId: ID,
+        username: 'storm10@test',
+        email: 'storm10@test',
+        roles: ['admin'],
+      }, 13),
+    );
+    // roles_changed: cache drop, but no ledger row (nothing to dedupe)
+    expect(authMock.clearCache).toHaveBeenCalledWith(ID);
+    let ledger = await dataSource.query(
+      `SELECT id FROM webhook_processed_events`,
+    );
+    expect(ledger).toHaveLength(0);
+    let rows = await dataSource.query(
+      `SELECT id FROM accounts WHERE id = ${ID}`,
+    );
+    expect(rows).toHaveLength(0);
+
+    // deactivated delivered twice: the ledger dedupes the mirror write,
+    // yet BOTH deliveries drop the cache
+    const payload = { userId: ID, username: 'storm10@test', email: 'storm10@test' };
+    await service.handleEvent(event('user.deactivated', payload, 14));
+    await service.handleEvent(event('user.deactivated', payload, 14));
+    expect(authMock.clearCache).toHaveBeenCalledTimes(3);
+    ledger = await dataSource.query(
+      `SELECT id FROM webhook_processed_events`,
+    );
+    expect(ledger).toHaveLength(1);
+    rows = await dataSource.query(
+      `SELECT is_activated FROM accounts WHERE id = ${ID}`,
+    );
+    expect(rows).toHaveLength(1);
+  });
 });
 
 describe('SubscriberService — event-server registration', () => {
@@ -222,7 +272,7 @@ describe('SubscriberService — event-server registration', () => {
     jest.clearAllMocks();
   });
 
-  it('S1: registers the four lifecycle patterns under the api-server name', async () => {
+  it('S1: registers the lifecycle + invalidation patterns under the api-server name', async () => {
     (httpPost as jest.Mock).mockResolvedValue({ status: 200, ok: true });
     const config = {
       get: (_: string, fallback?: string) => fallback,
@@ -233,12 +283,15 @@ describe('SubscriberService — event-server registration', () => {
       'http://event-server:3005/subscribe',
       {
         service: 'api-server',
-        url: 'http://api-server:5000/webhooks/events',
+        // per-replica default: own container hostname, not the shared
+        // service DNS name (subscriptions key on (service, url))
+        url: `http://${os.hostname()}:5000/webhooks/events`,
         patterns: [
           'user.registered',
           'user.confirmed',
           'user.deactivated',
           'user.deleted',
+          'user.roles_changed',
         ],
         active: true,
       },
@@ -255,7 +308,7 @@ describe('SubscriberService — event-server registration', () => {
     await new SubscriberService(config as any).onApplicationBootstrap();
 
     expect((httpPost as jest.Mock).mock.calls[0][1].url).toBe(
-      'http://api-server:5000/api/webhooks/events',
+      `http://${os.hostname()}:5000/api/webhooks/events`,
     );
   });
 
@@ -268,5 +321,20 @@ describe('SubscriberService — event-server registration', () => {
     await new SubscriberService(config as any).onApplicationBootstrap();
 
     expect((httpPost as jest.Mock).mock.calls[0][1].secret).toBe('s3cret');
+  });
+
+  it('S4: WEBHOOK_URL overrides the per-replica default entirely', async () => {
+    (httpPost as jest.Mock).mockResolvedValue({ status: 200, ok: true });
+    const config = {
+      get: (key: string, fallback?: string) =>
+        key === 'WEBHOOK_URL'
+          ? 'http://api-server:5000/webhooks/events'
+          : fallback,
+    };
+    await new SubscriberService(config as any).onApplicationBootstrap();
+
+    expect((httpPost as jest.Mock).mock.calls[0][1].url).toBe(
+      'http://api-server:5000/webhooks/events',
+    );
   });
 });

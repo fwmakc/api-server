@@ -11,6 +11,6 @@ import { AccountService } from './account.service';
     AuthClientModule.forRoot(),
   ],
   providers: [AccountService],
-  exports: [AccountService],
+  exports: [AccountService, AuthClientModule],
 })
 export class AccountModule {}
