@@ -291,6 +291,65 @@ You get a production-ready backend without the pain of wiring it up yourself.
 
 ---
 
+## Production notes
+
+Deployment runbook for the whole stack (service registry, secrets, TLS,
+upgrades, scaling, operations): [gateway-server/docs/DEPLOYMENT.md](https://github.com/fwmakc/gateway-server/blob/master/docs/DEPLOYMENT.md).
+
+**Role in the stack.** The public domain API — the service a frontend
+actually talks to for data. Entities are declared here (`EntityController` +
+`CommonService` from the toolkit); access control is the toolkit model:
+per-operation and per-field rules, deny by default (no rule → 403, no rules
+→ route doesn't exist → 404, rows outside a role's scope → 404). The
+`accounts` table is a local read-only mirror projected from auth-server's
+`user.*` events — this service never writes identities.
+
+**Wiring.**
+
+- Default edge route: everything that is not `/account`, `/token`, `/auth`,
+  `/.well-known`, `/files`, `/uploads`, `/swagger` (nginx zone 10 req/s per IP).
+- JWT verified locally via auth-server's JWKS; account/role lookups cached
+  (`AUTH_CACHE_TTL`) and invalidated by `user.roles_changed` / `deactivated`
+  / `deleted` webhooks (HMAC-verified when `WEBHOOK_SECRET` is set).
+- Publishes domain events to event-server; applies its own migrations on boot.
+
+**Production configuration.**
+
+| Concern | Setting |
+|---------|---------|
+| Required secrets | `DB_PASSWORD`, `INTERNAL_API_KEY` |
+| CORS | `CORS_ORIGINS` (comma-separated allowlist, empty = off). The primary browser-facing allowlist is the nginx origin map at the edge |
+| Auth | `AUTH_SERVER_URL`, `AUTH_CACHE_TTL`, `JWT_ISSUER` / `JWT_AUDIENCE` (identical stack-wide) |
+| Accounts mirror | `WEBHOOK_SECRET` for signed `user.*` deliveries |
+| Limits | `REQUEST_TIMEOUT`, `METRICS_ENABLE` (Prometheus `/metrics` — internal networks only, nginx returns 404 for it) |
+
+**Scaling.** Stateless — scale freely behind nginx (`resolve` upstreams).
+Reads are latency-bound, not CPU-bound: 1 → 2 replicas measured 392 → 394
+req/s; a domain read storm reached 1318 req/s at 4 replicas with 0% errors
+(2026-10-08). Postgres connections go through pgbouncer (transaction
+pooling), so replica count does not multiply real connections.
+
+**Verified under load** (dates and raw numbers:
+[gateway-server/load-tests/results.md](https://github.com/fwmakc/gateway-server/blob/master/load-tests/results.md)):
+
+- 368 CI tests — the largest suite in the stack (guards, access model,
+  search, EntityController semantics against real Postgres).
+- Read-heavy baseline through nginx: 365.7 req/s single replica, p95 13–30
+  ms, 0% failures.
+- e2e-cases 60/60 and live pentest 27/27 (cross-tenant writes, owner-scope
+  escapes, field-stripping probes) on the live stack, 2026-10-08.
+- Activity storm: 7208/7208 writes with 0 duplicates — dedup and capacity
+  invariants held at a 1k req/s target.
+- Edge protection: a single-IP flood is 429'd by nginx in ~1.9 ms; the
+  application never sees it.
+
+**Semantics to accept.** Deny-by-default is the contract: an entity without
+configured rules has no routes at all; the superuser is a global bypass;
+deletes are soft by default; the server stamps owner/tenant columns and
+ignores client-supplied values.
+
+---
+
 ## Versioning
 
 Each service versions **independently** (semver): a `vX.Y.Z` git tag marks the released state of each repo. There is no stack-wide shared major — compatibility is guaranteed by **exact dependency pins**, not by version numbers.
@@ -307,7 +366,7 @@ Each service versions **independently** (semver): a `vX.Y.Z` git tag marks the r
 
 ### Current versions
 
-> Synced across all repos on 2026-10-07 (wave 13). Source of truth: the `v*` git tags at each repo HEAD.
+> Synced across all repos on 2026-10-08 (wave 15). Source of truth: the `v*` git tags at each repo HEAD.
 
 | Service | Version |
 |---------|---------|
@@ -318,5 +377,5 @@ Each service versions **independently** (semver): a `vX.Y.Z` git tag marks the r
 | [file-server](https://github.com/fwmakc/file-server) | v0.8.3 |
 | [chat-server](https://github.com/fwmakc/chat-server) | v0.1.3 (frozen) |
 | [api-server](https://github.com/fwmakc/api-server) | v0.9.0 |
-| [gateway-server](https://github.com/fwmakc/gateway-server) | v0.6.0 (infra) |
+| [gateway-server](https://github.com/fwmakc/gateway-server) | v0.7.0 (infra) |
 | [api-server-scaffold](https://github.com/fwmakc/api-server-scaffold) | v0.1.5 |
